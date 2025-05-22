@@ -58,31 +58,33 @@ class DataRepository:
     
     @staticmethod
     def registreer_gebruiker(voornaam, achternaam, email, wachtwoord):
-        sql_check = "SELECT * FROM gebruikers WHERE email = %s"
+        sql_check = "SELECT * FROM users WHERE email = %s"
         bestaande_gebruiker = Database.get_one_row(sql_check, (email,))
         if bestaande_gebruiker:
             print("❌ Email is al in gebruik.")
             return None  # Changed from False to None for consistency
 
         wachtwoord_hash = bcrypt.hashpw(wachtwoord.encode('utf-8'), bcrypt.gensalt())
-        sql_insert = "INSERT INTO gebruikers (voornaam,achternaam,email, wachtwoord_hash) VALUES (%s, %s, %s, %s)"
+        sql_insert = "INSERT INTO users (userid, voornaam,achternaam,email, wachtwoord_hash) VALUES (UUID(),%s, %s, %s, %s)"
         params = [voornaam, achternaam, email, wachtwoord_hash]
         resultaat = Database.execute_sql(sql_insert, params)
+        print("resultaat", resultaat)
         if resultaat:
+            print("✅ Gebruiker geregistreerd en token aangemaakt.")
+            # Token aanmaken
+
             # Ophalen van de nieuw aangemaakte gebruiker (id)
-            sql_get_user = "SELECT id FROM gebruikers WHERE email = %s"
-            gebruiker = Database.get_one_row(sql_get_user, (email,))
-            print(gebruiker)
-            if gebruiker:
+            sql_get_user = "SELECT userid FROM users WHERE email = %s"
+            user = Database.get_one_row(sql_get_user, (email,))
+            if user:
                 payload = {
-                    "user_id": gebruiker["id"],
+                    "user_id": user["userid"],
                     "email": email,
                     "exp": datetime.datetime.now() + datetime.timedelta(hours=1),
                     "jti": str(uuid.uuid4())
                 }
                 token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-                print("✅ Gebruiker geregistreerd en token aangemaakt.")
-                return token
+                return token, user
             else:
                 print("❌ Gebruiker registratie gelukt, maar ophalen id mislukt.")
                 return None
@@ -92,7 +94,7 @@ class DataRepository:
 
     @staticmethod
     def login(email, wachtwoord):
-        sql_select = "SELECT id, wachtwoord_hash FROM gebruikers WHERE email = %s"
+        sql_select = "SELECT id, wachtwoord_hash FROM users WHERE email = %s"
         gebruiker = Database.get_one_row(sql_select, (email,))
         
         if gebruiker is None:

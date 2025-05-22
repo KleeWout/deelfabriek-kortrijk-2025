@@ -6,11 +6,13 @@ GET http://172.30.82.165:5000/lockers/1
 
 ### Register
 
-POST http://192.168.129.59:5000/register
+POST http://localhost:5000/register
 Content-Type: application/json
 
 {
-  "gebruikersnaam": "testuser",
+  "voornaam": "testuser",
+  "achternaam": "testuser",
+  "email": "test@udsefrd.com",
   "wachtwoord": "wachtwoord"
 }
 
