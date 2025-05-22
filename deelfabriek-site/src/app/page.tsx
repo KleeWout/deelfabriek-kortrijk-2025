@@ -40,7 +40,7 @@ export default function Home() {
                       }`}
                       style={{ zIndex: 2 }}
                     >
-                      {item.availability === 1 ? "beschikbaar" : "bezet"}
+                      {item.availability === 1 ? "beschikbaar" : "uitgeleend"}
                     </span>
                     <Image
                       src={item.img}

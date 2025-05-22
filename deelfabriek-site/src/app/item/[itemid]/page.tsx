@@ -73,7 +73,7 @@ export default function ItemPage({ params }: { params: Promise<{ itemid: string 
             <span className="font-semibold">Locker ID:</span> {item.idLocker}
           </div>
           <div>
-            <span className="font-semibold">Status:</span> <span className={`px-2 py-1 rounded text-xs font-semibold ${item.availability === 1 ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>{item.availability === 1 ? "beschikbaar" : "bezet"}</span>
+            <span className="font-semibold">Status:</span> <span className={`px-2 py-1 rounded text-xs font-semibold ${item.availability === 1 ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>{item.availability === 1 ? "beschikbaar" : "uitgeleend"}</span>
           </div>
         </div>
         <button className={`w-full py-3 rounded font-bold transition ${item.availability === 1 ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-400 text-white cursor-not-allowed"}`} disabled={item.availability !== 1} onClick={handleReserve}>
