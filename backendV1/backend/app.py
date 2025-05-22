@@ -8,7 +8,12 @@ import requests
 HCAPTCHA_SECRET = "ES_6e6f4832fdf54318bcfbd5ce6f158bb1"
 
 app = Flask(__name__)
-CORS(app)
+# Configure CORS to properly handle credentials
+CORS(app, 
+     supports_credentials=True,  # This is crucial for 'credentials: "include"' requests
+     origins=["http://localhost:3000"],  # Specify your frontend origin
+     max_age=600,  # Cache preflight requests for 10 minutes
+     allow_headers=["Content-Type", "Authorization"])
 
 @app.route("/open_locker", methods=["POST"])
 def api_open_locker():
@@ -129,7 +134,7 @@ def api_login():
 
 
 ##nieuwe routes --> Wout
-@app.route("/reservation", methods=["POST"])
+@app.route("/registration", methods=["POST"])
 def api_add_registration():
     data = request.get_json()
     if not data:
@@ -152,6 +157,13 @@ def api_add_registration():
     else:
         return jsonify({"success": False, "message": "Fout bij toevoegen registratie"}), 500
 
+@app.route("/registrations/<string:userid>", methods=["GET"])
+def api_get_registrations(userid):
+    registrations = DataRepository.get_registrations_by_user(userid)
+    if registrations:
+        return jsonify(registrations), 200
+    else:
+        return jsonify({"message": "Geen reserveringen gevonden"}), 200
 
 @app.route("/pickup/<int:registration_code>", methods=["GET"])
 def api_item_pickup(registration_code):
