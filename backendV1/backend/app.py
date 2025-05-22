@@ -8,7 +8,12 @@ import requests
 HCAPTCHA_SECRET = "ES_6e6f4832fdf54318bcfbd5ce6f158bb1"
 
 app = Flask(__name__)
-CORS(app)
+# Configure CORS to properly handle credentials
+CORS(app, 
+     supports_credentials=True,  # This is crucial for 'credentials: "include"' requests
+     origins=["http://localhost:3000"],  # Specify your frontend origin
+     max_age=600,  # Cache preflight requests for 10 minutes
+     allow_headers=["Content-Type", "Authorization"])
 
 @app.route("/open_locker", methods=["POST"])
 def api_open_locker():
