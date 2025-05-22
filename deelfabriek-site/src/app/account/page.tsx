@@ -23,7 +23,6 @@ export default function Account() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const fetchReservations = async () => {
     if (!user?.userId) return;
 
@@ -38,7 +37,17 @@ export default function Account() {
       }
 
       const data = await response.json();
-      setReservations(data);
+
+      // Check if response is an object with a message (no registrations found case)
+      if (data && typeof data === "object" && !Array.isArray(data) && data.message === "Geen registraties gevonden") {
+        setReservations([]);
+        setError("Geen reserveringen gevonden");
+      } else if (Array.isArray(data)) {
+        setReservations(data);
+      } else {
+        // Fallback for unexpected response format
+        setReservations([]);
+      }
     } catch (err) {
       console.error("Error fetching reservations:", err);
       setError("Er is een fout opgetreden bij het ophalen van je reserveringen.");
@@ -97,18 +106,15 @@ export default function Account() {
                 </>
               )}
             </button>
-          </div>
-
-          {error && <div className="bg-red-50 text-red-800 p-4 rounded-lg mb-6">{error}</div>}
-
-          {reservations.length === 0 && !loading && !error ? (
+          </div>{" "}
+          {error && error !== "Geen reserveringen gevonden" && <div className="bg-red-50 text-red-800 p-4 rounded-lg mb-6">{error}</div>}
+          {(reservations.length === 0 && !loading && !error) || error === "Geen reserveringen gevonden" ? (
             <div className="text-center py-8 bg-gray-50 rounded-lg">
-              <p className="text-gray-500">Je hebt nog geen reserveringen.</p>
+              <p className="text-gray-500">{error === "Geen reserveringen gevonden" ? "Geen reserveringen gevonden" : "Je hebt nog geen reserveringen."}</p>
             </div>
           ) : (
             <div className="bg-white shadow rounded-lg overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
-                {" "}
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

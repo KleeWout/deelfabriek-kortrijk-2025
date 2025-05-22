@@ -163,7 +163,7 @@ def api_get_registrations(userid):
     if registrations:
         return jsonify(registrations), 200
     else:
-        return jsonify({"success": False, "message": "Geen registraties gevonden"}), 404
+        return jsonify({"message": "Geen reserveringen gevonden"}), 200
 
 @app.route("/pickup/<int:registration_code>", methods=["GET"])
 def api_item_pickup(registration_code):
