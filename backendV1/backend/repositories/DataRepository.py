@@ -94,17 +94,17 @@ class DataRepository:
 
     @staticmethod
     def login(email, wachtwoord):
-        sql_select = "SELECT id, wachtwoord_hash FROM users WHERE email = %s"
-        gebruiker = Database.get_one_row(sql_select, (email,))
+        sql_select = "SELECT userid, wachtwoord_hash FROM users WHERE email = %s"
+        user = Database.get_one_row(sql_select, (email,))
         
-        if gebruiker is None:
-            print("❌ Gebruiker niet gevonden.")
+        if user is None:
+            print("❌ user niet gevonden.")
             return None
 
-        wachtwoord_hash = gebruiker["wachtwoord_hash"]
+        wachtwoord_hash = user["wachtwoord_hash"]
         if bcrypt.checkpw(wachtwoord.encode('utf-8'), wachtwoord_hash):
             payload = {
-                "user_id": gebruiker["id"],
+                "user_id": user["userid"],
                 "email": email,
                 "exp": datetime.datetime.now() + datetime.timedelta(hours=1),
                 "jti": str(uuid.uuid4())  # Unieke token id
