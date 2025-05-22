@@ -9,6 +9,7 @@ interface Reservation {
   enddate: string;
   ispayed: number;
   itemid: number;
+  itemname: string;
   registrationid: number;
   reservationcode: number;
   startdate: string;
@@ -107,10 +108,11 @@ export default function Account() {
           ) : (
             <div className="bg-white shadow rounded-lg overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
+                {" "}
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Item ID
+                      Item
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Reserveringscode
@@ -136,7 +138,7 @@ export default function Account() {
                   ) : (
                     reservations.map((reservation) => (
                       <tr key={reservation.registrationid}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reservation.itemid}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{reservation.itemname || `Item ${reservation.itemid}`}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{reservation.reservationcode}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(reservation.startdate)}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(reservation.enddate)}</td>
