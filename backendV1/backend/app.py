@@ -4,7 +4,7 @@ from repositories.DataRepository import DataRepository
 from flask_cors import CORS
 import requests
 import jwt
-import datetime
+from datetime import datetime, timedelta
 
 HCAPTCHA_SECRET = "ES_6e6f4832fdf54318bcfbd5ce6f158bb1"
 SECRET_KEY = "your_secret_key"  # Use a strong secret and keep it safe!
@@ -44,10 +44,10 @@ def api_open_locker():
     password = "TD669224"
 
     if check_relay(host) != 1:
-        return jsonify({"success": False, "message": "Relay niet bereikbaar"}), 503
+        return jsonify({"message": "Relay niet bereikbaar"}), 503
 
     open_locker(host, user, password, relay-1)
-    return jsonify({"success": True, "message": f"Locker {relay} geopend"}), 200
+    return jsonify({"message": f"Locker {relay} geopend"}), 200
 
 @app.route("/lockers", methods=["GET"])
 def api_get_lockers():
@@ -60,7 +60,7 @@ def api_get_locker(locker_id):
     if locker:
         return jsonify(locker), 200
     else:
-        return jsonify({"success": False, "message": "Locker niet gevonden"}), 404
+        return jsonify({"message": "Locker niet gevonden"}), 404
 
 @app.route("/items/lockers", methods=["GET"])
 def api_get_items_lockers():
@@ -69,7 +69,7 @@ def api_get_items_lockers():
         if items:
             return jsonify(items), 200
         else:
-            return jsonify({"success": False, "message": "Geen items gevonden"}), 404
+            return jsonify({"message": "Geen items gevonden"}), 404
 
 @app.route("/items/lockers/<int:item_id>", methods=["GET"])
 def api_get_item_lockers(item_id):
@@ -78,47 +78,47 @@ def api_get_item_lockers(item_id):
         if lockers:
             return jsonify(lockers), 200
         else:
-            return jsonify({"success": False, "message": "Geen lockers gevonden voor dit item"}), 404
+            return jsonify({"message": "Geen lockers gevonden voor dit item"}), 404
 
 @app.route("/lockers/<int:locker_id>", methods=["PUT"])
 def api_reserve_locker(locker_id):
     # Token check
-    if not verify_token(request):
-        return jsonify({"success": False, "message": "Ongeldige of ontbrekende token"}), 401
+    # if not verify_token(request):
+    #     return jsonify({"message": "Ongeldige of ontbrekende token"}), 401
 
     if request.method == "PUT":
         locker = DataRepository.get_locker_by_id(locker_id)
         if not locker:
-            return jsonify({"success": False, "message": "Locker niet gevonden"}), 404
+            return jsonify({"message": "Locker niet gevonden"}), 404
 
         # status: 0 = gereserveerd, 1 = beschikbaar
         if locker["status"] == 0:
             # Already reserved, so release first
             released = DataRepository.release_locker(locker_id)
             if released:
-                return jsonify({"success": True, "message": "Locker vrijgegeven"}), 200
+                return jsonify({"message": "Locker vrijgegeven"}), 200
             else:
-                return jsonify({"success": False, "message": "Fout bij vrijgeven van locker"}), 500
+                return jsonify({"message": "Fout bij vrijgeven van locker"}), 500
 
         elif locker["status"] == 1:
             data = request.get_json()
             code = data.get("code") if data else None
             if not code:
-                return jsonify({"success": False, "message": "Code ontbreekt"}), 400
+                return jsonify({"message": "Code ontbreekt"}), 400
             reserved = DataRepository.reserve_locker(locker_id, code)
             if reserved:
-                return jsonify({"success": True, "message": "Locker gereserveerd"}), 200
+                return jsonify({"message": "Locker gereserveerd"}), 200
             else:
-                return jsonify({"success": False, "message": "Fout bij reserveren van locker"}), 500
+                return jsonify({"message": "Fout bij reserveren van locker"}), 500
 
         else:
-            return jsonify({"success": False, "message": "Ongeldige locker status"}), 400
+            return jsonify({"message": "Ongeldige locker status"}), 400
 
 @app.route("/register", methods=["POST"])
 def api_register():
     data = request.get_json()
     if not data:
-        return jsonify({"success": False, "message": "Geen gegevens ontvangen"}), 400
+        return jsonify({"message": "Geen gegevens ontvangen"}), 400
 
     voornaam = data.get("voornaam")
     achternaam = data.get("achternaam")
@@ -127,7 +127,7 @@ def api_register():
     # captcha_token = data.get("captcha")
 
     # if not captcha_token:
-    #     return jsonify({"success": False, "message": "Captcha is verplicht"}), 400
+    #     return jsonify({"message": "Captcha is verplicht"}), 400
     
     # # hCaptcha verificatie
     # verify_response = requests.post(
@@ -141,30 +141,30 @@ def api_register():
     # result = verify_response.json()
     # print(result)
     # if not result.get("success"):
-    #     return jsonify({"success": False, "message": "Captcha verificatie mislukt"}), 400
+    #     return jsonify({"message": "Captcha verificatie mislukt"}), 400
     
     # registratie uitvoeren
     created_token, user = DataRepository.registreer_gebruiker(voornaam,achternaam,email, wachtwoord)
     if created_token:
         token = generate_token(user["userid"])
-        return jsonify({"userId": user["userid"], "success": True, "token": token}), 201
+        return jsonify({"userId": user["userid"], "token": token}), 201
     else:
-        return jsonify({"success": False, "message": "Registratie mislukt"}), 400
+        return jsonify({"message": "Registratie mislukt"}), 400
 #
     
 @app.route("/login", methods=["POST"])
 def api_login():
     data = request.get_json()
     if not data:
-        return jsonify({"success": False, "message": "Geen gegevens ontvangen"}), 400
+        return jsonify({"message": "Geen gegevens ontvangen"}), 400
     email = data.get("email")
     wachtwoord = data.get("wachtwoord")
     user = DataRepository.login(email, wachtwoord)
     if user:
         token = generate_token(user["userid"])
-        return jsonify({"success": True, "token": token, "userId": user["userid"]}), 200
+        return jsonify({"token": token, "userId": user["userid"]}), 200
     else:
-        return jsonify({"success": False, "message": "Login mislukt"}), 401
+        return jsonify({"message": "Login mislukt"}), 401
 
 
 
@@ -172,29 +172,29 @@ def api_login():
 @app.route("/registration", methods=["POST"])
 def api_add_registration():
     # Token check
-    if not verify_token(request):
-        return jsonify({"success": False, "message": "Ongeldige of ontbrekende token"}), 401
+    # if not verify_token(request):
+    #     return jsonify({"message": "Ongeldige of ontbrekende token"}), 401
 
     data = request.get_json()
     if not data:
-        return jsonify({"success": False, "message": "Geen gegevens ontvangen"}), 400
+        return jsonify({"message": "Geen gegevens ontvangen"}), 400
 
     user_id = data.get("user_id")
     item_id = data.get("item_id")
     # start_date en end_date worden hier bepaald
-    start_date = datetime.datetime.utcnow()
-    end_date = start_date + datetime.timedelta(weeks=1)
+    start_date = datetime.now()
+    end_date = start_date + timedelta(weeks=1)
 
     if not all([user_id, item_id]):
-        return jsonify({"success": False, "message": "Onvolledige gegevens"}), 400
+        return jsonify({"message": "Onvolledige gegevens"}), 400
 
     result, reservation_code = DataRepository.add_reservation(user_id, item_id, start_date, end_date)
     if result:
-        return jsonify({"success": True, "message": "Registratie toegevoegd", "code": reservation_code}), 201
+        return jsonify({"message": "Registratie toegevoegd", "code": reservation_code}), 201
     else:
-        return jsonify({"success": False, "message": "Fout bij toevoegen registratie"}), 500
+        return jsonify({"message": "Fout bij toevoegen registratie"}), 500
 
-@app.route("/registrations/<string:userid>", methods=["GET"])
+@app.route("/registration/<string:userid>", methods=["GET"])
 def api_get_registrations(userid):
     registrations = DataRepository.get_registrations_by_user(userid)
     if registrations:
@@ -208,10 +208,10 @@ def api_item_pickup(registration_code):
     if result:
         #check if paid then 
         #open locker with id locker_id
-        return jsonify({"success": True, "message": "Item opgehaald"}), 200
+        return jsonify({"message": "Item opgehaald"}), 200
         
     else:
-        return jsonify({"success": False, "message": "Fout bij ophalen item"}), 500
+        return jsonify({"message": "Fout bij ophalen item"}), 500
 
     
 
@@ -221,10 +221,10 @@ def api_item_return(registration_code):
     if result:
         #check if paid then 
         #open locker with id locker_id --> result["locker_id"]
-        return jsonify({"success": True, "message": "Item teruggebracht"}), 200
+        return jsonify({"message": "Item teruggebracht"}), 200
         
     else:
-        return jsonify({"success": False, "message": "Fout bij terugbrengen item"}), 500    
+        return jsonify({"message": "Fout bij terugbrengen item"}), 500    
 
 @app.route("/auth/validate", methods=["GET"])
 def validate_token():

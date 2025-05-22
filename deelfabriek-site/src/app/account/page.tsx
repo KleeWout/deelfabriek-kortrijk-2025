@@ -30,7 +30,7 @@ export default function Account() {
     setError(null);
 
     try {
-      const response = await fetchWithAuth(`http://localhost:5000/registrations/${user.userId}`);
+      const response = await fetchWithAuth(`http://localhost:5000/registration/${user.userId}`);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch reservations: ${response.status}`);
