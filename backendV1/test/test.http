@@ -23,3 +23,7 @@ Content-Type: application/json
   "gebruikersnaam": "testuser",
   "wachtwoord": "wachtwoord"
 }
+
+### Get Locker Items
+
+GET http://172.30.82.151:5000/items/lockers
