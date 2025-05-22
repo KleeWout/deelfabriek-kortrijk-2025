@@ -1,0 +1,5 @@
+{
+  "print.browserPath": "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+  "python.pythonPath": "/bin/python",
+  "python.analysis.extraPaths": ["./LockerScript", "./LockerScript"]
+}

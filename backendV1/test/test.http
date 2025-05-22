@@ -1,0 +1,25 @@
+GET http://172.30.82.165:5000/lockers
+
+###
+
+GET http://172.30.82.165:5000/lockers/1
+
+### Register
+
+POST http://192.168.129.59:5000/register
+Content-Type: application/json
+
+{
+  "gebruikersnaam": "testuser",
+  "wachtwoord": "wachtwoord"
+}
+
+### Login
+
+POST http://192.168.129.59:5000/login
+Content-Type: application/json
+
+{
+  "gebruikersnaam": "testuser",
+  "wachtwoord": "wachtwoord"
+}
