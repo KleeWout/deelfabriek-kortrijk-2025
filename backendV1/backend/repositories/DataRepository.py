@@ -136,6 +136,7 @@ class DataRepository:
                     break
                     
                 short_code = DataRepository.generate_six_digit_code()
+                print(short_code)
         
         sql_update = "UPDATE deelfabriek.registrations SET reservationcode = %s WHERE registrationid = %s;"
         params_update = [short_code, result]
