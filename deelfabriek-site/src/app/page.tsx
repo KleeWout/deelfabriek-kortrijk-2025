@@ -18,41 +18,42 @@ export default function Home() {
 
   return (
     <>
-      <main>
-        <h1>Welcome bij de deelfabriek</h1>
+      <main className="px-24 py-12 flex flex-col items-center gap-12">
+        <h1 className="text-4xl">Welcome bij de deelfabriek</h1>
         <p>Dit zijn al onze items die je kan lenen.</p>
         <div>
-          <h2>Items</h2>
-          <ul>
+          <ul className="flex justify-between flex-wrap gap-8 p-0">
             {items.map((item, idx) => (
-              <div key={idx}>
-                <div style={{ position: "relative", display: "inline-block" }}>
-                  <p
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      margin: 0,
-                      background: "rgba(255,255,255,0.7)",
-                      padding: "2px 6px",
-                      borderRadius: "4px",
-                      fontSize: "0.9em",
-                      zIndex: 1,
-                    }}
-                  >
-                    {item.availability === 1 ? "beschikbaar" : "bezet"}
-                  </p>
-                  <Image
-                    src={item.img}
-                    alt={item.itemname}
-                    width={150}
-                    height={150}
-                  />
-                </div>
-                <h3>{item.itemname}</h3>
-                <p>{item.description}</p>
-                <p>Prijs: {item.price} euro</p>
-              </div>
+              <Link
+                key={idx}
+                href={`/item/${item.itemid}`}
+                className="flex flex-col items-center border rounded-lg p-4 shadow-md relative no-underline text-inherit"
+                style={{ listStyle: "none" }}
+              >
+                <li>
+                  <div className="relative">
+                    <span
+                      className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-semibold ${
+                        item.availability === 1
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
+                      style={{ zIndex: 2 }}
+                    >
+                      {item.availability === 1 ? "beschikbaar" : "bezet"}
+                    </span>
+                    <Image
+                      src={item.img}
+                      alt={item.itemname}
+                      width={150}
+                      height={150}
+                      className="rounded"
+                    />
+                  </div>
+                  <h3 className="mt-4 text-lg font-bold">{item.itemname}</h3>
+                  <p className="mt-2">Prijs: {item.price} euro</p>
+                </li>
+              </Link>
             ))}
           </ul>
         </div>

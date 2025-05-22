@@ -3,9 +3,11 @@ from lockerScript.lockercontrol import open_locker, check_relay
 from repositories.DataRepository import DataRepository
 from flask_cors import CORS
 import requests
-
+import jwt
+import datetime
 
 HCAPTCHA_SECRET = "ES_6e6f4832fdf54318bcfbd5ce6f158bb1"
+SECRET_KEY = "your_secret_key"  # Use a strong secret and keep it safe!
 
 app = Flask(__name__)
 # Configure CORS to properly handle credentials
@@ -14,6 +16,24 @@ CORS(app,
      origins=["http://localhost:3000"],  # Specify your frontend origin
      max_age=600,  # Cache preflight requests for 10 minutes
      allow_headers=["Content-Type", "Authorization"])
+
+def verify_token(request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return None
+    token = auth_header.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload  # You can return user info from the token if needed
+    except Exception:
+        return None
+
+def generate_token(user_id):
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
 @app.route("/open_locker", methods=["POST"])
 def api_open_locker():
@@ -51,8 +71,21 @@ def api_get_items_lockers():
         else:
             return jsonify({"success": False, "message": "Geen items gevonden"}), 404
 
+@app.route("/items/lockers/<int:item_id>", methods=["GET"])
+def api_get_item_lockers(item_id):
+    if request.method == "GET":
+        lockers = DataRepository.get_locker_item(item_id)
+        if lockers:
+            return jsonify(lockers), 200
+        else:
+            return jsonify({"success": False, "message": "Geen lockers gevonden voor dit item"}), 404
+
 @app.route("/lockers/<int:locker_id>", methods=["PUT"])
 def api_reserve_locker(locker_id):
+    # Token check
+    if not verify_token(request):
+        return jsonify({"success": False, "message": "Ongeldige of ontbrekende token"}), 401
+
     if request.method == "PUT":
         locker = DataRepository.get_locker_by_id(locker_id)
         if not locker:
@@ -113,7 +146,8 @@ def api_register():
     # registratie uitvoeren
     created_token, user = DataRepository.registreer_gebruiker(voornaam,achternaam,email, wachtwoord)
     if created_token:
-        return jsonify({"userId": user["userid"],"success": True, "token": created_token}), 201
+        token = generate_token(user["userid"])
+        return jsonify({"userId": user["userid"], "success": True, "token": token}), 201
     else:
         return jsonify({"success": False, "message": "Registratie mislukt"}), 400
 #
@@ -127,7 +161,8 @@ def api_login():
     wachtwoord = data.get("wachtwoord")
     user = DataRepository.login(email, wachtwoord)
     if user:
-        return jsonify({"success": True, "token": user['token'], "userId": user["userid"],}), 200
+        token = generate_token(user["userid"])
+        return jsonify({"success": True, "token": token, "userId": user["userid"]}), 200
     else:
         return jsonify({"success": False, "message": "Login mislukt"}), 401
 
@@ -136,24 +171,26 @@ def api_login():
 ##nieuwe routes --> Wout
 @app.route("/registration", methods=["POST"])
 def api_add_registration():
+    # Token check
+    if not verify_token(request):
+        return jsonify({"success": False, "message": "Ongeldige of ontbrekende token"}), 401
+
     data = request.get_json()
     if not data:
         return jsonify({"success": False, "message": "Geen gegevens ontvangen"}), 400
 
-
     user_id = data.get("user_id")
     item_id = data.get("item_id")
-    start_date = data.get("start_date")
-    end_date = data.get("end_date")
+    # start_date en end_date worden hier bepaald
+    start_date = datetime.datetime.utcnow()
+    end_date = start_date + datetime.timedelta(weeks=1)
 
-    if not all([user_id, item_id, start_date, end_date]):
-
+    if not all([user_id, item_id]):
         return jsonify({"success": False, "message": "Onvolledige gegevens"}), 400
 
     result, reservation_code = DataRepository.add_reservation(user_id, item_id, start_date, end_date)
     if result:
         return jsonify({"success": True, "message": "Registratie toegevoegd", "code": reservation_code}), 201
-    #send verification email
     else:
         return jsonify({"success": False, "message": "Fout bij toevoegen registratie"}), 500
 
@@ -189,10 +226,11 @@ def api_item_return(registration_code):
     else:
         return jsonify({"success": False, "message": "Fout bij terugbrengen item"}), 500    
 
+@app.route("/auth/validate", methods=["GET"])
+def validate_token():
+    if not verify_token(request):
+        return jsonify({"valid": False}), 401
+    return jsonify({"valid": True}), 200
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
-
-
-# - Todo:
-# - in de frontend, bij openen datepicker, fetch beschikbare data op basis van de geselecteerde item_id

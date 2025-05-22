@@ -63,7 +63,7 @@ export default function RegistreerAccount() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex flex-col items-center justify-between p-24">
       <h1 className="text-4xl font-bold">Registratie</h1>
       <form
         className="flex flex-col items-center gap-4 mt-8 w-full max-w-xs"
