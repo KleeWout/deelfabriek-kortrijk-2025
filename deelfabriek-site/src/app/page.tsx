@@ -6,7 +6,7 @@ export default function Home() {
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("http://172.30.82.151:5000/items/lockers")
+    fetch("http://localhost:5000/items/lockers")
       .then((res) => res.json())
       .then((json) => {
         console.log(json);
@@ -42,12 +42,7 @@ export default function Home() {
                   >
                     {item.availability === 1 ? "beschikbaar" : "bezet"}
                   </p>
-                  <Image
-                    src={item.img}
-                    alt={item.itemname}
-                    width={150}
-                    height={150}
-                  />
+                  <Image src={item.img} alt={item.itemname} width={150} height={150} />
                 </div>
                 <h3>{item.itemname}</h3>
                 <p>{item.description}</p>

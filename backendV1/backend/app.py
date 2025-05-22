@@ -86,29 +86,29 @@ def api_register():
     achternaam = data.get("achternaam")
     email = data.get("email")
     wachtwoord = data.get("wachtwoord")
-    captcha_token = data.get("captcha")
+    # captcha_token = data.get("captcha")
 
-    if not captcha_token:
-        return jsonify({"success": False, "message": "Captcha is verplicht"}), 400
+    # if not captcha_token:
+    #     return jsonify({"success": False, "message": "Captcha is verplicht"}), 400
     
-    # hCaptcha verificatie
-    verify_response = requests.post(
-        "https://hcaptcha.com/siteverify",
-        data={
-            "secret": HCAPTCHA_SECRET,
-            "response": captcha_token
-        }
-    )
+    # # hCaptcha verificatie
+    # verify_response = requests.post(
+    #     "https://hcaptcha.com/siteverify",
+    #     data={
+    #         "secret": HCAPTCHA_SECRET,
+    #         "response": captcha_token
+    #     }
+    # )
     
-    result = verify_response.json()
-    print(result)
-    if not result.get("success"):
-        return jsonify({"success": False, "message": "Captcha verificatie mislukt"}), 400
+    # result = verify_response.json()
+    # print(result)
+    # if not result.get("success"):
+    #     return jsonify({"success": False, "message": "Captcha verificatie mislukt"}), 400
     
     # registratie uitvoeren
-    created = DataRepository.registreer_gebruiker(voornaam,achternaam,email, wachtwoord)
-    if created:
-        return jsonify({"success": True, "token": created}), 201
+    created_token, user = DataRepository.registreer_gebruiker(voornaam,achternaam,email, wachtwoord)
+    if created_token:
+        return jsonify({"userId": user["userid"],"success": True, "token": created_token}), 201
     else:
         return jsonify({"success": False, "message": "Registratie mislukt"}), 400
 #
