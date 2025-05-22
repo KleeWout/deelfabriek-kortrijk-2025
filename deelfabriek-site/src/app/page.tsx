@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   const [items, setItems] = useState<any[]>([]);
@@ -17,7 +18,6 @@ export default function Home() {
 
   return (
     <>
-      <nav></nav>
       <main>
         <h1>Welcome bij de deelfabriek</h1>
         <p>Dit zijn al onze items die je kan lenen.</p>
@@ -42,7 +42,12 @@ export default function Home() {
                   >
                     {item.availability === 1 ? "beschikbaar" : "bezet"}
                   </p>
-                  <Image src={item.img} alt={item.itemname} width={150} height={150} />
+                  <Image
+                    src={item.img}
+                    alt={item.itemname}
+                    width={150}
+                    height={150}
+                  />
                 </div>
                 <h3>{item.itemname}</h3>
                 <p>{item.description}</p>
@@ -52,7 +57,6 @@ export default function Home() {
           </ul>
         </div>
       </main>
-      <footer></footer>
     </>
   );
 }
