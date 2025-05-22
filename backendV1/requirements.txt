@@ -1,9 +1,9 @@
-flask==2.3.3
-flask-cors==4.0.0
-requests==2.31.0
-mysql-connector-python==8.2.0
-jwt==2.5.3
-bcrypt==4.0.1
+flask
+flask-cors
+requests
+mysql-connector-python
+jwt
+bcrypt
 fastapi 
 uvicorn 
 requests 

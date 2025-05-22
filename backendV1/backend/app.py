@@ -36,7 +36,16 @@ def api_get_locker(locker_id):
         return jsonify(locker), 200
     else:
         return jsonify({"success": False, "message": "Locker niet gevonden"}), 404
-    
+
+@app.route("/items/lockers", methods=["GET"])
+def api_get_items_lockers():
+    if request.method == "GET":
+        items = DataRepository.get_lockers_items()
+        if items:
+            return jsonify(items), 200
+        else:
+            return jsonify({"success": False, "message": "Geen items gevonden"}), 404
+
 @app.route("/lockers/<int:locker_id>", methods=["PUT"])
 def api_reserve_locker(locker_id):
     if request.method == "PUT":
