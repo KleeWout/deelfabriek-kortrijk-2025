@@ -31,7 +31,7 @@ def verify_token(request):
 def generate_token(user_id):
     payload = {
         "user_id": user_id,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        "exp": datetime.now() + timedelta(hours=24)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
