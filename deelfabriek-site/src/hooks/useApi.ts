@@ -9,19 +9,17 @@ export function useApi() {
   const { user } = useAuth();
 
   const fetchWithAuth = async (url: string, options: FetchOptions = {}) => {
-    const { requiresAuth = true, ...fetchOptions } = options;
-
-    // Default headers
+    const { requiresAuth = true, ...fetchOptions } = options; // Default headers
     let headers: HeadersInit = {
       "Content-Type": "application/json",
       ...options.headers,
     };
 
-    // Add authorization header if required and user is logged in
+    // Add authorization header if user is logged in
     if (requiresAuth && user?.token) {
       headers = {
         ...headers,
-        Authorization: `Bearer ${user.token}`
+        Authorization: `Bearer ${user.token}`,
       };
     }
 
