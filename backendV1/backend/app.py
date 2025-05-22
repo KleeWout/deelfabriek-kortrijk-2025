@@ -129,7 +129,7 @@ def api_login():
 
 
 ##nieuwe routes --> Wout
-@app.route("/registrations", methods=["POST"])
+@app.route("/registration", methods=["POST"])
 def api_add_registration():
     data = request.get_json()
     if not data:
@@ -152,7 +152,7 @@ def api_add_registration():
     else:
         return jsonify({"success": False, "message": "Fout bij toevoegen registratie"}), 500
 
-@app.route("/registrations/<int:userid>", methods=["GET"])
+@app.route("/registrations/<string:userid>", methods=["GET"])
 def api_get_registrations(userid):
     registrations = DataRepository.get_registrations_by_user(userid)
     if registrations:

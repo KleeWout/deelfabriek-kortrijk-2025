@@ -12,9 +12,7 @@ export default function Footer() {
         textAlign: "center",
       }}
     >
-      <p style={{ margin: 0, fontWeight: 500, color: "#2d3748" }}>
-        Deelfabriek &copy; 2025
-      </p>
+      <p style={{ margin: 0, fontWeight: 500, color: "#2d3748" }}>Deelfabriek &copy; 2025</p>
       <ul
         style={{
           display: "flex",
