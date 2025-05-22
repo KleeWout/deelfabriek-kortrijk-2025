@@ -120,9 +120,9 @@ def api_login():
         return jsonify({"success": False, "message": "Geen gegevens ontvangen"}), 400
     email = data.get("email")
     wachtwoord = data.get("wachtwoord")
-    jstoken = DataRepository.login(email, wachtwoord)
-    if jstoken:
-        return jsonify({"success": True, "token": jstoken}), 200
+    user = DataRepository.login(email, wachtwoord)
+    if user:
+        return jsonify({"success": True, "token": user['token'], "userId": user["userid"],}), 200
     else:
         return jsonify({"success": False, "message": "Login mislukt"}), 401
 

@@ -108,10 +108,10 @@ class DataRepository:
                 "email": email,
                 "exp": datetime.datetime.now() + datetime.timedelta(hours=1),
                 "jti": str(uuid.uuid4())  # Unieke token id
-            }
-            token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            } 
+            user['token'] = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
             print("✅ Login geslaagd.")
-            return token
+            return user
         else:
             print("❌ Fout wachtwoord.")
             return None
