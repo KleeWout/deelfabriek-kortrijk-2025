@@ -2,7 +2,6 @@ flask
 flask-cors
 requests
 mysql-connector-python
-jwt
 bcrypt
 fastapi 
 uvicorn 

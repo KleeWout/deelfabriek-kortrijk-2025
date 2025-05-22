@@ -1,15 +1,9 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext"; // <-- import AuthContext
 
 export default function NavBar() {
-  const [hasToken, setHasToken] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setHasToken(!!localStorage.getItem("token"));
-    }
-  }, []);
+  const auth = useAuth(); // <-- use AuthContext
 
   return (
     <nav
@@ -47,7 +41,7 @@ export default function NavBar() {
             Home
           </Link>
         </li>
-        {!hasToken && (
+        {!auth.user && (
           <>
             <li>
               <Link
@@ -75,7 +69,7 @@ export default function NavBar() {
             </li>
           </>
         )}
-        {hasToken && (
+        {auth.user && (
           <li>
             <Link
               href="/account"

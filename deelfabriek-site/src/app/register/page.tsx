@@ -65,16 +65,61 @@ export default function RegistreerAccount() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <h1 className="text-4xl font-bold">Registratie</h1>
-      <form className="flex flex-col items-center gap-4 mt-8 w-full max-w-xs" onSubmit={handleSubmit}>
-        <input type="text" name="voornaam" className="w-full px-4 py-2 border rounded-lg" placeholder="Voornaam" value={form.voornaam} onChange={handleChange} />
-        <input type="text" name="achternaam" className="w-full px-4 py-2 border rounded-lg" placeholder="Achternaam" value={form.achternaam} onChange={handleChange} />
-        <input type="email" name="email" className="w-full px-4 py-2 border rounded-lg" placeholder="E-mailadres" value={form.email} onChange={handleChange} />
-        <input type="password" name="wachtwoord" className="w-full px-4 py-2 border rounded-lg" placeholder="Wachtwoord" value={form.wachtwoord} onChange={handleChange} />
-        <input type="password" name="bevestigWachtwoord" className="w-full px-4 py-2 border rounded-lg" placeholder="Bevestig wachtwoord" value={form.bevestigWachtwoord} onChange={handleChange} />
+      <form
+        className="flex flex-col items-center gap-4 mt-8 w-full max-w-xs"
+        onSubmit={handleSubmit}
+      >
+        <input
+          type="text"
+          name="voornaam"
+          className="w-full px-4 py-2 border rounded-lg"
+          placeholder="Voornaam"
+          value={form.voornaam}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="achternaam"
+          className="w-full px-4 py-2 border rounded-lg"
+          placeholder="Achternaam"
+          value={form.achternaam}
+          onChange={handleChange}
+        />
+        <input
+          type="email"
+          name="email"
+          className="w-full px-4 py-2 border rounded-lg"
+          placeholder="E-mailadres"
+          value={form.email}
+          onChange={handleChange}
+        />
+        <input
+          type="password"
+          name="wachtwoord"
+          className="w-full px-4 py-2 border rounded-lg"
+          placeholder="Wachtwoord"
+          value={form.wachtwoord}
+          onChange={handleChange}
+        />
+        <input
+          type="password"
+          name="bevestigWachtwoord"
+          className="w-full px-4 py-2 border rounded-lg"
+          placeholder="Bevestig wachtwoord"
+          value={form.bevestigWachtwoord}
+          onChange={handleChange}
+        />
 
-        <HCaptcha sitekey="81d80556-306e-4ac4-a932-74289cfcc3e4" onVerify={setCaptchaToken} ref={hcaptchaRef} />
+        <HCaptcha
+          sitekey="81d80556-306e-4ac4-a932-74289cfcc3e4"
+          onVerify={setCaptchaToken}
+          ref={hcaptchaRef}
+        />
 
-        <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-colors">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-colors"
+        >
           Registreren
         </button>
         {melding && <div className="text-red-500">{melding}</div>}
