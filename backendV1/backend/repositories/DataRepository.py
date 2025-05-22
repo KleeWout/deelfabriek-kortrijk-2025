@@ -186,3 +186,10 @@ class DataRepository:
         sql = "SELECT i.itemid,itemname,description,img,price,idLocker,availability FROM deelfabriek.items AS i LEFT JOIN deelfabriek.lockers AS l ON i.itemid = l.itemid;"
         result = Database.get_rows(sql)
         return result
+
+    @staticmethod
+    def get_registrations_by_user(user_id):
+        sql = "SELECT * FROM deelfabriek.registrations WHERE userid = %s;"
+        params = [user_id]
+        result = Database.get_rows(sql, params)
+        return result
