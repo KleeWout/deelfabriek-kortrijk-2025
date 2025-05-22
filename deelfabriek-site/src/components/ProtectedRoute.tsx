@@ -1,21 +1,24 @@
 "use client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, ReactNode } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
-export default function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
+export default function ProtectedRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !user) {
       router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [user, loading, router]);
 
-  // Don't render children if not authenticated
-  if (!isAuthenticated) {
-    return <div>Loading...</div>;
+  if (loading) {
+    return <div>Loading...</div>; // or your own loading spinner
   }
 
   return <>{children}</>;
