@@ -168,7 +168,7 @@ def api_login():
 
 
 
-##nieuwe routes --> Wout
+#er kan pas worden gereserveerd als een item terug is en is gecontroleerd!
 @app.route("/registration", methods=["POST"])
 def api_add_registration():
     # Token check
@@ -187,12 +187,14 @@ def api_add_registration():
 
     if not all([user_id, item_id]):
         return jsonify({"message": "Onvolledige gegevens"}), 400
-
-    result, reservation_code = DataRepository.add_reservation(user_id, item_id, start_date, end_date)
-    if result:
-        return jsonify({"message": "Registratie toegevoegd", "code": reservation_code}), 201
-    else:
-        return jsonify({"message": "Fout bij toevoegen registratie"}), 500
+    if (DataRepository.check_availibility(item_id)):
+        result, reservation_code = DataRepository.add_reservation(user_id, item_id, start_date, end_date)
+        if result:
+            return jsonify({"message": "Registratie toegevoegd", "code": reservation_code}), 201
+        else:
+            return jsonify({"message": "Fout bij toevoegen registratie"}), 404
+    else: 
+        return jsonify({"message": "Item is niet beschikbaar"}), 409
 
 @app.route("/registration/<string:userid>", methods=["GET"])
 def api_get_registrations(userid):

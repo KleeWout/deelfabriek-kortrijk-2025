@@ -116,33 +116,56 @@ class DataRepository:
             print("❌ Fout wachtwoord.")
             return None
         
-
-
+    @staticmethod
+    def check_availibility(item_id):
+        # Combine both queries into a single query to improve performance
+        sql = "SELECT availability, checked FROM deelfabriek.lockers WHERE itemid = %s;"
+        params = [item_id]
+        result = Database.get_one_row(sql, params)
+        
+        if result:
+            if result["availability"] == 1:
+                if result["checked"] == 1:
+                    print("✅ Item is beschikbaar.")
+                    return True
+                else:
+                    print("item moet nog gecontroleerd worden")
+                    return False
+            else:
+                print("❌ Item is niet beschikbaar.")
+                return False
+        else:
+            print("❌ Item niet gevonden.")
+            return False
     @staticmethod
     def add_reservation(user_id, item_id, start_date, end_date):
-        sql = "INSERT INTO deelfabriek.registrations (userid,itemid,startdate, enddate) VALUES (%s, %s, %s, %s);"
-        params = [user_id, item_id, start_date, end_date]
-        result = Database.execute_sql(sql, params)
-        if result:
-            # Generate a 6-digit code derived from UUID
-            short_code = DataRepository.generate_six_digit_code()
-            
-            # Ensure code is unique
-            while True:
-                check_sql = "SELECT COUNT(*) as count FROM deelfabriek.registrations WHERE reservationcode = %s;"
-                check_result = Database.get_one_row(check_sql, [short_code])
-                
-                if check_result["count"] == 0:
-                    break
-                    
-                short_code = DataRepository.generate_six_digit_code()
-                print(short_code)
+        # Generate a unique 6-digit code first to avoid needing a separate UPDATE query
+        short_code = DataRepository.generate_unique_reservation_code()
         
-        sql_update = "UPDATE deelfabriek.registrations SET reservationcode = %s WHERE registrationid = %s;"
-        params_update = [short_code, result]
-        Database.execute_sql(sql_update, params_update)
+        # Insert the reservation with the code in a single query
+        sql = "INSERT INTO deelfabriek.registrations (userid, itemid, startdate, enddate, reservationcode) VALUES (%s, %s, %s, %s, %s);"
+        params = [user_id, item_id, start_date, end_date, short_code]
+        result = Database.execute_sql(sql, params)
         
         return result, short_code
+        
+    @staticmethod
+    def generate_unique_reservation_code():
+        """
+        Generate a unique 6-digit reservation code that doesn't exist in the database
+        
+        Returns:
+            str: A unique 6-digit numeric code
+        """
+        while True:
+            short_code = DataRepository.generate_six_digit_code()
+            
+            # Check if code already exists
+            check_sql = "SELECT COUNT(*) as count FROM deelfabriek.registrations WHERE reservationcode = %s;"
+            check_result = Database.get_one_row(check_sql, [short_code])
+            
+            if check_result["count"] == 0:
+                return short_code
         
     @staticmethod
     def item_pickup(registration_code):
