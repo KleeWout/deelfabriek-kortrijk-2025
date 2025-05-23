@@ -19,12 +19,6 @@ class DataRepository:
 
     @staticmethod
     def generate_six_digit_code():
-        """
-        Generate a 6-digit numeric code derived from a UUID
-        
-        Returns:
-            str: A 6-digit numeric code
-        """
         # Generate a UUID and convert to integer
         random_int = int(uuid.uuid4().int) % 1000000  # Get last 6 digits
         # Format as 6-digit string with leading zeros if needed
@@ -90,8 +84,7 @@ class DataRepository:
                 return None
         else:
             print("❌ Registratie mislukt.")
-            return None
-
+            return None    
     @staticmethod
     def login(email, wachtwoord):
         sql_select = "SELECT userid, wachtwoord_hash FROM users WHERE email = %s"
@@ -115,15 +108,22 @@ class DataRepository:
         else:
             print("❌ Fout wachtwoord.")
             return None
-        
+            
     @staticmethod
     def check_availibility(item_id):
-        # Combine both queries into a single query to improve performance
-        sql = "SELECT availability, checked FROM deelfabriek.lockers WHERE itemid = %s;"
+        # Combine all queries into a single query to improve performance
+        # Also check the reserved status of the item
+        sql = "SELECT availability, checked, reserved FROM deelfabriek.lockers WHERE itemid = %s;"
         params = [item_id]
         result = Database.get_one_row(sql, params)
         
         if result:
+            # Check if item is reserved
+            if result.get("reserved") == 1:
+                print("❌ Item is gereserveerd.")
+                return False
+            
+            # Then check availability and checked status
             if result["availability"] == 1:
                 if result["checked"] == 1:
                     print("✅ Item is beschikbaar.")
@@ -147,16 +147,16 @@ class DataRepository:
         params = [user_id, item_id, start_date, end_date, short_code]
         result = Database.execute_sql(sql, params)
         
+        # Update the reserved status in the lockers table
+        if result:
+            update_sql = "UPDATE deelfabriek.lockers SET reserved = 1 WHERE itemid = %s;"
+            update_params = [item_id]
+            Database.execute_sql(update_sql, update_params)
+        
         return result, short_code
         
     @staticmethod
     def generate_unique_reservation_code():
-        """
-        Generate a unique 6-digit reservation code that doesn't exist in the database
-        
-        Returns:
-            str: A unique 6-digit numeric code
-        """
         while True:
             short_code = DataRepository.generate_six_digit_code()
             
