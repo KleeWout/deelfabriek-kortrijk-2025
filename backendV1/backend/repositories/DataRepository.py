@@ -166,7 +166,6 @@ class DataRepository:
             
             if check_result["count"] == 0:
                 return short_code
-        
     @staticmethod
     def item_pickup(registration_code):
         sql = "SELECT * FROM deelfabriek.registrations WHERE reservationcode = %s;"
@@ -175,8 +174,9 @@ class DataRepository:
 
         if result:
             item_id = result["itemid"]
-            sql_update = "UPDATE deelfabriek.lockers SET availability = %s WHERE itemid = %s;"
-            params_update = [0, item_id]
+            # Update both availability (to 0 as item is no longer available) and reserved (to 0 as it's no longer reserved but picked up)
+            sql_update = "UPDATE deelfabriek.lockers SET availability = %s, reserved = %s WHERE itemid = %s;"
+            params_update = [0, 0, item_id]
             Database.execute_sql(sql_update, params_update)
 
             # Todo: add loan history
@@ -191,8 +191,8 @@ class DataRepository:
         result = Database.get_one_row(sql, params)
         if result:
             item_id = result["itemid"]
-            sql_update = "UPDATE deelfabriek.lockers SET availability = %s WHERE itemid = %s;"
-            params_update = [1, item_id]
+            sql_update = "UPDATE deelfabriek.lockers SET availability = %s, checked = %s WHERE itemid = %s;"
+            params_update = [1, 0, item_id]
             Database.execute_sql(sql_update, params_update)
              #remove loan history?
 
@@ -203,6 +203,13 @@ class DataRepository:
             print("❌ Geen registratie gevonden met deze code.")
             return None
         
+        return result
+    
+    @staticmethod
+    def check_item(item_id):
+        sql = "UPDATE deelfabriek.lockers SET checked = %s WHERE itemid = %s;"
+        params = [1, item_id]
+        result = Database.execute_sql(sql, params)
         return result
     
     @staticmethod

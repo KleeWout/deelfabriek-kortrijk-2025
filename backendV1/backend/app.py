@@ -228,6 +228,18 @@ def api_item_return(registration_code):
     else:
         return jsonify({"message": "Fout bij terugbrengen item"}), 500    
 
+
+@app.route("/item/check/<int:item_id>", methods=["GET"])
+def check_item(item_id):
+    if request.method == "GET":
+        item = DataRepository.check_item(item_id)
+        if item:
+            return jsonify({"message": "Item :${item} geupdate"}), 200
+        else:
+            return jsonify({"message": "Item niet gevonden"}), 404
+
+
+
 @app.route("/auth/validate", methods=["GET"])
 def validate_token():
     if not verify_token(request):
