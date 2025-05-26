@@ -26,4 +26,5 @@ jobs:
 
       - name: Trigger deployment webhook
         run: |
-          curl -X POST http://YOUR_PI_PUBLIC_IP:9000/hooks/update-deelfabriek
+          curl -X POST http://webhook-deelfabriek2.woutjuuh02.be/hooks/update-deelfabriek
+          
