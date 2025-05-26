@@ -12,8 +12,12 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: build image
-        run: docker build ./frontend -t woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
+        run: |
+          docker build ./frontend -t woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
+          docker build ./backend -t woutjuuh02/deelfabriek-kortrijk-2025-backend:latest
       - name: push image to docker Hub
         run: |
           docker login -u woutjuuh02 -p ${{ secrets.DOCKER_HUB_TOKEN }}
           docker push woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
+          docker push woutjuuh02/deelfabriek-kortrijk-2025-backend:latest
+
