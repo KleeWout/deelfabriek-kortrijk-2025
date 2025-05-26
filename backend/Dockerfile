@@ -1,0 +1,29 @@
+# Build Stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+
+WORKDIR /source
+
+# Copy project file and restore
+COPY *.csproj .
+RUN dotnet restore
+
+# Copy everything else and publish
+COPY . .
+RUN dotnet publish --configuration Release --output /app
+
+# Runtime Stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+
+WORKDIR /app
+COPY --from=build /app .
+
+# Define a safe default port
+EXPOSE 3001
+
+# Use dotnet instead of a native binary unless you self-contained
+ENTRYPOINT ["dotnet", "deelfabriek-backend.dll"]
+
+
+
+# docker build -t deelfabriek-backend
+# docker run -d -p 3001:3001 deelfabriek-backend

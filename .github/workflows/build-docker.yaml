@@ -1,0 +1,18 @@
+name: Build and Publish image to Docker Hub
+on:
+  [workflow_dispatch]
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  publish_images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: build image
+        run: docker build ./frontend -t woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
+      - name: push image to docker Hub
+        run: |
+          docker push woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
