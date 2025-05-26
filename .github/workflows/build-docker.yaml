@@ -1,12 +1,12 @@
 name: Build and Publish image to Docker Hub
 on:
-  [workflow_dispatch]
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'frontend/**'
-  #     - 'backend/**'
+  # [workflow_dispatch]
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
 
 jobs:
   publish_images:
@@ -24,3 +24,6 @@ jobs:
           docker push woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
           docker push woutjuuh02/deelfabriek-kortrijk-2025-backend:latest
 
+      - name: Trigger deployment webhook
+        run: |
+          curl -X POST http://YOUR_PI_PUBLIC_IP:9000/hooks/update-deelfabriek

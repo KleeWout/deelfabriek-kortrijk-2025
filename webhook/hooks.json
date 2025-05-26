@@ -1,0 +1,17 @@
+[
+  {
+    "id": "update-deelfabriek",
+    "execute-command": "/scripts/update-containers.sh",
+    "response-message": "Deployment webhook received, updating containers",
+    "trigger-rule": {
+      "match": {
+        "type": "value",
+        "value": "{{ .X-Secret-Token }}",
+        "parameter": {
+          "source": "header",
+          "name": "X-Secret-Token"
+        }
+      }
+    }
+  }
+]
