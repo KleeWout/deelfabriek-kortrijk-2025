@@ -1,0 +1,23 @@
+[
+  {
+    "id": "household",
+    "title": "Huishoud",
+    "iconName": "Broom"
+  },
+  {
+    "id": "sport",
+    "title": "Sport",
+    "iconName": "SneakerMove"
+  },
+  {
+    "id": "toys",
+    "title": "Speelgoed",
+    "iconName": "Lego"
+  },
+  {
+    "id": "books",
+    "title": "Boeken",
+    "iconName": "Book"
+  }
+]
+

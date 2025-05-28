@@ -6,12 +6,12 @@ export default function Navigation() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="flex items-center justify-between p-4 border-b-1 border-primarygreen-2">
+    <nav className="flex items-center justify-between p-4 border-b-1 border-primarygreen-2 bg-white">
       <Image
         src="/deelfabriek-website-labels-boven_v2.svg"
         alt="Logo deelfabriek"
-        width={200}
-        height={200}
+        width={150}
+        height={150}
       />
       {/* Burger button */}
       <button
