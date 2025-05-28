@@ -20,17 +20,17 @@ export default function Navigation() {
         aria-label="Open menu"
       >
         <span
-          className={`block h-1 w-8 bg-primary-1 rounded transition-all duration-300 ${
+          className={`block h-1 w-8 bg-primary-1 rounded transition-all duration-500 ${
             open ? "rotate-45 translate-y-2 bg-white" : ""
           }`}
         ></span>
         <span
-          className={`block h-1 w-8 bg-primary-1 rounded my-1 transition-all duration-300 ${
+          className={`block h-1 w-8 bg-primary-1 rounded my-1 transition-all duration-500 ${
             open ? "opacity-0 bg-white" : ""
           }`}
         ></span>
         <span
-          className={`block h-1 w-8 bg-primary-1 rounded transition-all duration-300 ${
+          className={`block h-1 w-8 bg-primary-1 rounded transition-all duration-500 ${
             open ? "-rotate-45 -translate-y-2 bg-white" : ""
           }`}
         ></span>
@@ -43,18 +43,18 @@ export default function Navigation() {
       >
         <ul className="">
           <li>
-            <a href="#" className="text-lg font-semibold">
+            <a href="#" className="text-lg text-white">
               Home
             </a>
           </li>
           <li>
-            <a href="#" className="text-lg font-semibold">
-              Over ons
+            <a href="#" className="text-lg text-white">
+              Items
             </a>
           </li>
           <li>
-            <a href="#" className="text-lg font-semibold">
-              Contact
+            <a href="#" className="text-lg text-white">
+              Info
             </a>
           </li>
         </ul>
