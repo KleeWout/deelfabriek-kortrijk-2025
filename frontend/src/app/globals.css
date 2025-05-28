@@ -7,8 +7,9 @@
 }
 
 @theme {
-  --color-primary-1: #004431;
-  --color-primary-2: #e8366f;
+  --color-primarygreen-1: #004431;
+  --color-primarygreen-2: #dbe6e6;
+  --color-primarypink-1: #e8366f;
 }
 
 @media (prefers-color-scheme: dark) {
