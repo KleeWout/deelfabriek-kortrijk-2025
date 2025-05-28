@@ -41,17 +41,5 @@ services:
     networks:
       - default
 
-  webhook:
-    image: almir/webhook
-    container_name: webhook-service
-    restart: unless-stopped
-    volumes:
-      - ./webhook/hooks.json:/etc/webhook/hooks.json
-      - ./webhook/scripts:/scripts
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: -hooks=/etc/webhook/hooks.json -verbose
-    networks:
-      - default
-
 volumes:
   db_data:
