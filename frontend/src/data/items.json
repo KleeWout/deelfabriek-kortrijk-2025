@@ -1,6 +1,6 @@
 [
   {
-    "id": "1",
+    "id": 1,
     "title": "Naaimachine",
     "price": 5.0,
     "status": "Beschikbaar",
@@ -8,7 +8,7 @@
     "categoryId": "household"
   },
   {
-    "id": "2",
+    "id": 2,
     "title": "Schroef- en klopboormachine",
     "price": 5.0,
     "status": "Beschikbaar",
@@ -16,7 +16,7 @@
     "categoryId": "household"
   },
   {
-    "id": "3",
+    "id": 3,
     "title": "Gardena Tuinslang (20m)",
     "price": 2.0,
     "status": "Beschikbaar",
@@ -24,7 +24,7 @@
     "categoryId": "household"
   },
   {
-    "id": "4",
+    "id": 4,
     "title": "Verlengkabel",
     "price": 5.0,
     "status": "Gereserveerd",
@@ -32,7 +32,7 @@
     "categoryId": "household"
   },
   {
-    "id": "5",
+    "id": 5,
     "title": "Ijsmachine",
     "price": 5.0,
     "status": "Uitgeleend",
@@ -40,7 +40,7 @@
     "categoryId": "household"
   },
   {
-    "id": "6",
+    "id": 6,
     "title": "Laptop",
     "price": 17.0,
     "status": "Gereserveerd",

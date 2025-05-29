@@ -1,21 +1,32 @@
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface ItemCardProps {
+  id: number;
   title: string;
   price: number;
   imageSrc?: string;
   status: string;
   index: number; //achtergrond
+  onClick?: () => void;
 }
 
-export function ItemCard({ title, price, imageSrc = "/assets/items/naaimachine.png", status = "Beschikbaar", index=0 }: ItemCardProps) {
+export function ItemCard({ id, title, price, imageSrc = "/assets/items/naaimachine.png", status = "Beschikbaar", index = 0 }: ItemCardProps) {
+  const router = useRouter();
+
   //verschillende achtergrond gradients:
   const backgroundGradients = ["bg-gradient-green", "bg-gradient-purple", "bg-gradient-yellow", "bg-gradient-teal", "bg-gradient-red", "bg-gradient-salmon"];
 
   const gradientClass = backgroundGradients[index % 6];
 
+  //klik en navigeer nr detail pagina van item
+
+  const handleItemClick = (itemId: number) => {
+    router.push(`/mobile/items/${itemId}`);
+  };
+
   return (
-    <div className="flex flex-col w-full max-w-[340px] max-h-[280px] min-w-[140px] rounded-xl shadow-md hover:shadow-lg border-white border-2 relative cursor-pointer transition-all duration-300 hover:scale-105">
+    <div className="flex flex-col w-full max-w-[340px] max-h-[280px] min-w-[140px] rounded-xl shadow-md hover:shadow-lg border-white border-2 relative cursor-pointer transition-all duration-300 hover:scale-105" onClick={() => handleItemClick(id)}>
       <div className={`${gradientClass} rounded-t-xl h-[116px] md:h-[200px] flex items-center justify-center p-2`}>
         {" "}
         <Image src={imageSrc} width={120} height={90} alt={title} className="object-contain max-w-full max-h-full w-[120px] h-[90px] md:w-[160px] md:h-[120px]" priority />

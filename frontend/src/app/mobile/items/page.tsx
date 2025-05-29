@@ -8,6 +8,9 @@ import categoriesData from "@/data/categories.json";
 import itemsData from "@/data/items.json";
 
 export default function MobileItemPage() {
+
+
+
   return (
     <div>
       {" "}
@@ -20,14 +23,7 @@ export default function MobileItemPage() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8">
         {itemsData.map((item, index) => (
-          <ItemCard
-            key={item.id}
-            title={item.title}
-            price={item.price}
-            status={item.status}
-            imageSrc={item.imageSrc}
-            index={index}
-          />
+          <ItemCard key={item.id} id={item.id} title={item.title} price={item.price} status={item.status} imageSrc={item.imageSrc} index={index} />
         ))}
       </div>
       <Footer />
