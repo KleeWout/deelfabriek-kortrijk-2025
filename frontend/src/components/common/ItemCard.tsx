@@ -10,9 +10,15 @@ interface ItemCardProps {
 export function ItemCard({ title, price, imageSrc = "/assets/items/naaimachine.png", status = "Beschikbaar" }: ItemCardProps) {
   return (
     <div className="flex flex-col w-full max-w-[340px] max-h-[280px] min-w-[140px] rounded-xl shadow-md hover:shadow-lg border-white border-2 relative cursor-pointer transition-all duration-300 hover:scale-105">
-      <div className="bg-gradient-green rounded-t-xl h-[116px] md:h-[200px]">
-        {/* <p>nietn</p> */}
-        <Image src={imageSrc} width={114} height={85} alt={title}  className="object-cover rounded-t-xl" priority />{" "}
+      <div className="bg-gradient-green rounded-t-xl h-[116px] md:h-[200px] flex items-center justify-center p-2 ">
+        <Image 
+          src={imageSrc} 
+          width={120} 
+          height={90} 
+          alt={title}  
+          className="object-contain max-w-full max-h-full w-[120px] h-[90px] md:w-[160px] md:h-[120px]" 
+          priority 
+        />
       </div>
       <div className="bg-white p-2 flex flex-start flex-col rounded-b-xl">
         <p className="text-primarytext-1 text-base font-bold truncate">{title}</p>
