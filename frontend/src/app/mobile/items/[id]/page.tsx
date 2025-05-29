@@ -7,11 +7,15 @@ import Image from "next/image";
 import { ReturnButton } from "@/components/common/ReturnButton";
 import Navigation from "@/components/mobile/nav";
 import { getGradientClassForBackground } from "@/utils/constants";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 
 export default function ItemDetailPage() {
   const params = useParams(); //get item id from URL params
   const id = parseInt(params.id as string);
+  const router = useRouter();
+  const [isReserving, setIsReserving] = useState(false);
 
    const gradientClass = getGradientClassForBackground(id);
 
@@ -28,6 +32,12 @@ export default function ItemDetailPage() {
       </div>
     );
   }
+
+  const handleReservation = () => {
+    //navigeer naar reservatie pagine met item id
+    router.push(`/mobile/reserve/${id}`);
+  }
+
 
   return (
     <div>
@@ -119,7 +129,8 @@ export default function ItemDetailPage() {
               )}
 
               {item.status === "Beschikbaar" ? (
-                <button className="mt-6 w-full bg-primarygreen-1 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Reserveren</button>
+                //reserveer button
+                <button onClick={handleReservation} className="mt-6 w-full bg-primarygreen-1 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Reserveren</button>
               ) : (
                 <div className="mt-6 p-3 bg-amber-50 border-l-4 border-amber-500 rounded">
                   <p className="text-amber-700">Weer beschikbaar vanaf: {new Date(item.availability.end).toLocaleDateString("nl-BE")}</p>
