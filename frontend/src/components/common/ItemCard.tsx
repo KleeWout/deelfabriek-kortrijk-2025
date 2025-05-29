@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { getGradientClassForBackground } from "@/utils/constants";
 
 interface ItemCardProps {
   id: number;
@@ -15,10 +16,8 @@ export function ItemCard({ id, title, price, imageSrc = "/assets/items/naaimachi
   const router = useRouter();
 
   //verschillende achtergrond gradients:
-  const backgroundGradients = ["bg-gradient-green", "bg-gradient-purple", "bg-gradient-yellow", "bg-gradient-teal", "bg-gradient-red", "bg-gradient-salmon"];
-
-  const gradientClass = backgroundGradients[index % 6];
-
+  const gradientClass = getGradientClassForBackground(id);
+ 
   //klik en navigeer nr detail pagina van item
 
   const handleItemClick = (itemId: number) => {

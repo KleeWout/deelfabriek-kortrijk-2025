@@ -6,16 +6,14 @@ import itemsDetails from "@/data/itemDetails.json";
 import Image from "next/image";
 import { ReturnButton } from "@/components/common/ReturnButton";
 import Navigation from "@/components/mobile/nav";
+import { getGradientClassForBackground } from "@/utils/constants";
+
 
 export default function ItemDetailPage() {
   const params = useParams(); //get item id from URL params
   const id = parseInt(params.id as string);
 
-  // Different background gradients (same as in ItemCard component)
-  const backgroundGradients = ["bg-gradient-green", "bg-gradient-purple", "bg-gradient-yellow", "bg-gradient-teal", "bg-gradient-red", "bg-gradient-salmon"];
-
-  // Get the gradient based on the item ID (same logic as in the list)
-  const gradientClass = backgroundGradients[(id - 1) % backgroundGradients.length];
+   const gradientClass = getGradientClassForBackground(id);
 
   //later veranderen naar api call
   const item = itemsDetails.find((item) => item.id === id);
