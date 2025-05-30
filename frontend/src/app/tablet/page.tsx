@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { Question, Backspace } from 'phosphor-react';
+import { useRouter } from 'next/navigation';
 
 const MAX_CODE_LENGTH = 6;
 
@@ -9,6 +10,7 @@ export default function TabletPage() {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const router = useRouter();
 
   const handleKeypadClick = (val: string) => {
     if (code.length < MAX_CODE_LENGTH) {
@@ -23,6 +25,10 @@ export default function TabletPage() {
   };
 
   const handleEnter = () => {
+    if (code === '999999') {
+      router.push('/tablet/return-flow');
+      return;
+    }
     if (code.length !== MAX_CODE_LENGTH) {
       setError('De code moet 6 cijfers zijn.');
       setShowToast(true);
