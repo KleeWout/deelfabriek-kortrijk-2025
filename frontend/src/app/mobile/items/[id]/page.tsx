@@ -7,7 +7,7 @@ import Image from "next/image";
 import { ReturnButton } from "@/components/common/ReturnButton";
 import Navigation from "@/components/mobile/nav";
 import { getGradientClassForBackground } from "@/utils/constants";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 
