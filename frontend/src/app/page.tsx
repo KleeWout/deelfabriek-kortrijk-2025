@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -22,7 +22,7 @@ export default function Home() {
             Binnenkort Online
           </h1>
 
-          <p className="text-lg sm:text-xl text-[#1A1A1A] mb-6 sm:mb-8">
+          <p className="text-lg sm:text-l text-[#1A1A1A] mb-6 sm:mb-8">
             We werken hard aan ons nieuw project: The Library of Things voor de
             Deelfabriek Kortrijk. Kom later terug voor meer info!
           </p>
@@ -30,15 +30,15 @@ export default function Home() {
           <div className="flex items-center justify-center space-x-4">
             <div
               className="w-3 h-3 bg-[#FF6B6B] rounded-full animate-bounce"
-              style={{ animationDelay: '0ms' }}
+              style={{ animationDelay: "0ms" }}
             ></div>
             <div
               className="w-3 h-3 bg-[#4ECDC4] rounded-full animate-bounce"
-              style={{ animationDelay: '150ms' }}
+              style={{ animationDelay: "150ms" }}
             ></div>
             <div
               className="w-3 h-3 bg-[#FFE66D] rounded-full animate-bounce"
-              style={{ animationDelay: '300ms' }}
+              style={{ animationDelay: "300ms" }}
             ></div>
           </div>
         </div>
