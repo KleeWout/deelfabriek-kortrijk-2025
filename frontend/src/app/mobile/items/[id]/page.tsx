@@ -35,7 +35,7 @@ export default function ItemDetailPage() {
 
   const handleReservation = () => {
     //navigeer naar reservatie pagine met item id
-    router.push(`/mobile/reserve/${id}`);
+    router.push(`/mobile/reserveer/${id}`);
   }
 
 

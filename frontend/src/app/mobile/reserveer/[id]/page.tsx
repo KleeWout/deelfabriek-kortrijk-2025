@@ -5,14 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { ReturnButton } from "@/components/common/ReturnButton";
 import Navigation from "@/components/mobile/nav";
 import itemsDetails from "@/data/itemDetails.json";
-import Image from "next/image";
-import { getGradientClassForBackground } from "@/utils/constants";
 import { addWeeks, format } from "date-fns";
 
 export default function ReservationPage() {
   const params = useParams();
   const id = parseInt(params.id as string);
   const router = useRouter();
+
 
   // Form state
   const [formData, setFormData] = useState({
@@ -117,6 +116,8 @@ export default function ReservationPage() {
 
       // navigeer naar de bevestigingspagina
       router.push(`/mobile/reserveer/confirmation?id=${id}`);
+
+
     } catch (error) {
       console.error("Error submitting reservation:", error);
       //TODO: aparte pagina of een popup
