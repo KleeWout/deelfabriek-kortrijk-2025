@@ -35,6 +35,10 @@ export default function TabletPage() {
       setTimeout(() => setShowToast(false), 2000);
       return;
     }
+    if (code === '999998') {
+      router.push('/tablet/ophaal-flow');
+      return;
+    }
     // TODO: Navigatie naar andere pagina
   };
 
