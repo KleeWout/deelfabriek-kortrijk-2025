@@ -4,23 +4,11 @@
   --background: #ffffff;
   --foreground: #171717;
   font-family: var(--font-open-sans), sans-serif;
-
-  --color-gradient-green: var(--radial-naaimachine, radial-gradient(144.5% 50% at 50% 50%, #bae2b6 0%, #a5ea9f 100%));
-  .bg-gradient-green {
-    background: var(--color-gradient-green);
-  }
 }
 
 @theme {
-  --color-primarybackground: #f4f4f4;
-
-  --color-primarygreen-1: #004431;
-  --color-primarygreen-2: #dbe6e6;
-  --color-primarypink-1: #e8366f;
-
-  --color-secondarygreen-1: #c5d4d4;
-
-  --color-primarytext-1: #202020;
+  --color-primary-1: #004431;
+  --color-primary-2: #e8366f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,27 +31,4 @@ h4,
 h5,
 h6 {
   font-family: var(--font-exo2), sans-serif;
-}
-
-/* Gradient backgrounds */
-
-.bg-gradient-green {
-  background: radial-gradient(144.5% 50% at 50% 50%, #bae2b6 0%, #a5ea9f 100%);
-}
-.bg-gradient-purple {
-  background: radial-gradient(144.5% 50% at 50% 50%, #e0dafe 0%, #a193f0 100%);
-}
-
-.bg-gradient-yellow {
-  background: radial-gradient(144.5% 50% at 50% 50%, #fffcee 0%, #f2e5a1 100%);
-}
-.bg-gradient-teal {
-  background: radial-gradient(144.5% 50% at 50% 50%, #f8ffff 0%, #85dcdf 100%);
-}
-.bg-gradient-red {
-  background: radial-gradient(144.5% 50% at 50% 50%, #f8a9a9 0%, #ea4747 100%);
-}
-
-.bg-gradient-salmon {
-  background: radial-gradient(144.5% 50% at 50% 50%, #ffe8e8 0%, #efabaa 100%);
 }

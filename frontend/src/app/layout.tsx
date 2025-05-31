@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${exo2.variable} ${openSans.variable} antialiased bg-primarybackground`}>
+      <body className={`${exo2.variable} ${openSans.variable} antialiased`}>
         {children}
       </body>
     </html>
