@@ -1,8 +1,5 @@
-export interface ItemCardProps {
-  id: number;
-  title: string;
-  price: number;
-  imageSrc?: string;
-  status: string;
+import { ItemProps } from "./ItemProps";
+
+export interface ItemCardProps extends ItemProps {
   index: number;
 }

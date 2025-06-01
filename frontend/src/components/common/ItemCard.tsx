@@ -1,16 +1,17 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getGradientClassForBackground } from "@/utils/constants";
+import { ItemCardProps } from "@/models/ItemCardProps";
 
-interface ItemCardProps {
-  id: number;
-  title: string;
-  price: number;
-  imageSrc?: string;
-  status: string;
-  index: number; //achtergrond
-  onClick?: () => void;
-}
+// interface ItemCardProps {
+//   id: number;
+//   title: string;
+//   price: number;
+//   imageSrc?: string;
+//   status: string;
+//   index: number; //achtergrond
+//   onClick?: () => void;
+// }
 
 export function ItemCard({ id, title, price, imageSrc = "/assets/items/naaimachine.png", status = "Beschikbaar", index = 0 }: ItemCardProps) {
   const router = useRouter();

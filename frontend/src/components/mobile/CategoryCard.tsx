@@ -1,4 +1,4 @@
-import * as PhosphorIcons from "@phosphor-icons/react";
+import { getIconByName } from "../../utils/iconUtils";
 
 interface CategoryProps {
   title: string;
@@ -6,16 +6,6 @@ interface CategoryProps {
 
   //later toevoegen om categorieën te kunnen selecteren
   onClick?: () => void;
-}
-
-function getIconByName(iconName: string) {
-  // Check if the icon exists
-  if (iconName in PhosphorIcons) {
-    return (PhosphorIcons as any)[iconName];
-  }
-
-  // Default icon
-  return PhosphorIcons.WrenchIcon;
 }
 
 export function CategoryCard({ title, iconName, onClick }: CategoryProps) {
