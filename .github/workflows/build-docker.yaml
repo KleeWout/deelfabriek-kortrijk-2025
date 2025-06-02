@@ -14,6 +14,10 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+
+      - name: Create .env file from GitHub Secret
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+      
       - name: build image
         run: |
           docker build ./frontend -t woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
