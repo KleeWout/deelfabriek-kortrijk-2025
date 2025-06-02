@@ -1,7 +1,9 @@
 'use client';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Check, LockOpen, Warning } from 'phosphor-react';
+import { Check, LockOpen, Warning, Star } from 'phosphor-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import StarRating from '../components/StarRating';
 
 const reasons = [
@@ -15,11 +17,21 @@ const reasons = [
   'Anders',
 ];
 
+const feedbackOptions = [
+  'Product was beschadigd',
+  'Product werkte niet goed',
+  'Product was niet schoon',
+  'Product was niet compleet',
+  'Andere reden',
+];
+
 export default function ReturnFlow() {
+  const router = useRouter();
   const [rating, setRating] = useState<number>(0);
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
   const [otherReason, setOtherReason] = useState('');
   const [warning, setWarning] = useState('');
+  const [hoveredRating, setHoveredRating] = useState(0);
 
   const handleReasonToggle = (reason: string) => {
     if (selectedReasons.includes(reason)) {
@@ -35,9 +47,42 @@ export default function ReturnFlow() {
     }
   };
 
+  const handleRatingClick = (value: number) => {
+    setRating(value);
+    if (value >= 3) {
+      setSelectedReasons([]);
+    }
+  };
+
+  const handleOptionToggle = (option: string) => {
+    setSelectedReasons((prev) =>
+      prev.includes(option)
+        ? prev.filter((o) => o !== option)
+        : [...prev, option]
+    );
+  };
+
   const showReasons = rating > 0 && rating <= 3;
   const showOtherInput = selectedReasons.includes('Anders');
   const lockerNumber = 2;
+
+  const handleSubmit = () => {
+    if (rating === 0) {
+      toast.error('Geef eerst een beoordeling door sterren aan te klikken');
+      return;
+    }
+
+    if (rating < 3 && selectedReasons.length === 0) {
+      toast.error('Selecteer ten minste één reden voor je lage beoordeling');
+      return;
+    }
+
+    router.push('/tablet/return-flow/thank-you?feedback=true');
+  };
+
+  const handleSkip = () => {
+    router.push('/tablet/return-flow/thank-you?feedback=false');
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-[var(--color-primarybackground)] py-8">
@@ -80,7 +125,9 @@ export default function ReturnFlow() {
               Wat was je ervaring met het item?
             </div>
             {/* Sterren */}
-            <StarRating value={rating} onChange={setRating} />
+            <div className="flex justify-center gap-2 mb-8">
+              <StarRating value={rating} onChange={setRating} />
+            </div>
             {/* Redenen bij <=3 sterren */}
             {showReasons && (
               <div className="w-full mb-4 mt-8 animate-fade-in transition-opacity duration-500 opacity-100">
@@ -135,10 +182,14 @@ export default function ReturnFlow() {
               <button
                 className="flex-1 py-5 bg-[var(--color-primarygreen-1)] text-white text-3xl rounded-lg font-semibold shadow hover:bg-[#00664f] transition"
                 disabled={rating === 0}
+                onClick={handleSubmit}
               >
                 Verzenden
               </button>
-              <button className="flex-1 py-5 bg-white text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] text-3xl rounded-lg font-semibold hover:bg-[var(--color-primarygreen-2)] transition">
+              <button
+                className="flex-1 py-5 bg-white text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] text-3xl rounded-lg font-semibold hover:bg-[var(--color-primarygreen-2)] transition"
+                onClick={handleSkip}
+              >
                 Overslaan
               </button>
             </div>
