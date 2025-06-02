@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     // bg-[#004431]
-    <div className="min-h-screen flex flex-col justify-between bg-pink-400">
+    <div className="min-h-screen flex flex-col justify-between bg-primary">
       {/* Main content */}
       <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-8">
         <div className="max-w-2xl w-full text-center space-y-6 sm:space-y-8 bg-white/90 rounded-2xl p-6 sm:p-10 shadow-2xl border border-white/30">
