@@ -3,7 +3,6 @@
 # set CLOUDFLARE_TUNNEL_TOKEN=your_token
 # docker-compose up -d
 
-version: "3.8"
 services:
   frontend:
     build: ./frontend
