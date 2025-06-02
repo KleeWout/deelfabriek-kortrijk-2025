@@ -21,9 +21,9 @@ services:
   database:
     image: mysql:8.0
     environment:
-      MYSQL_USER: deelfabriek
-      MYSQL_ROOT_PASSWORD: deelfabriek2025
-      MYSQL_DATABASE: deelfabriek
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3306:3306"
     volumes:
