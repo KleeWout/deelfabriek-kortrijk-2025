@@ -47,7 +47,7 @@ export default function MobilePage() {
         </section>
         <Link
           className="bg-primarygreen-1 text-white flex justify-center rounded-xl py-2 w-3/4 mx-auto"
-          href={""}
+          href={"/mobile/items"}
         >
           Ondek alle items
         </Link>

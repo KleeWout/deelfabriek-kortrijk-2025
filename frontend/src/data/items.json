@@ -5,7 +5,7 @@
     "price": 5.0,
     "status": "Beschikbaar",
     "imageSrc": "/assets/items/naaimachine.png",
-    "categoryId": "household"
+    "category": "household"
   },
   {
     "id": 2,
@@ -13,7 +13,7 @@
     "price": 5.0,
     "status": "Beschikbaar",
     "imageSrc": "/assets/items/boormachine.png",
-    "categoryId": "household"
+    "category": "household"
   },
   {
     "id": 3,
@@ -21,7 +21,7 @@
     "price": 2.0,
     "status": "Beschikbaar",
     "imageSrc": "/assets/items/gardena_tuinslang_20m.png",
-    "categoryId": "household"
+    "category": "Garden"
   },
   {
     "id": 4,
@@ -29,7 +29,7 @@
     "price": 5.0,
     "status": "Gereserveerd",
     "imageSrc": "/assets/items/verlengkabel.png",
-    "categoryId": "household"
+    "category": "household"
   },
   {
     "id": 5,
@@ -37,7 +37,7 @@
     "price": 5.0,
     "status": "Uitgeleend",
     "imageSrc": "/assets/items/ijsmachine.png",
-    "categoryId": "household"
+    "category": "household"
   },
   {
     "id": 6,
@@ -45,6 +45,6 @@
     "price": 17.0,
     "status": "Gereserveerd",
     "imageSrc": "/assets/items/laptop.png",
-    "categoryId": "household"
+    "category": "household"
   }
 ]

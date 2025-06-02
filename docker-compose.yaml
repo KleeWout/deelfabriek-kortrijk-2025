@@ -3,15 +3,16 @@
 # set CLOUDFLARE_TUNNEL_TOKEN=your_token
 # docker-compose up -d
 
-version: "3.8"
 services:
   frontend:
+    # image: woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
     build: ./frontend
     ports:
       - "3000:3000"
     restart: unless-stopped
 
   backend:
+    # image: woutjuuh02/deelfabriek-kortrijk-2025-backend:latest
     build:
       context: ./backend
     ports:
@@ -21,9 +22,9 @@ services:
   database:
     image: mysql:8.0
     environment:
-      MYSQL_USER: deelfabriek
-      MYSQL_ROOT_PASSWORD: deelfabriek2025
-      MYSQL_DATABASE: deelfabriek
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3306:3306"
     volumes:
