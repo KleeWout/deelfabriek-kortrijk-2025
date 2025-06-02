@@ -5,6 +5,12 @@ export interface ItemProps {
   imageSrc: string;
   status: string;
   description?: string;
+  howToUse?: string;
+  accessories?: string[];
+  dimensions?: string;
+  weight?: string;
+  tip?: string;
+  whatsIncluded?: string;
   category?: string;
   availability?: {
     start: string;

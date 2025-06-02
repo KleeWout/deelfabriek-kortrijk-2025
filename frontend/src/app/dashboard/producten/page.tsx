@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import items from "@/data/items.json";
+import item from "@/data/items.json";
 import { ItemProps } from "@/models/ItemProps";
+import { PencilSimpleLine, Trash } from "phosphor-react";
 
 // interface Product {
 //   id: number;
@@ -15,96 +16,258 @@ import { ItemProps } from "@/models/ItemProps";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<ItemProps[]>([]);
-
+  const [currentView, setCurrentView] = useState("list"); // 'list' or 'form'
+  const [editingProduct, setEditingProduct] = useState<ItemProps | null>(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "",
+    price: "",
+    description: "",
+    howToUse: "",
+    whatsIncluded: "",
+    tip: "",
+    weight: "",
+    dimensions: "",
+    imageSrc: "",
+  });
   useEffect(() => {
-    setProducts(items);
+    setProducts(item);
   }, []);
 
-  return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Producten</h1>
-        <button className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors">
-          Voeg product toe
-        </button>
-      </div>
+  const handleAddProduct = () => {
+    setEditingProduct(null);
+    setFormData({
+      title: "",
+      category: "",
+      price: "",
+      description: "",
+      howToUse: "",
+      whatsIncluded: "",
+      tip: "",
+      weight: "",
+      dimensions: "",
+      imageSrc: "",
+    });
+    setCurrentView("form");
+  };
 
-      <div className="bg-white rounded-lg shadow">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Product
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Categorie
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Prijs per week
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acties
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
-                <tr key={product.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <img className="h-10 w-10 rounded-lg object-cover" src={product.imageSrc} alt={product.title} />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {product.title}
+  const handleEditProduct = (item: ItemProps) => {
+    setEditingProduct(item);
+    setFormData({
+      title: item.title || "",
+      category: item.category || "",
+      price: item.price?.toString() || "",
+      description: item.description || "",
+      howToUse: item.howToUse || "",
+      whatsIncluded: item.whatsIncluded || "",
+      tip: item.tip || "",
+      weight: item.weight || "",
+      dimensions: item.dimensions || "",
+      imageSrc: item.imageSrc || "",
+    });
+    setCurrentView("form");
+  };
+
+  const handleCancel = () => {
+    setCurrentView("list");
+    setEditingProduct(null);
+  };
+
+  const handleSave = () => {
+    // Here you would typically save to your backend/data source
+    console.log("Saving product:", formData);
+
+    if (editingProduct) {
+      // Update existing product
+      setProducts(products.map((p) => (p.id === editingProduct.id ? { ...p, ...formData, price: parseFloat(formData.price) } : p)));
+    } else {
+      // Add new product
+      const newProduct = {
+        ...formData,
+        id: Math.max(...products.map((p) => p.id)) + 1,
+        price: parseFloat(formData.price),
+        status: "Beschikbaar",
+      };
+      setProducts([...products, newProduct]);
+    }
+
+    setCurrentView("list");
+    setEditingProduct(null);
+  };
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleDeleteProduct = (productId: number) => {
+    // Show confirmation dialog
+    if (window.confirm("Weet je zeker dat je dit product wilt verwijderen?")) {
+      // Remove the product from the products state
+      setProducts(products.filter((product) => product.id !== productId));
+
+      // Here you would typically also delete from your backend
+      console.log("Product deleted:", productId);
+    }
+  };
+
+  if (currentView === "list") {
+    return (
+      <div className="p-6 bg-gray-100 min-h-screen">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Producten</h1>
+          <button className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors" onClick={handleAddProduct}>
+            Voeg product toe
+          </button>
+        </div>
+
+        <div className="bg-white rounded-lg shadow">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categorie</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prijs per week</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {products.map((product) => (
+                  <tr key={product.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <img className="h-10 w-10 rounded-lg object-cover" src={product.imageSrc} alt={product.title} />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{product.title}</div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {(product.category ?? "Geen categorie").charAt(0).toUpperCase() + (product.category ?? "Geen categorie").slice(1)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      €{product.price.toFixed(2)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      product.status === "Beschikbaar" 
-                        ? "bg-green-100 text-green-800"
-                        : product.status === "Gereserveerd"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                    }`}>
-                      {product.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-[#004431] hover:text-[#003422] mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button className="text-red-600 hover:text-red-800">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{(product.category ?? "Geen categorie").charAt(0).toUpperCase() + (product.category ?? "Geen categorie").slice(1)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">€{product.price.toFixed(2)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.status === "Beschikbaar" ? "bg-green-100 text-green-800" : product.status === "Gereserveerd" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>{product.status}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button className="text-[#004431] hover:text-[#003422] mr-4" onClick={() => handleEditProduct(product)}>
+                        <PencilSimpleLine size={20} />
+                      </button>
+                      <button className="text-red-600 hover:text-red-800" onClick={() => handleDeleteProduct(product.id)}>
+                        <Trash size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+  if (currentView === "form") {
+    return (
+      <div className="p-6 bg-gray-100 min-h-screen">
+        {/* Header */}
+
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Producten</h1>
+          <div className="flex space-x-3">
+            <button onClick={handleCancel} className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+              Annuleren
+            </button>
+            <button onClick={handleSave} className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors">
+              Opslaan
+            </button>
+          </div>
+        </div>
+        {/* Form Content */}
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-700">{editingProduct ? "Product bewerken" : "Product aanmaken en bewerken"}</h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Column */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 ">Product naam</label>
+                <input type="text" value={formData.title} onChange={(e) => handleInputChange("title", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="naaimachine" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Categorie</label>
+                  <input type="text" value={formData.category} onChange={(e) => handleInputChange("category", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="Spelletjes" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Prijs</label>
+                  <input type="number" step="0.01" value={formData.price} onChange={(e) => handleInputChange("price", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="€15.00" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Beschrijving</label>
+                <textarea value={formData.description} onChange={(e) => handleInputChange("description", e.target.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Hoe gebruiken?</label>
+                <textarea value={formData.howToUse} onChange={(e) => handleInputChange("howToUse", e.target.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Wat zit erbij?</label>
+                <textarea value={formData.whatsIncluded} onChange={(e) => handleInputChange("whatsIncluded", e.target.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tip</label>
+                <textarea value={formData.tip} onChange={(e) => handleInputChange("tip", e.target.value)} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Product foto</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-white">
+                  {formData.imageSrc ? (
+                    <img src={formData.imageSrc} alt="Product" className="mx-auto max-h-40 rounded-lg" />
+                  ) : (
+                    <div className="text-gray-400">
+                      <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p>Upload foto</p>
+                    </div>
+                  )}
+                </div>
+                {/* <input type="url" value={formData.imageSrc} onChange={(e) => handleInputChange("imageSrc", e.target.value)} className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="Image URL" /> */}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Gewicht</label>
+                <input type="text" value={formData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Afmetingen</label>
+                <input type="text" value={formData.dimensions} onChange={(e) => handleInputChange("dimensions", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
