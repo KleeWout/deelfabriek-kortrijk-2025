@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import items from "@/data/items.json";
+import ItemProps from "@/models/ItemProps";
 
 interface Product {
   id: number;
@@ -13,7 +14,7 @@ interface Product {
 }
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ItemProps[]>([]);
 
   useEffect(() => {
     setProducts(items);
@@ -67,7 +68,7 @@ export default function ProductsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {product.categoryId.charAt(0).toUpperCase() + product.categoryId.slice(1)}
+                      {(product.category ?? "Geen categorie").charAt(0).toUpperCase() + (product.category ?? "Geen categorie").slice(1)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

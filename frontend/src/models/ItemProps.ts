@@ -1,4 +1,4 @@
-export interface ItemProps {
+export default interface ItemProps {
   id: number;
   title: string;
   price: number;
