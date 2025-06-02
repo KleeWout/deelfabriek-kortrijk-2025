@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import item from "@/data/items.json";
-import { ItemProps } from "@/models/ItemProps";
+import ItemProps from "@/models/ItemProps";
 import { PencilSimpleLine, Trash } from "phosphor-react";
 
 // interface Product {
