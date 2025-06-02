@@ -5,14 +5,16 @@
 
 services:
   frontend:
-    build: ./frontend
+    image: woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
+    # build: ./frontend
     ports:
       - "3000:3000"
     restart: unless-stopped
 
   backend:
-    build:
-      context: ./backend
+    image: woutjuuh02/deelfabriek-kortrijk-2025-backend:latest
+    # build:
+    #   context: ./backend
     ports:
       - 3001:3001
     restart: unless-stopped
