@@ -15,7 +15,7 @@ export default function MobilePage() {
       <main className="py-8 px-8 flex flex-col gap-4">
         <h1 className="text-4xl font-bold text-center text-primarygreen-1">Deelkast</h1>
         <p className="text-center">Slim delen begint hier. Bij de Deelkast kan je snel en makkelijk spullen lenen via onze kast. Meld je aan, kies een item en haal het op bij de locker - 100% selfservice.</p>
-        <Link className="bg-primarygreen-1 text-white flex justify-center rounded-xl py-2 m-8 w-3/4 mx-auto items-center max-w-2xs" href={"/mobile/items"}>
+        <Link className="bg-primarygreen-1 text-white flex justify-center rounded-xl py-2 m-8 w-3/4 mx-auto items-center max-w-2xs gap-2" href={"/mobile/items"}>
           <Package size={32} />
           Ontdek alle items
         </Link>

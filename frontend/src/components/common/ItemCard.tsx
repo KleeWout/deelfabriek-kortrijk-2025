@@ -29,8 +29,8 @@ export function ItemCard({ id, title, pricePerWeek, imageSrc = "/assets/items/na
     <div className="flex flex-col w-full max-w-[340px] max-h-[280px] min-w-[140px] rounded-xl shadow-md hover:shadow-lg border-white border-2 relative cursor-pointer" onClick={() => handleItemClick(id)}>
       <div className={`${gradientClass} rounded-t-xl h-[116px] md:h-[200px] flex items-center justify-center p-2`}>
         {" "}
-        <p>{imageSrc}</p>
-        {/* <Image src={imageSrc} width={120} height={90} alt={title} className="object-contain max-w-full max-h-full w-[120px] h-[90px] md:w-[160px] md:h-[120px]" priority /> */}
+        {/* <p>{imageSrc}</p> */}
+        <Image src={imageSrc} width={120} height={90} alt={title} className="object-contain max-w-full max-h-full w-[120px] h-[90px] md:w-[160px] md:h-[120px]" priority />
       </div>
       <div className="bg-white p-2 flex flex-start flex-col rounded-b-xl">
         <p className="text-primarytext-1 text-base font-bold truncate">{title}</p>

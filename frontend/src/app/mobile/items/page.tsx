@@ -30,38 +30,43 @@ export default function MobileItemPage() {
   }, []);
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Navigation />
-      <h1 className="text-primarygreen-1 font-bold text-xl px-4 py-2">Bekijk onze items</h1>
-      <div className="flex gap-2 overflow-x-auto px-4 py-2 hide-scrollbar">
-        {categoriesData.map((category) => (
-          <CategoryCard key={category.id} iconName={category.iconName} title={category.title} />
-        ))}
-      </div>
       
-      {loading ? (
-        <div className="text-center py-8">Loading items...</div>
-      ) : error ? (
-        <div className="text-center text-red-500 py-8">{error}</div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8">
-          {items.map((item, index) => (
-            <ItemCard 
-              key={item.id} 
-              id={item.id} 
-              title={item.title} 
-              pricePerWeek={item.pricePerWeek} 
-              status={item.status} 
-              imageSrc={item.imageSrc} 
-              index={index} 
-            />
+      {/* Main content area that will expand to fill space */}
+      <main className="flex-1">
+        <h1 className="text-primarygreen-1 font-bold text-xl px-4 py-2">Bekijk onze items</h1>
+        
+        <div className="flex gap-2 overflow-x-auto px-4 py-2 hide-scrollbar">
+          {categoriesData.map((category) => (
+            <CategoryCard key={category.id} iconName={category.iconName} title={category.title} />
           ))}
-
-            {
-    
-  }
         </div>
-      )}
+        
+        {loading ? (
+          <div className="text-center py-8 min-h-96">Loading items...</div>
+        ) : error ? (
+          <div className="text-center text-red-500 py-8 min-h-96">{error}</div>
+        ) : items.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8">
+            {items.map((item, index) => (
+              <ItemCard 
+                key={item.id} 
+                id={item.id} 
+                title={item.title} 
+                pricePerWeek={item.pricePerWeek} 
+                status={item.status} 
+                imageSrc={item.imageSrc} 
+                index={index} 
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 min-h-96 text-gray-500">
+            <p>Geen items beschikbaar</p>
+          </div>
+        )}
+      </main>
       
       <Footer />
     </div>
