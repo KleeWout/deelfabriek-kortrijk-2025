@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ReactNode } from "react";
-import Stepper from "@/components/Stepper";
+import Stepper, { TabletHeader } from "@/components/tabletHeader";
 import { usePathname } from "next/navigation";
 import MobileItemPage from "@/app/mobile/items/page";
 import ItemDetailPage from "@/app/mobile/items/[id]/page";
@@ -24,17 +24,8 @@ export default function ReservationFlowLayout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-primarybackground">
-      {/* Header bar */}
-      <div className="w-full flex items-center justify-between bg-white px-12 py-6 shadow-sm">
-        {/* Logo */}
-        <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={240} height={90} />
-        {/* Stepper */}
-        <div className="ml-auto">
-          <Stepper activeStep={getActiveStep()} />
-        </div>
-      </div>
-
       {/* Main content */}
+      <TabletHeader />
       <main className="flex-grow">{children}</main>
     </div>
   );

@@ -157,7 +157,7 @@ export default function OphaalFlowPage() {
           </div>
           <button
             className="w-full py-4 mt-1 bg-[var(--color-primarygreen-1)] text-white text-xl rounded-lg font-bold shadow hover:bg-[#00664f] transition"
-            onClick={() => router.push('/tablet/ophaal-flow/pay')}
+            onClick={() => router.push('/tablet/payment/4')}
           >
             Betalen
           </button>

@@ -2,8 +2,8 @@
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, MagnifyingGlass, User, CreditCard } from "phosphor-react";
-import Stepper from "@/components/Stepper";
-import ItemDetailPage from "@/app/mobile/items/[id]/page";
+import Stepper from "@/components/tabletHeader";
+import ItemDetailPage from "@/components/common/ItemDetailPage";
 import { ReturnButton } from "@/components/common/ReturnButton";
 
 export default function TabletProductDetailPage() {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import { ReturnButton } from "@/components/common/ReturnButton";
 import Navigation from "@/components/mobile/nav";
 import itemsDetails from "@/data/itemDetails.json";
@@ -11,6 +11,10 @@ export default function ReservationPage() {
   const params = useParams();
   const id = parseInt(params.id as string);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Check if we're on the tablet route
+  const isTabletRoute = pathname.includes("/tablet/");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -113,8 +117,12 @@ export default function ReservationPage() {
       // Api call voor het versturen van de reservering
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // navigeer naar de bevestigingspagina
-      router.push(`/mobile/reserveer/confirmation?id=${id}`);
+      // Navigate to the appropriate confirmation page based on route type
+      if (isTabletRoute) {
+        router.push(`/tablet/payment/${id}`);
+      } else {
+        router.push(`/mobile/reserveer/confirmation?id=${id}`);
+      }
     } catch (error) {
       console.error("Error submitting reservation:", error);
       //TODO: aparte pagina of een popup
@@ -152,9 +160,11 @@ export default function ReservationPage() {
             <div className="text-center text-sm text-primarytext-1 m-4">Prijs: €{item.price.toFixed(2).replace(".", ",")} per week</div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primarygreen-1 mb-4">€{totalPrice}</div>
-              <div className="bg-gray-50 rounded-lg  text-center px-3 py-2">
-                <p className="text-gray-600 text-sm font-semibold">Betaling gebeurd via Payconiq bij ophalen</p>
-              </div>
+              {!isTabletRoute && (
+                <div className="bg-gray-50 rounded-lg  text-center px-3 py-2">
+                  <p className="text-gray-600 text-sm font-semibold">Betaling gebeurd via Payconiq bij ophalen</p>
+                </div>
+              )}
             </div>
           </div>
           <div className="bg-red-100 rounded-lg p-4 mb-6 text-center text-red-900 border border-red-800 text-sm font-semibold">48 uur om uw item op te halen anders wordt de reservatie geannuleerd!</div>
@@ -237,7 +247,7 @@ export default function ReservationPage() {
       </div>
       <div className="flex justify-center items-center w-full">
         <button form="reservationForm" type="submit" disabled={isSubmitting} className="w-64 bg-primarygreen-1 text-white py-3 px-4 rounded-lg hover:bg-green-900 transition-colors disabled:bg-gray-400">
-          {isSubmitting ? "Bezig met reserveren..." : "Reserveren"}
+          {isSubmitting ? "Bezig met reserveren..." : isTabletRoute ? "Huur nu" : "Reserveren"}
         </button>
       </div>
     </div>

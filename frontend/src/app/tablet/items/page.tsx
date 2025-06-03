@@ -2,11 +2,7 @@
 
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { ArrowLeft, MagnifyingGlass, User, CreditCard } from "phosphor-react";
-import { ItemCard } from "@/components/common/ItemCard";
-import Stepper from "@/components/Stepper";
 import { ReturnButton } from "@/components/common/ReturnButton";
-import MobileItemPage from "@/app/mobile/items/page";
 import { ItemPage } from "@/components/common/ItemsPage";
 
 export default function TabletItemsPage() {

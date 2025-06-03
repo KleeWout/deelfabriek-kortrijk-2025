@@ -1,21 +1,23 @@
-'use client';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckCircle } from 'phosphor-react';
+"use client";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { CheckCircle } from "phosphor-react";
 
 export default function ThankYouPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [countdown, setCountdown] = useState(5);
-  const hasFeedback = searchParams.get('feedback') === 'true';
+  const hasFeedback = searchParams.get("feedback") === "true";
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
+  // This effect handles countdown
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          router.push('/tablet');
+          setShouldRedirect(true); // Flag for redirect instead of directly navigating
           return 0;
         }
         return prev - 1;
@@ -23,7 +25,19 @@ export default function ThankYouPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [router]);
+  }, []);
+
+  // This separate effect handles navigation based on the redirect flag
+  useEffect(() => {
+    if (shouldRedirect) {
+      // Use a small timeout to ensure this happens after render is complete
+      const redirectTimeout = setTimeout(() => {
+        router.push("/tablet");
+      }, 100);
+
+      return () => clearTimeout(redirectTimeout);
+    }
+  }, [shouldRedirect, router]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3f6f8]">
@@ -31,43 +45,23 @@ export default function ThankYouPage() {
         <div className="bg-white rounded-2xl shadow-xl p-12 flex flex-col items-center">
           {/* Logo */}
           <div className="mb-12">
-            <Image
-              src="/deelfabriek-website-labels-boven_v2.svg"
-              alt="Deelfabriek Logo"
-              width={320}
-              height={120}
-            />
+            <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={320} height={120} />
           </div>
 
           {/* Success Icon */}
           <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mb-8">
-            <CheckCircle
-              size={64}
-              weight="fill"
-              className="text-[var(--color-primarygreen-1)]"
-            />
+            <CheckCircle size={64} weight="fill" className="text-[var(--color-primarygreen-1)]" />
           </div>
 
           {/* Message */}
           <div className="text-center max-w-2xl">
-            <h1 className="text-3xl font-bold text-[var(--color-primarygreen-1)] mb-6">
-              {hasFeedback
-                ? 'Bedankt voor je feedback!'
-                : 'Bedankt voor het uitlenen!'}
-            </h1>
-            <p className="text-xl text-gray-700 mb-8">
-              {hasFeedback
-                ? 'We waarderen je feedback en zullen deze gebruiken om onze service te verbeteren. We hopen je snel terug te zien bij de Deelfabriek!'
-                : 'Bedankt voor het uitlenen van een product bij de Deelfabriek. We hopen je snel terug te zien!'}
-            </p>
+            <h1 className="text-3xl font-bold text-[var(--color-primarygreen-1)] mb-6">{hasFeedback ? "Bedankt voor je feedback!" : "Bedankt voor het uitlenen!"}</h1>
+            <p className="text-xl text-gray-700 mb-8">{hasFeedback ? "We waarderen je feedback en zullen deze gebruiken om onze service te verbeteren. We hopen je snel terug te zien bij de Deelfabriek!" : "Bedankt voor het uitlenen van een product bij de Deelfabriek. We hopen je snel terug te zien!"}</p>
           </div>
 
           {/* Countdown */}
           <div className="mt-8 text-center">
-            <p className="text-gray-600">
-              Je wordt over {countdown} seconden doorgestuurd naar het
-              beginscherm...
-            </p>
+            <p className="text-gray-600">Je wordt over {countdown} seconden doorgestuurd naar het beginscherm...</p>
           </div>
         </div>
       </div>
