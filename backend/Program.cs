@@ -3,6 +3,17 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add CORS service with policy that allows any origin
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // read settings from json
 var databaseSettings = builder.Configuration.GetSection("DatabaseSettings");
 builder.Services.Configure<DatabaseSettings>(databaseSettings);
@@ -39,8 +50,10 @@ builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 // app.UseAuthentication();
 // app.UseAuthorization();
+// Enable CORS middleware - this line was missing
+app.UseCors("AllowAll");
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "Welcome to the deelfabriek API!");
 
 app.MapGroup("/items").GroupPublicItems();
 app.MapGroup("/users").GroupPublicUsers();

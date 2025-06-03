@@ -138,15 +138,33 @@ export default function ReservationPage() {
 
         <div className="bg-primarygreen-2 border border-primarygreen-1 rounded-lg p-6 mb-6">
           <div className="flex justify-center items-center gap-6 mb-4">
-            <button onClick={() => handleDurationChange(-1)} className="w-8 h-8 bg-primarygreen-1 rounded-full flex items-center justify-center text-white font-bold text-xl" disabled={formData.duration <= 1}>
-              -
-            </button>
+            {formData.duration > 1 && (
+              <button 
+                onClick={() => handleDurationChange(-1)} 
+                className="w-8 h-8 bg-primarygreen-1 rounded-full flex items-center justify-center text-white font-bold text-xl"
+              >
+                -
+              </button>
+            )}
+            {formData.duration === 1 && (
+              <div className="w-8 h-8"></div> // Empty space to maintain layout
+            )}
+            
             <span className="text-primarygreen-1 text-2xl font-bold">
               {formData.duration} {formData.duration > 1 ? "weken" : "week"}
             </span>
-            <button onClick={() => handleDurationChange(1)} className="w-8 h-8 bg-primarygreen-1 rounded-full flex items-center justify-center text-white font-bold text-xl" disabled={formData.duration >= 4}>
-              +
-            </button>
+            
+            {formData.duration < 2 && (
+              <button 
+                onClick={() => handleDurationChange(1)} 
+                className="w-8 h-8 bg-primarygreen-1 rounded-full flex items-center justify-center text-white font-bold text-xl"
+              >
+                +
+              </button>
+            )}
+            {formData.duration >= 2 && (
+              <div className="w-8 h-8"></div> // Empty space to maintain layout
+            )}
           </div>
 
           <div className="flex justify-between m-2 p-2 text-base text-primarytext-1">

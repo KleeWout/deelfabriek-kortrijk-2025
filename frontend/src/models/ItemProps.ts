@@ -1,7 +1,7 @@
 export default interface ItemProps {
   id: number;
   title: string;
-  price: number;
+  pricePerWeek: number;
   imageSrc: string;
   status: string;
   description?: string;
