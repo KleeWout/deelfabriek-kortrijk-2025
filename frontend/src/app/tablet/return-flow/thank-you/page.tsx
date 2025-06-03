@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle } from "phosphor-react";
 
-export default function ThankYouPage() {
+// Wrapper component that uses searchParams
+function ThankYouContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [countdown, setCountdown] = useState(5);
@@ -38,7 +39,6 @@ export default function ThankYouPage() {
       return () => clearTimeout(redirectTimeout);
     }
   }, [shouldRedirect, router]);
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3f6f8]">
       <div className="w-full max-w-4xl mx-auto px-8">
@@ -66,5 +66,30 @@ export default function ThankYouPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading fallback UI
+function ThankYouPageLoading() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3f6f8]">
+      <div className="w-full max-w-4xl mx-auto px-8">
+        <div className="bg-white rounded-2xl shadow-xl p-12 flex flex-col items-center">
+          <div className="mb-12">
+            <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={320} height={120} />
+          </div>
+          <p className="text-gray-600">Laden...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Export the main page component with Suspense
+export default function ThankYouPage() {
+  return (
+    <Suspense fallback={<ThankYouPageLoading />}>
+      <ThankYouContent />
+    </Suspense>
   );
 }
