@@ -23,7 +23,7 @@ export interface ItemResponse {
 }
 
 // const url = "http://localhost:3001";
-const url = "https://api-deelfabriek.woutjuuh02.be/";
+const url = "https://api-deelfabriek.woutjuuh02.be";
 
 export const getItems = async (): Promise<ItemProps[]> => {
   try {

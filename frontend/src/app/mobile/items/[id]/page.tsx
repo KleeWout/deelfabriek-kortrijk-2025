@@ -72,7 +72,6 @@ export default function ItemDetailPage() {
 
   return (
     <div>
-      <Navigation />
       <div className="py-7 px-4">
         <ReturnButton href="/mobile/items" />
       </div>

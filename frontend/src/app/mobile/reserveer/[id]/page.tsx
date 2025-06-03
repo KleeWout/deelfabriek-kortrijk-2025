@@ -128,8 +128,6 @@ export default function ReservationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
-      <Navigation />
-
       <div className="container mx-auto px-4 mt-4">
         <h1 className="text-2xl font-bold text-center text-primarygreen-1 mb-4">Reserveren</h1>
 

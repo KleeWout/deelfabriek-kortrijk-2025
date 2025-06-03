@@ -11,7 +11,6 @@ import { Package, Question } from "phosphor-react";
 export default function MobilePage() {
   return (
     <>
-      <Navigation />
       <main className="py-8 px-8 flex flex-col gap-4">
         <h1 className="text-4xl font-bold text-center text-primarygreen-1">Deelkast</h1>
         <p className="text-center">Slim delen begint hier. Bij de Deelkast kan je snel en makkelijk spullen lenen via onze kast. Meld je aan, kies een item en haal het op bij de locker - 100% selfservice.</p>

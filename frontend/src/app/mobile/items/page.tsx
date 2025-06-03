@@ -31,7 +31,6 @@ export default function MobileItemPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navigation />
       
       {/* Main content area that will expand to fill space */}
       <main className="flex-1">

@@ -163,7 +163,6 @@ function ReservationSkeleton() {
 export default function ConfirmationPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
       <Suspense fallback={<ReservationSkeleton />}>
         <ReservationContent />
       </Suspense>
