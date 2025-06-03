@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { getGradientClassForBackground } from '@/utils/constants';
 import { ItemCardProps } from '@/models/ItemCardProps';
 
@@ -21,15 +21,21 @@ export function ItemCard({
   status = 'Beschikbaar',
   index = 0,
   onClick,
+  baseRoute
 }: ItemCardProps & { onClick?: () => void }) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  // If baseRoute is not provided, determine it from the current path
+  const resolvedBaseRoute = baseRoute || (pathname.startsWith("/mobile") ? "/mobile/items" : pathname.startsWith("/tablet") ? "/tablet/items" : "/items");
+
 
   //verschillende achtergrond gradients:
   const gradientClass = getGradientClassForBackground(id);
 
   //klik en navigeer nr detail pagina van item
   const handleItemClick = (itemId: number) => {
-    router.push(`/mobile/items/${itemId}`);
+    router.push(`${resolvedBaseRoute}/${itemId}`);
   };
 
   return (
@@ -55,3 +61,4 @@ export function ItemCard({
     </div>
   );
 }
+

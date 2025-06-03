@@ -20,6 +20,9 @@ export default function ItemDetailPage() {
 
   const gradientClass = getGradientClassForBackground(id);
 
+
+  
+
   useEffect(() => {
     const fetchItem = async () => {
       try {
@@ -45,7 +48,6 @@ export default function ItemDetailPage() {
     return (
       <div className="container mx-auto p-4">
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
-          <ReturnButton href="/mobile/items" />
           <h1 className="text-2xl font-bold">Laden...</h1>
         </div>
       </div>
@@ -65,16 +67,18 @@ export default function ItemDetailPage() {
   }
 
   // Parse accessories from string to array if needed
+  const howToUse = item.howToUse ? item.howToUse.split(",").map((item) => item.trim()) : [];
   const accessories = item.accesories ? item.accesories.split(",").map((item) => item.trim()) : [];
+
 
   // Use default image if none provided
   const imageSrc = item.imageSrc || "/placeholder-image.jpg";
 
   return (
     <div>
-      <div className="py-7 px-4">
+      {/* <div className="py-7 px-4">
         <ReturnButton href="/mobile/items" />
-      </div>
+      </div> */}
       <div className="container mx-auto p-4">
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex flex-col lg:flex-row lg:gap-8">
