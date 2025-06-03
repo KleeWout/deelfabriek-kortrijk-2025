@@ -67,7 +67,6 @@ export default function MobileItemPage() {
         )}
       </main>
       
-      <Footer />
     </div>
   );
 }

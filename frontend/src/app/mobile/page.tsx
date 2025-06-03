@@ -33,7 +33,6 @@ export default function MobilePage() {
           <InfoCard number={5} title="Gebruik & breng terug" description="Geniet van je geleende item en breng het optijd terug. Deel je ervaring via de tablet - zo helpen we elkaar!" />
         </section>
       </main>
-      <Footer />
     </>
   );
 }

@@ -13,7 +13,6 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
     <div className="min-h-screen flex flex-col bg-primarybackground">
       <Navigation />
       <main className="flex-grow">{children}</main>
-      <Footer />
     </div>
   );
 }
