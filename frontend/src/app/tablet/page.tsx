@@ -66,7 +66,7 @@ export default function TabletPage() {
           </h1>
           <button
             className="w-full max-w-[480px] h-16 bg-[var(--color-primarygreen-1)] text-white text-2xl rounded-lg font-semibold shadow hover:bg-[#00664f] transition"
-            // TODO: Link naar items bekijken pagina
+            onClick={() => router.push('/tablet/reservation-flow')}
           >
             Items bekijken
           </button>
