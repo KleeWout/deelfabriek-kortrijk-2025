@@ -2,25 +2,47 @@
 namespace Deelkast.API.Repositories;
 
 
-public interface ILockerRepository 
+public interface ILockerRepository
 {
-    Task<Locker> GetByLockerNumber(int lockerNumber);
+    Task<Locker?> GetByLockerNumber(int lockerNumber);
+
+    Task<bool> LockerNumberExist(int lockerNumber);
+
+    Task<bool> AnyOtherLockerWithNumber(int id, int lockerNumber);
+    
+    Task<Locker?> GetLockerByItemId(int itemId);
 
 }
 
 
 public class LockerRepository : ILockerRepository
 {
-    private readonly IGenericRepository<Locker> _genericRepository;
+    private readonly ApplicationDbContext _context;
 
-    public LockerRepository(IGenericRepository<Locker> genericRepository)
+    public LockerRepository(ApplicationDbContext context)
     {
-        _genericRepository = genericRepository;
+        _context = context;
     }
 
-    public async Task<Locker> GetByLockerNumber(int lockerNumber)
+    public async Task<Locker?> GetByLockerNumber(int lockerNumber)
     {
-        var lockers = await _genericRepository.GetAllAsync();
-        return lockers.FirstOrDefault(l => l.LockerNumber == lockerNumber);
+        return await _context.Lockers
+            .FirstOrDefaultAsync(l => l.LockerNumber == lockerNumber);
     }
+
+    public async Task<bool> LockerNumberExist(int lockerNumber)
+    {
+        return await _context.Lockers.AnyAsync(l => l.LockerNumber == lockerNumber);
+    }
+    public async Task<bool> AnyOtherLockerWithNumber(int id, int lockerNumber)
+    {
+        return await _context.Lockers.AnyAsync(l => l.LockerNumber == lockerNumber && l.Id != id);
+    }
+
+    public async Task<Locker?> GetLockerByItemId(int itemId)
+    {
+        return await _context.Lockers
+            .FirstOrDefaultAsync(l => l.ItemId == itemId);
+    }
+
 }

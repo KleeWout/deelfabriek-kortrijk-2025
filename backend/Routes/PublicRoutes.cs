@@ -163,6 +163,30 @@ public static class PublicRoutes
     {
         // Implement reservation routes here
         // e.g., group.MapGet("/reservations", ...);
+        group.MapPost("/", async (CreateReservationDto dto, IReservationService reservationService) =>
+        {
+            try
+            {
+                var reservation = await reservationService.CreateReservation(dto);
+                return Results.Ok(new { ReservationId = reservation.Id }); // Only return the ID
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred while creating the reservation: {ex.Message}");
+            }
+        });
+
+        group.MapGet("/{id:int}", async (int id, IReservationService reservationService) =>
+        {
+            var reservation = await reservationService.GetReservationbyId(id);
+            if (reservation == null)
+            {
+                return Results.NotFound();
+            }
+
+            return Results.Ok(reservation);
+        });
+
         return group;
     }
 

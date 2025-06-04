@@ -1,16 +1,17 @@
-@url = http://localhost:5159
+@url = http://0.0.0.0:3001
 
 
 //USERS 
 
-
+//werkt
 GET {{url}}/users
 
 ### 
+//werkt
 GET {{url}}/users/1
 
 ###
-// for user
+// werkt
 POST {{url}}/users
 Content-Type: application/json
 
@@ -26,6 +27,7 @@ Content-Type: application/json
 }
 
 ###
+// werkt
 PUT {{url}}/users/1
 Content-Type: application/json
 
@@ -45,23 +47,41 @@ Content-Type: application/json
 //ITEMS
 // -------------------------------
 ###
-// all products page  (delete categories )
+// all products page  -werkt
 GET {{url}}/items
 
 ###
-// detail product page 
+// detail product page  -werkt
 GET {{url}}/items/5
 ###
-// get item with status available (for dropdown in product admin page)
+// get item with status available 
+// Werkt
 GET {{url}}/items/available
 ###
-GET {{url}}/items?categoryId=6
+//Werkt
+GET {{url}}/items?categoryId=3
 Accept: application/json
 ###
 
 //CATEGORIES
 // -------------------------------
+// werkt
 GET {{url}}/categories
 ###
 
+// reservations
+// -------------------------------
+// werkt
+POST {{url}}/reservations
+Content-Type: application/json
 
+{
+  "itemId": 2,
+  "userId": 1,
+  "weeks": 2
+}
+
+// get reservations for user
+###
+// nog output maken 
+GET {{url}}/reservations/3

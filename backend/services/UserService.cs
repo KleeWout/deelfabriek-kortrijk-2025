@@ -8,10 +8,7 @@ public interface IUserService
     Task AddUser(User user);
     Task UpdateUser(User user);
     Task DeleteUser(int id);
-
     Task<bool> EmailExists(string email);
-
-
 
 }
 
@@ -55,8 +52,5 @@ public class UserService : IUserService
     {
         return await _customUserRepository.EmailExists(email);
     }
-
-
-
 
 }

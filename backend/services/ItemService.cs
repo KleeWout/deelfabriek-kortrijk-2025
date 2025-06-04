@@ -11,20 +11,18 @@ public interface IItemService
     Task UpdateItem(Item item);
     Task DeleteItem(int id);
 
-    //get item b categorie
     Task<List<ItemsPageDto>> GetItemsByCategoryAsync(int categoryId);
     Task<List<ItemNameDto>> GetAvailableItems();
 
+    // category related methods
+
     Task<Item> GetItemByIdWithCategories(int id);
-
     Task<IEnumerable<CategoryDto>> GetAllCategories();
-
     Task<Category> GetCategoryById(int id);
     Task AddCategory(Category category);
     Task DeleteCategory(int id);
 
-    Task UpdateItemWithCategories(Item item); // Uncomment if you need this method
-
+    Task UpdateItemWithCategories(Item item); 
 }
 
 
@@ -35,7 +33,6 @@ public class ItemService : IItemService
     private readonly IGenericRepository<Category> _categoryRepository;
 
     private readonly IItemRepository _customItemRepository;
-
     private readonly IMapper _mapper;
 
     public ItemService(
@@ -53,7 +50,7 @@ public class ItemService : IItemService
 
     public async Task<List<ItemDetailDto>> GetAllItemsAdmin()
     {
-        var items = await _customItemRepository.GetItems(); // deze methode geeft List<Item> terug met alle includes
+        var items = await _customItemRepository.GetItems(); 
         return _mapper.Map<List<ItemDetailDto>>(items);
     }
 

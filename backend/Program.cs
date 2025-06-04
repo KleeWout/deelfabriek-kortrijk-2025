@@ -25,12 +25,15 @@ builder.Services.AddScoped<IGenericRepository<Item>, GenericRepository<Item>>();
 builder.Services.AddScoped<IGenericRepository<Locker>, GenericRepository<Locker>>();
 builder.Services.AddScoped<IGenericRepository<User>, GenericRepository<User>>();
 builder.Services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
+builder.Services.AddScoped<IGenericRepository<Reservation>, GenericRepository<Reservation>>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<ILockerRepository, LockerRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<ILockerService, LockerService>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<ItemValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
@@ -58,12 +61,14 @@ app.MapGet("/", () => "Welcome to the deelfabriek API!");
 app.MapGroup("/items").GroupPublicItems();
 app.MapGroup("/users").GroupPublicUsers();
 app.MapGroup("/categories").GroupPublicCategories();
+app.MapGroup("/reservations").GroupReservations();
 
 // add authorization later 
-var adminApi = app.MapGroup("/admin");
+var adminApi = app.MapGroup("/dashboard");
 adminApi.MapGroup("/items").GroupAdminItems();
 adminApi.MapGroup("/lockers").GroupAdminLockers();
 adminApi.MapGroup("/categories").GroupAdminCategories();
 adminApi.MapGroup("/users").GroupAdminUsers();
+adminApi.MapGroup("/reservations").GroupAdminReservations();
 
 app.Run();

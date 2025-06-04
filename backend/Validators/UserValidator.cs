@@ -31,6 +31,7 @@ public class UserValidator : AbstractValidator<User>
             .When((user, context) => context.RootContextData.ContainsKey("Operation") && 
                                      context.RootContextData["Operation"].ToString() == "CREATE");
 
+
         RuleFor(address => address.Street)
             .NotEmpty().WithMessage("Street is required.")
             .MaximumLength(200).WithMessage("Street cannot exceed 200 characters.");

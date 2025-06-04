@@ -10,9 +10,7 @@ public interface IItemRepository
     Task<List<Item>> GetAvailableItemsAsync();
     Task<List<Item>> GetItemsByCategoryAsync(int categoryId);
     Task UpdateItemWithCategories(Item item);
-
     Task<Item> GetItemByIdWithCategories(int id);
-    Task<IActionResult> ReturnItem(string pickupCode);
 }
 
 public class ItemRepository : GenericRepository<Item>, IItemRepository
@@ -24,7 +22,6 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
         _context = context;
     }
 
-    // In your CustomItemRepository
         public async Task<List<Item>> GetItemsByCategoryAsync(int categoryId)
         {
             return await _context.Items
@@ -34,7 +31,6 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
                 .ToListAsync();
         }
     
-
     public async Task<List<Item>> GetItems()
     {
         return await _context.Items
@@ -134,51 +130,5 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
             _context.ItemCategories.RemoveRange(existingCategories);
         }
     }
-
-
-
-    public async Task<IActionResult> ReturnItem(string pickupCode)
-    {
-        var reservation = await _context.Reservations
-            .Include(r => r.Item)
-            .Include(r => r.Locker)
-            .FirstOrDefaultAsync(r => r.PickupCode == pickupCode && r.ActualReturnDate == null);
-
-        // if (reservation == null)
-        //     return new NotFoundObjectResult("Invalid or already returned pickup code.");
-
-        // OPTIONAL: Trigger hardware signal to unlock locker
-        // _lockerService.OpenLocker(reservation.Locker.Id);
-
-        // Wait for confirmation or timeout (depends on locker tech)
-        // e.g., await _lockerService.WaitForLockerClose(reservation.Locker.Id);
-
-        // Update database
-        // reservation.ActualReturnDate = DateTime.UtcNow;
-        // reservation.Item.Status = ItemStatus.Beschikbaar;
-        // reservation.Item.TimesLoaned += 1;
-
-        // await _context.SaveChangesAsync();
-
-        return new OkObjectResult("Item returned successfully.");
-    }
-
-
-
-    //     public async Task<IActionResult> AssignLockerToItem(int itemId, string lockerCode)
-    // {
-    //     var item = await _context.Items.FindAsync(itemId);
-    //     var locker = new Locker { Code = lockerCode, ItemId = itemId };
-
-    //     _context.Lockers.Add(locker);
-    //     await _context.SaveChangesAsync();
-
-    //     item.LockerId = locker.Id;
-    //     _context.Items.Update(item);
-    //     await _context.SaveChangesAsync();
-
-    //     return Ok();
-    // }
-
 
 }
