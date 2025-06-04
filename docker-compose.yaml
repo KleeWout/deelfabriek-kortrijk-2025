@@ -6,7 +6,10 @@
 services:
   frontend:
     # image: woutjuuh02/deelfabriek-kortrijk-2025-frontend:latest
-    build: ./frontend
+    build:
+      context: ./frontend
+      platforms:
+      - linux/arm64
     ports:
       - "3000:3000"
     restart: unless-stopped
