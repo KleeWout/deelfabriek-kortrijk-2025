@@ -45,7 +45,6 @@ public class Item : IEntity
 public enum ItemStatus
 {
     Beschikbaar,
-    Gereserveerd,
     Geleend,
     Niet_Beschikbaar,
     Onderhoud

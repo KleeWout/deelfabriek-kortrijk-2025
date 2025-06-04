@@ -1,14 +1,15 @@
 
 namespace Deelkast.API.Context;
+
 public class ApplicationDbContext : IdentityDbContext
 {
 
-        public DbSet<User> User { get; set; }
-        public DbSet<Item> Items { get; set; }
-        public DbSet<Locker> Lockers { get; set; }
-        public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<ItemCategory> ItemCategories { get; set; }
+    public DbSet<User> User { get; set; }
+    public DbSet<Item> Items { get; set; }
+    public DbSet<Locker> Lockers { get; set; }
+    public DbSet<Reservation> Reservations { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<ItemCategory> ItemCategories { get; set; }
 
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -19,7 +20,7 @@ public class ApplicationDbContext : IdentityDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-         // ItemCategory (Many-to-Many between Item and Category)
+        // ItemCategory (Many-to-Many between Item and Category)
         modelBuilder.Entity<ItemCategory>()
             .HasKey(ic => new { ic.ItemId, ic.CategoryId });
 
@@ -75,7 +76,7 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<Category>().HasData(
             new Category { Id = 1, Name = "Elektrisch", IconName = "electricity" },
             new Category { Id = 2, Name = "Speelgoed", IconName = "toy" },
-            new Category { Id = 3, Name = "Tuingereedschap" , IconName = "garden-tools" },
+            new Category { Id = 3, Name = "Tuingereedschap", IconName = "garden-tools" },
             new Category { Id = 4, Name = "Keukenapparatuur", IconName = "kitchen-appliances" }
         );
 
@@ -176,34 +177,54 @@ public class ApplicationDbContext : IdentityDbContext
 
 
 
-    // Seed ItemCategory (join table)
-    modelBuilder.Entity<ItemCategory>().HasData(
-        new ItemCategory { ItemId = 1, CategoryId = 1 }, // Boormachine → Elektrisch
-        new ItemCategory { ItemId = 2, CategoryId = 2 }, // Houten trein → Speelgoed
-        new ItemCategory { ItemId = 2, CategoryId = 3 }  // Houten trein → Tuingereedschap
-    );
-            // Seed Lockers
-            modelBuilder.Entity<Locker>().HasData(
-                new Locker
-                {
-                    Id = 1,
-                    LockerNumber = 101,
-                    IsAvailable = false,
-                    IsOpen = true,
-                    ItemId = null // Geen item toegewezen
-                },
-                new Locker
-                {
-                    Id = 2,
-                    LockerNumber = 102,
-                    IsAvailable = true,
-                    IsOpen = true,
-                    ItemId = null // Geen item toegewezen
-                }
-            );
+        // Seed ItemCategory (join table)
+        modelBuilder.Entity<ItemCategory>().HasData(
+            new ItemCategory { ItemId = 1, CategoryId = 1 }, // Boormachine → Elektrisch
+            new ItemCategory { ItemId = 2, CategoryId = 2 }, // Houten trein → Speelgoed
+            new ItemCategory { ItemId = 2, CategoryId = 3 }  // Houten trein → Tuingereedschap
+        );
+        // Seed Lockers
+        modelBuilder.Entity<Locker>().HasData(
+            new Locker
+            {
+                Id = 1,
+                LockerNumber = 101,
+                IsOpen = true,
+                ItemId = null // Geen item toegewezen
+            },
+            new Locker
+            {
+                Id = 2,
+                LockerNumber = 102,
+                IsOpen = true,
+                ItemId = null // Geen item toegewezen
+            }
+        );
 
-  
+        // Seed Reservations
+        modelBuilder.Entity<Reservation>().HasData(
+            new Reservation
+            {
+                Id = 1,
+                PickupCode = "123456",
+                ReservationDate = new DateTime(2023, 6, 5),
+                LoanStart = null,
+                LoanEnd = null,
+                ActualReturnDate = null,
+                Weeks = 1,
+                PickupDeadline = new DateTime(2023, 6, 7),
+                TotalPrice = 5.00m,
+                UserId = 1,
+                ItemId = 1,
+                LockerId = 1
+            }
+        );
+        // review seed
+
+
     }
+    
+
 
 
 }

@@ -1,15 +1,17 @@
-@url = http://localhost:5159
+@url = http://0.0.0.0:3001
 
 //USERS 
 
-
-GET {{url}}/admin/users
+//Werkt
+GET {{url}}/dashboard/users
 
 ### 
-GET {{url}}/admin/users/1
+//werkt
+GET {{url}}/dashboard/users/1
 
 ###
-PUT {{url}}/admin/users/1
+// werkt
+PUT {{url}}/dashboard/users/1
 Content-Type: application/json
 
 {
@@ -17,22 +19,22 @@ Content-Type: application/json
   "lastname": "example",
   "phoneNumber": "32470123456",
   "email": "Philipp.example.com",
-  "street": "Main Street 123",
+  "street": "Mdddain Street 123",
   "city": "Brussels",
   "bus": "02",
   "postalCode": "2000"
-  
 }
-###(
-DELETE {{url}}/admin/users/3
+###
+DELETE {{url}}/dashboard/users/2
 ###
 //ITEMS
 // -------------------------------
-
-GET {{url}}/admin/items
+// werkt (miss nog een dto voor betere output)
+GET {{url}}/dashboard/items
 ###
-// there is an api that also sends the image to upload and stores the png in database http://localhost:5159/admin/items/with-image (api name still needs to change)  
-POST {{url}}/admin/items
+// there is an api that also sends the image to upload and stores the png in database http://http://0.0.0.0:3001/dashbaoard/items/with-image (api name still needs to change)  
+//Werkt
+POST {{url}}/dashboard/items
 Content-Type: application/json
 
 {
@@ -56,7 +58,8 @@ Content-Type: application/json
 
 ###
 // still need to make an api to update with the image, this one works without image upload
-PUT {{url}}/admin/items/7
+//werkt
+PUT {{url}}/dashboard/items/5
 Content-Type: application/json
 
 {
@@ -73,21 +76,23 @@ Content-Type: application/json
   "createdAt": "2023-06-10T00:00:00Z",
   "itemCategories": [
     {
-      "categoryId": 1
+      "categoryId": 5
     }
   ]
 }
 ###
-DELETE {{url}}/admin/items/4
-
+//werkt 
+DELETE {{url}}/dashboard/items/6
 ###
 
 //CATEGORIES
 // -------------------------------
-GET {{url}}/admin/categories
+//Werkt
+GET {{url}}/dashboard/categories
 ###
 
-POST {{url}}/admin/categories
+//Werkt
+POST {{url}}/dashboard/categories
 Content-Type: application/json
 
 {
@@ -96,49 +101,42 @@ Content-Type: application/json
 }
 
 ###
-DELETE {{url}}/admin/categories/4
+DELETE {{url}}/dashboard/categories/4
 //LOCKERS
 // -------------------------------
 ###
-GET {{url}}/admin/lockers
+//werkt
+GET {{url}}/dashboard/lockers
 ###
-GET {{url}}/admin/lockers/1
-
-# ###
-# POST {{url}}/admin/lockers
-# Content-Type: application/json
-
-# {
-#   "LockerNumber": 231,
-#   // choose an item that exists 
-#   "itemId": 4
-# }
-###
-# PUT {{url}}/lockers/1
-# Content-Type: application/json
-
-# {
-#   "LockerNumber": 101,
-#   // choose an item that exists 
-#   "itemId": 1
-# }
+//werkt
+GET {{url}}/dashboard/lockers/1
 
 ###
-DELETE {{url}}/admin/lockers/1
+//werkt
+POST {{url}}/dashboard/lockers
+Content-Type: application/json
+
+{
+  "LockerNumber": 32,
+  "itemId": 5
+}
+//still need to see if it can be uploaded without an itemId
+###
+//werkt
+PUT {{url}}/dashboard/lockers/1
+Content-Type: application/json
+
+{
+  "LockerNumber": 122,
+  "itemId": 2
+}
 
 ###
-#  Open/Close Locker (Manual Button Toggle)
-# PUT /lockers/{id}/toggle
-
-
-# POST {{url}}/lockers/unlock
-# Content-Type: application/json
-
-# {
-#   "code": "23714#01"
-# }
+DELETE {{url}}/dashboard/lockers/3
+###
 
 ###
 //RESERVATIONS
 // -------------------------------
-
+// werkt (dto betere output)
+GET {{url}}/dashboard/reservations
