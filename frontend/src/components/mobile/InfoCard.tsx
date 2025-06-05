@@ -7,7 +7,8 @@ interface FeatureCardProps {
   imageSrc?: string;
 }
 
-export default function FeatureCard({
+export default function 
+FeatureCard({
   number,
   title,
   description,

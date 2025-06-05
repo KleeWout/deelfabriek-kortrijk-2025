@@ -1,4 +1,7 @@
+"use client";
 import Image from "next/image";
+import Link from "next/link";
+import { DeviceMobile, DeviceTablet, SquaresFour } from "@phosphor-icons/react";
 
 export default function Home() {
   return (
@@ -8,38 +11,41 @@ export default function Home() {
       <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-8">
         <div className="max-w-2xl w-full text-center space-y-6 sm:space-y-8 bg-white/90 rounded-2xl p-6 sm:p-10 shadow-2xl border border-white/30">
           <div className="mb-6 sm:mb-8 flex justify-center">
-            <Image
-              src="/deelfabriek-website-labels-boven_v2.svg"
-              alt="Deelfabriek Kortrijk Logo"
-              width={250}
-              height={100}
-              priority
-              className="mx-auto w-[200px] sm:w-[250px]"
-            />
+            <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Kortrijk Logo" width={250} height={100} priority className="mx-auto w-[200px] sm:w-[250px]" />
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#004431] mb-3 sm:mb-4 tracking-tight">
-            Binnenkort Online
-          </h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#004431] mb-3 sm:mb-4 tracking-tight">Live Demo</h1>
 
-          <p className="text-lg sm:text-l text-[#1A1A1A] mb-6 sm:mb-8">
-            We werken hard aan ons nieuw project: The Library of Things voor de
-            Deelfabriek Kortrijk. Kom later terug voor meer info!
-          </p>
+          {/* <p className="text-lg sm:text-l text-[#1A1A1A] mb-6 sm:mb-8">We werken hard aan ons nieuw project: The Library of Things voor de Deelfabriek Kortrijk. Kom later terug voor meer info!</p> */}
 
-          <div className="flex items-center justify-center space-x-4">
-            <div
-              className="w-3 h-3 bg-[#FF6B6B] rounded-full animate-bounce"
-              style={{ animationDelay: "0ms" }}
-            ></div>
-            <div
-              className="w-3 h-3 bg-[#4ECDC4] rounded-full animate-bounce"
-              style={{ animationDelay: "150ms" }}
-            ></div>
-            <div
-              className="w-3 h-3 bg-[#FFE66D] rounded-full animate-bounce"
-              style={{ animationDelay: "300ms" }}
-            ></div>
+          {/* Navigation Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-8">
+            <Link href="/mobile" className="flex flex-col items-center">
+              <div className="w-32 h-32 bg-[#004431] hover:bg-[#00664A] rounded-lg flex items-center justify-center transition-colors duration-300 shadow-lg">
+                <DeviceMobile size={64} className="text-white" />
+              </div>
+              <span className="mt-2 font-medium text-[#004431]">Mobile</span>
+            </Link>
+
+            <Link href="/tablet" className="flex flex-col items-center">
+              <div className="w-32 h-32 bg-[#004431] hover:bg-[#00664A] rounded-lg flex items-center justify-center transition-colors duration-300 shadow-lg">
+                <DeviceTablet size={64} className="text-white" />
+              </div>
+              <span className="mt-2 font-medium text-[#004431]">Tablet (Kiosk)</span>
+            </Link>
+
+            <Link href="/dashboard" className="flex flex-col items-center">
+              <div className="w-32 h-32 bg-[#004431] hover:bg-[#00664A] rounded-lg flex items-center justify-center transition-colors duration-300 shadow-lg">
+                <SquaresFour size={64} className="text-white" />
+              </div>
+              <span className="mt-2 font-medium text-[#004431]">Dashboard</span>
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-center space-x-4 mt-6">
+            <div className="w-3 h-3 bg-[#FF6B6B] rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+            <div className="w-3 h-3 bg-[#4ECDC4] rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+            <div className="w-3 h-3 bg-[#FFE66D] rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
           </div>
         </div>
       </div>
@@ -48,23 +54,13 @@ export default function Home() {
       <footer className="w-full bg-[#004431] py-6 px-4 sm:px-8 border-t border-white/10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center w-full max-w-2xl mx-auto gap-4 sm:gap-8 sm:justify-center">
           <div className="flex-shrink-0 flex items-center justify-center">
-            <Image
-              src="/logo-stadkortrijk.png"
-              alt="Kortrijk Logo"
-              width={140}
-              height={56}
-              className="bg-transparent w-[120px] h-auto mb-2 sm:mb-0 sm:w-[260px] sm:h-[45px]"
-            />
+            <Image src="/logo-stadkortrijk.png" alt="Kortrijk Logo" width={140} height={56} className="bg-transparent w-[120px] h-auto mb-2 sm:mb-0 sm:w-[260px] sm:h-[45px]" />
           </div>
           <div className="text-white flex flex-col justify-center items-start">
             <span className="font-bold text-lg sm:text-lg">Deelfabriek</span>
-            <span className="text-base sm:text-base">
-              Rijkswachtstraat 5, 8500 Kortrijk
-            </span>
+            <span className="text-base sm:text-base">Rijkswachtstraat 5, 8500 Kortrijk</span>
             <span className="text-base sm:text-base mt-2">056 27 76 60</span>
-            <span className="text-base sm:text-base">
-              deelfabriek@kortrijk.be
-            </span>
+            <span className="text-base sm:text-base">deelfabriek@kortrijk.be</span>
           </div>
         </div>
       </footer>

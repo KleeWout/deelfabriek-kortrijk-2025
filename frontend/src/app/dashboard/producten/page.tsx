@@ -56,7 +56,7 @@ export default function ProductsPage() {
     setFormData({
       title: item.title || "",
       category: item.category || "",
-      price: item.price?.toString() || "",
+      price: item.pricePerWeek?.toString() || "",
       description: item.description || "",
       howToUse: item.howToUse || "",
       whatsIncluded: item.whatsIncluded || "",
@@ -152,7 +152,7 @@ export default function ProductsPage() {
                       <div className="text-sm text-gray-900">{(product.category ?? "Geen categorie").charAt(0).toUpperCase() + (product.category ?? "Geen categorie").slice(1)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">€{product.price.toFixed(2)}</div>
+                      <div className="text-sm text-gray-900">€{product.pricePerWeek?.toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.status === "Beschikbaar" ? "bg-green-100 text-green-800" : product.status === "Gereserveerd" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>{product.status}</span>

@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1
 
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -64,3 +64,6 @@ ENV PORT=3000
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
+
+# Command to build the image for amd64 architecture
+# docker buildx build --platform linux/arm64 -t woutjuuh02/deelfabriek-kortrijk-2025-kortrijk:latest . --load
