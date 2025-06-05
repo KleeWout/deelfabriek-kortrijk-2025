@@ -102,6 +102,7 @@ PUT {{url}}/openingsuren/Maandag
 Content-Type: application/json
 
 {
-  "openTimeVm": "13:00"
+  "openTimeVm": "13:00",
+  "closeTimeVm": "18:00"
 }
 

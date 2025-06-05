@@ -240,7 +240,7 @@ public static class PublicRoutes
                 }
 
                 var times = new[] { input.OpenTimeVm, input.CloseTimeVm, input.OpenTimeNm, input.CloseTimeNm };
-                int filled = times.Count(t => !string.IsNullOrEmpty(t));
+                int filled = times.Count(t => t.HasValue);
 
                 if (filled == 0)
                 {
@@ -252,7 +252,7 @@ public static class PublicRoutes
                 }
                 else if (filled == 2 || filled == 4)
                 {
-                    if (filled == 2 && (string.IsNullOrEmpty(input.OpenTimeVm) || string.IsNullOrEmpty(input.CloseTimeVm)))
+                    if (filled == 2 && (!input.OpenTimeVm.HasValue || !input.CloseTimeVm.HasValue))
                     {
                         return Results.BadRequest("Als je 2 tijden opgeeft, moeten het openingstijden zijn voor de winkel.");
                     }

@@ -8,16 +8,16 @@ public class OpeningUren
     public string IdDay { get; set; }
 
     [JsonPropertyName("openTimeVm")]
-    public string? OpenTimeVm { get; set; }
+    public TimeSpan? OpenTimeVm { get; set; }
 
     [JsonPropertyName("closeTimeVm")]
-    public string? CloseTimeVm { get; set; }
+    public TimeSpan? CloseTimeVm { get; set; }
 
     [JsonPropertyName("openTimeNm")]
-    public string? OpenTimeNm { get; set; }
+    public TimeSpan? OpenTimeNm { get; set; }
 
     [JsonPropertyName("closeTimeNm")]
-    public string? CloseTimeNm { get; set; }
+    public TimeSpan? CloseTimeNm { get; set; }
 
     [JsonPropertyName("open")]
     public bool? Open { get; set; }
