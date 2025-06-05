@@ -12,64 +12,8 @@ const days = [
   'Zondag',
 ];
 
-const dummyOpeningHours = [
-  {
-    idDay: 'maandag',
-    openTimeVm: '08:00',
-    closeTimeVm: '12:00',
-    openTimeNm: '13:00',
-    closeTimeNm: '17:00',
-    gesloten: false,
-  },
-  {
-    idDay: 'dinsdag',
-    openTimeVm: '08:00',
-    closeTimeVm: '12:00',
-    openTimeNm: '13:00',
-    closeTimeNm: '17:00',
-    gesloten: false,
-  },
-  {
-    idDay: 'woensdag',
-    openTimeVm: '08:00',
-    closeTimeVm: '12:00',
-    openTimeNm: '',
-    closeTimeNm: '',
-    gesloten: false,
-  },
-  {
-    idDay: 'donderdag',
-    openTimeVm: '08:00',
-    closeTimeVm: '12:00',
-    openTimeNm: '',
-    closeTimeNm: '',
-    gesloten: false,
-  },
-  {
-    idDay: 'vrijdag',
-    openTimeVm: '08:00',
-    closeTimeVm: '12:00',
-    openTimeNm: '13:00',
-    closeTimeNm: '17:00',
-    gesloten: false,
-  },
-  {
-    idDay: 'zaterdag',
-    openTimeVm: '',
-    closeTimeVm: '',
-    openTimeNm: '',
-    closeTimeNm: '',
-    gesloten: true,
-  },
-  {
-    idDay: 'zondag',
-    openTimeVm: '',
-    closeTimeVm: '',
-    openTimeNm: '',
-    closeTimeNm: '',
-    gesloten: true,
-  },
-];
+const BACKEND_URL =
+  'https://api-deelfabriek.woutjuuh02.be/dashboard/openingsuren';
 
 function pad(num: number) {
   return num.toString().padStart(2, '0');
@@ -88,8 +32,22 @@ function formatTime(val: string) {
 }
 
 export default function OpeningsurenPage() {
-  const [openingHours, setOpeningHours] = useState<any[]>(dummyOpeningHours);
+  const [openingHours, setOpeningHours] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(BACKEND_URL)
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Fout bij ophalen openingsuren');
+        const data = await res.json();
+        setOpeningHours(data);
+      })
+      .catch(() => setError('Fout bij ophalen openingsuren'))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleChange = (
     idx: number,
@@ -101,10 +59,29 @@ export default function OpeningsurenPage() {
     );
   };
 
-  const handleSave = () => {
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 2000);
+  const handleSave = async () => {
+    setError(null);
+    setSuccess(false);
+    try {
+      await Promise.all(
+        openingHours.map(async (h) => {
+          const res = await fetch(`${BACKEND_URL}/${h.idDay}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(h),
+          });
+          if (!res.ok) throw new Error();
+        })
+      );
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+    } catch {
+      setError('Fout bij opslaan openingsuren');
+    }
   };
+
+  if (loading) return <div className="p-8">Laden...</div>;
+  if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="p-8 bg-[#f3f6f8] min-h-screen">
