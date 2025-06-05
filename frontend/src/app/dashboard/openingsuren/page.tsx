@@ -29,9 +29,11 @@ export default function OpeningsurenPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const backendUrl = 'https://api-deelfabriek.woutjuuh02.be/openinghours';
+
   useEffect(() => {
     setLoading(true);
-    fetch('/api/openinghours')
+    fetch(backendUrl)
       .then(async (res) => {
         if (!res.ok) throw new Error('Fout bij ophalen openingsuren');
         const data = await res.json();
@@ -57,7 +59,7 @@ export default function OpeningsurenPage() {
     setSuccess(false);
     const day = openingHours[idx];
     try {
-      const res = await fetch(`/api/openinghours/${day.idDay}`, {
+      const res = await fetch(`${backendUrl}/${day.idDay}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(day),
