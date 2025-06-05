@@ -74,5 +74,6 @@ adminApi.MapGroup("/lockers").GroupAdminLockers();
 adminApi.MapGroup("/categories").GroupAdminCategories();
 adminApi.MapGroup("/users").GroupAdminUsers();
 adminApi.MapGroup("/reservations").GroupAdminReservations();
+adminApi.MapGroup("/openingsuren").GroupAdminOpeningHours();
 
 app.Run();
