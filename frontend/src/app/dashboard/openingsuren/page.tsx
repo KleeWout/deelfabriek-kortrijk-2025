@@ -134,7 +134,7 @@ export default function OpeningsurenPage() {
             <div className="col-span-4 flex items-center gap-2">
               <input
                 type="time"
-                className="w-28 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition"
+                className={`w-28 rounded-lg border border-gray-200 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${h.gesloten ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-50'}`}
                 value={formatTime(h.openTimeVm) || ''}
                 onChange={(e) =>
                   handleChange(idx, 'openTimeVm', e.target.value)
@@ -144,7 +144,7 @@ export default function OpeningsurenPage() {
               <span className="text-gray-400">tot</span>
               <input
                 type="time"
-                className="w-28 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition"
+                className={`w-28 rounded-lg border border-gray-200 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${h.gesloten ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-50'}`}
                 value={formatTime(h.closeTimeVm) || ''}
                 onChange={(e) =>
                   handleChange(idx, 'closeTimeVm', e.target.value)
@@ -156,7 +156,7 @@ export default function OpeningsurenPage() {
             <div className="col-span-4 flex items-center gap-2">
               <input
                 type="time"
-                className="w-28 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition"
+                className={`w-28 rounded-lg border border-gray-200 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${h.gesloten ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-50'}`}
                 value={formatTime(h.openTimeNm) || ''}
                 onChange={(e) =>
                   handleChange(idx, 'openTimeNm', e.target.value)
@@ -166,7 +166,7 @@ export default function OpeningsurenPage() {
               <span className="text-gray-400">tot</span>
               <input
                 type="time"
-                className="w-28 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition"
+                className={`w-28 rounded-lg border border-gray-200 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${h.gesloten ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-50'}`}
                 value={formatTime(h.closeTimeNm) || ''}
                 onChange={(e) =>
                   handleChange(idx, 'closeTimeNm', e.target.value)
