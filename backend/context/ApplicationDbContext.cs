@@ -10,6 +10,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<ItemCategory> ItemCategories { get; set; }
+    public DbSet<OpeningUren> OpeningUren { get; set; }
 
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -41,8 +42,6 @@ public class ApplicationDbContext : IdentityDbContext
             .HasForeignKey<Locker>(l => l.ItemId)
             .OnDelete(DeleteBehavior.SetNull);
 
-
-
         // Reservation - Item (Many-to-One)
         modelBuilder.Entity<Reservation>()
             .HasOne(r => r.Item)
@@ -69,8 +68,6 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<Item>()
         .Property(i => i.Status)
         .HasConversion<string>();
-
-
 
         // Seed Categories
         modelBuilder.Entity<Category>().HasData(
@@ -219,11 +216,77 @@ public class ApplicationDbContext : IdentityDbContext
                 LockerId = 1
             }
         );
+
+        // Seed Opening Hours
+        modelBuilder.Entity<OpeningUren>().HasData(
+            new OpeningUren
+            {
+                IdDay = "Maandag",
+                OpenTimeVm = "08:00",
+                CloseTimeVm = "12:00",
+                OpenTimeNm = "13:00",
+                CloseTimeNm = "17:00",
+                Open = true
+            },
+            new OpeningUren
+            {
+                IdDay = "Dinsdag",
+                OpenTimeVm = "08:00",
+                CloseTimeVm = "12:00",
+                OpenTimeNm = "13:00",
+                CloseTimeNm = "17:00",
+                Open = true
+            },
+            new OpeningUren
+            {
+                IdDay = "Woensdag",
+                OpenTimeVm = "08:00",
+                CloseTimeVm = "12:00",
+                OpenTimeNm = "13:00",
+                CloseTimeNm = "17:00",
+                Open = true
+            },
+            new OpeningUren
+            {
+                IdDay = "Donderdag",
+                OpenTimeVm = "08:00",
+                CloseTimeVm = "12:00",
+                OpenTimeNm = "13:00",
+                CloseTimeNm = "17:00",
+                Open = true
+            },
+            new OpeningUren
+            {
+                IdDay = "Vrijdag",
+                OpenTimeVm = "08:00",
+                CloseTimeVm = "12:00",
+                OpenTimeNm = "13:00",
+                CloseTimeNm = "17:00",
+                Open = true
+            },
+            new OpeningUren
+            {
+                IdDay = "Zaterdag",
+                OpenTimeVm = "09:00",
+                CloseTimeVm = "12:00",
+                OpenTimeNm = null,
+                CloseTimeNm = null,
+                Open = true
+            },
+            new OpeningUren
+            {
+                IdDay = "Zondag",
+                OpenTimeVm = null,
+                CloseTimeVm = null,
+                OpenTimeNm = null,
+                CloseTimeNm = null,
+                Open = false
+            }
+        );
         // review seed
 
-
     }
-    
+
 
 
 

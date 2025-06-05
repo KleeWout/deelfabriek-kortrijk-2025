@@ -604,6 +604,80 @@ namespace deelfabriek_backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("OpeningUren", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("close_time")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("day")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("open_time")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OpeningUren");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            close_time = "09:00",
+                            day = "Maandag",
+                            open_time = "17:00"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            close_time = "09:00",
+                            day = "Dinsdag",
+                            open_time = "17:00"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            close_time = "09:00",
+                            day = "Woensdag",
+                            open_time = "17:00"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            close_time = "09:00",
+                            day = "Donderdag",
+                            open_time = "17:00"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            close_time = "09:00",
+                            day = "Vrijdag",
+                            open_time = "17:00"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            close_time = "10:00",
+                            day = "Zaterdag",
+                            open_time = "14:00"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            day = "Zondag",
+                            open_time = "Gesloten"
+                        });
+                });
+
             modelBuilder.Entity("Deelkast.API.Models.ItemCategory", b =>
                 {
                     b.HasOne("Deelkast.API.Models.Category", "Category")

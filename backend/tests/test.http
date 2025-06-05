@@ -85,3 +85,23 @@ Content-Type: application/json
 ###
 // nog output maken 
 GET {{url}}/reservations/3
+
+###
+// get opening hours
+GET {{url}}/openingsuren
+
+###
+// get opening hours id
+GET {{url}}/openingsuren/Maandag
+
+
+###
+// PUT opening hours
+
+PUT {{url}}/openingsuren/Maandag
+Content-Type: application/json
+
+{
+  "openTimeVm": "13:00"
+}
+
