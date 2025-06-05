@@ -140,3 +140,24 @@ DELETE {{url}}/dashboard/lockers/3
 // -------------------------------
 // werkt (dto betere output)
 GET {{url}}/dashboard/reservations
+
+###
+// get opening hours 
+GET {{url}}/dashboard/openingsuren
+
+
+###
+// get opening hours id
+GET {{url}}/dashboard/openingsuren/Maandag
+
+
+###
+// PUT opening hours
+
+PUT {{url}}/dashboard/openingsuren/Maandag
+Content-Type: application/json
+
+{
+  "openTimeVm": "13:00",
+  "closeTimeVm": "19:00"
+}

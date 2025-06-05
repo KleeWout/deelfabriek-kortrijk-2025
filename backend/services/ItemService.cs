@@ -1,5 +1,4 @@
 namespace Deelkast.API.Services;
-using Deelkast.API.Models;
 
 public interface IItemService
 {
@@ -22,7 +21,7 @@ public interface IItemService
     Task AddCategory(Category category);
     Task DeleteCategory(int id);
 
-    Task UpdateItemWithCategories(Item item); 
+    Task UpdateItemWithCategories(Item item);
 }
 
 
@@ -50,7 +49,7 @@ public class ItemService : IItemService
 
     public async Task<List<ItemDetailDto>> GetAllItemsAdmin()
     {
-        var items = await _customItemRepository.GetItems(); 
+        var items = await _customItemRepository.GetItems();
         return _mapper.Map<List<ItemDetailDto>>(items);
     }
 
@@ -108,7 +107,7 @@ public class ItemService : IItemService
         return _mapper.Map<List<ItemsPageDto>>(items);
     }
 
-    
+
 
     public async Task<List<ItemNameDto>> GetAvailableItems()
     {
@@ -122,7 +121,7 @@ public class ItemService : IItemService
         return _mapper.Map<IEnumerable<CategoryDto>>(categories);
 
     }
-    
+
     public async Task<Category> GetCategoryById(int id)
     {
         return await _categoryRepository.GetByIdAsync(id);
@@ -131,14 +130,14 @@ public class ItemService : IItemService
     {
         await _categoryRepository.AddAsync(category);
     }
-    
+
     public async Task DeleteCategory(int id)
     {
         await _categoryRepository.DeleteAsync(id);
     }
- 
 
 
-    
+
+
 
 }

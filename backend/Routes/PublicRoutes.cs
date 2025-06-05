@@ -1,5 +1,3 @@
-
-
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.AspNetCore.Mvc;
@@ -143,7 +141,7 @@ public static class PublicRoutes
             return Results.Ok(items);
         });
 
-          // Parameterized route last
+        // Parameterized route last
         group.MapGet("/{id:int}", async (int id, IItemService itemService) =>
         {
             var item = await itemService.GetItemByIdDto(id);
@@ -204,5 +202,19 @@ public static class PublicRoutes
         });
 
         return group;
-    }  
+    }
+    public static RouteGroupBuilder GroupPublicOpeningHours(this RouteGroupBuilder group)
+    {
+        // get all opening hours
+        group.MapGet("/", async (IOpeningsUrenService openingHourService) =>
+        {
+            var openingHours = await openingHourService.GetAllOpeningHoursAsync();
+            if (openingHours == null || !openingHours.Any())
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(openingHours);
+        });
+        return group;
+    }
 }

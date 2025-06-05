@@ -82,7 +82,7 @@ public static class AdminRoutes
                 return Results.BadRequest(ex.Message);
             }
         });
-    
+
         // delete locker
         group.MapDelete("/{id}", async (int id, ILockerService lockerService, IItemService itemService) =>
         {
@@ -103,11 +103,11 @@ public static class AdminRoutes
                     await itemService.UpdateItem(item);
                 }
             }
-            
+
             return Results.NoContent();
         });
 
- 
+
         return group;
     }
 
@@ -202,50 +202,50 @@ public static class AdminRoutes
             await userService.DeleteUser(id);
             return Results.NoContent();
         });
-          group.MapPut("/{id}", async (int id, User user, IUserService userService, UserValidator userValidator) =>
-        {
-            // Validate the incoming user data
-            var validationResult = await userValidator.ValidateAsync(user);
-            if (!validationResult.IsValid)
-            {
-                // Extract only the validation error messages
-                var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return Results.BadRequest(warnings); // Return only the warnings
-            }
+        group.MapPut("/{id}", async (int id, User user, IUserService userService, UserValidator userValidator) =>
+      {
+          // Validate the incoming user data
+          var validationResult = await userValidator.ValidateAsync(user);
+          if (!validationResult.IsValid)
+          {
+              // Extract only the validation error messages
+              var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+              return Results.BadRequest(warnings); // Return only the warnings
+          }
 
-            // Get the existing user (this will be tracked by EF)
-            var existingUser = await userService.GetUserById(id);
-            if (existingUser == null)
-            {
-                return Results.NotFound($"User with ID {id} not found.");
-            }
+          // Get the existing user (this will be tracked by EF)
+          var existingUser = await userService.GetUserById(id);
+          if (existingUser == null)
+          {
+              return Results.NotFound($"User with ID {id} not found.");
+          }
 
-            // Check if email already exists for another user (if email is being changed)
-            if (existingUser.Email != user.Email && await userService.EmailExists(user.Email))
-            {
-                return Results.Conflict("A user with this email already exists.");
-            }
+          // Check if email already exists for another user (if email is being changed)
+          if (existingUser.Email != user.Email && await userService.EmailExists(user.Email))
+          {
+              return Results.Conflict("A user with this email already exists.");
+          }
 
-            // Update the properties of the existing tracked entity
-            existingUser.FirstName = user.FirstName;
-            existingUser.LastName = user.LastName;
-            existingUser.PhoneNumber = user.PhoneNumber;
-            existingUser.Email = user.Email;
-            existingUser.Street = user.Street;
-            existingUser.City = user.City;
-            existingUser.Bus = user.Bus;
-            existingUser.PostalCode = user.PostalCode;
+          // Update the properties of the existing tracked entity
+          existingUser.FirstName = user.FirstName;
+          existingUser.LastName = user.LastName;
+          existingUser.PhoneNumber = user.PhoneNumber;
+          existingUser.Email = user.Email;
+          existingUser.Street = user.Street;
+          existingUser.City = user.City;
+          existingUser.Bus = user.Bus;
+          existingUser.PostalCode = user.PostalCode;
 
-            try
-            {
-                await userService.UpdateUser(existingUser);
-                return Results.Ok(existingUser);
-            }
-            catch (Exception ex)
-            {
-                return Results.Problem($"An error occurred while updating the user: {ex.Message}");
-            }
-        });
+          try
+          {
+              await userService.UpdateUser(existingUser);
+              return Results.Ok(existingUser);
+          }
+          catch (Exception ex)
+          {
+              return Results.Problem($"An error occurred while updating the user: {ex.Message}");
+          }
+      });
 
         return group;
     }
@@ -297,7 +297,7 @@ public static class AdminRoutes
              return Results.Ok(content);
 
          }).DisableAntiforgery();
-         
+
         // post item with image - works via postman 
         group.MapPost("/with-image", async (
               HttpRequest request,
@@ -425,7 +425,7 @@ public static class AdminRoutes
 
         return group;
     }
-    
+
     public static RouteGroupBuilder GroupAdminReservations(this RouteGroupBuilder group)
     {
         // get all reservations
@@ -437,6 +437,81 @@ public static class AdminRoutes
                 return Results.NotFound();
             }
             return Results.Ok(reservations);
+        });
+
+        return group;
+    }
+    public static RouteGroupBuilder GroupAdminOpeningHours(this RouteGroupBuilder group)
+    {
+        // get all opening hours
+        group.MapGet("/", async (IOpeningsUrenService openingHourService) =>
+        {
+            var openingHours = await openingHourService.GetAllOpeningHoursAsync();
+            if (openingHours == null || !openingHours.Any())
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(openingHours);
+        });
+
+        // get by day (idDay)
+        group.MapGet("/{idDay}", async (string idDay, IOpeningsUrenService openingHourService) =>
+        {
+            var openingHour = await openingHourService.GetOpeningHourByIdAsync(idDay);
+            if (openingHour == null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(openingHour);
+        });
+
+        // update opening hours for a day
+        group.MapPut("/{idDay}", async (string idDay, OpeningUren input, IOpeningsUrenService openingHourService) =>
+        {
+            try
+            {
+                Console.WriteLine($"Updating opening hours for day: {idDay}");
+                var existing = await openingHourService.GetOpeningHourByIdAsync(idDay);
+                if (existing == null)
+                {
+                    return Results.NotFound($"Opening hour with ID {idDay} not found.");
+                }
+
+                var times = new[] { input.OpenTimeVm, input.CloseTimeVm, input.OpenTimeNm, input.CloseTimeNm };
+                int filled = times.Count(t => t.HasValue);
+
+                if (filled == 0)
+                {
+                    existing.OpenTimeVm = null;
+                    existing.CloseTimeVm = null;
+                    existing.OpenTimeNm = null;
+                    existing.CloseTimeNm = null;
+                    existing.Open = false;
+                }
+                else if (filled == 2 || filled == 4)
+                {
+                    if (filled == 2 && (!input.OpenTimeVm.HasValue || !input.CloseTimeVm.HasValue))
+                    {
+                        return Results.BadRequest("Als je 2 tijden opgeeft, moeten het openingstijden zijn voor de winkel.");
+                    }
+                    existing.OpenTimeVm = input.OpenTimeVm;
+                    existing.CloseTimeVm = input.CloseTimeVm;
+                    existing.OpenTimeNm = input.OpenTimeNm;
+                    existing.CloseTimeNm = input.CloseTimeNm;
+                    existing.Open = true;
+                }
+                else
+                {
+                    return Results.BadRequest("Je moet 0, 2 of 4 tijdswaarden meegeven (nooit 1 of 3).");
+                }
+
+                var updated = await openingHourService.UpdateOpeningHourAsync(existing);
+                return Results.Ok(updated);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred while updating the opening hour: {ex.Message}");
+            }
         });
 
         return group;
