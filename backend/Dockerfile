@@ -1,20 +1,15 @@
 # Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
-# Set environment variables to optimize build
-ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
-ENV DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-ENV DOTNET_NOLOGO=1
-
 WORKDIR /source
 
 # Copy project file and restore
 COPY *.csproj .
-RUN dotnet restore --verbosity minimal
+RUN dotnet restore
 
 # Copy everything else and publish
 COPY . .
-RUN dotnet publish --configuration Release --output /app --no-restore --verbosity minimal
+RUN dotnet publish --configuration Release --output /app
 
 # Runtime Stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
@@ -27,3 +22,9 @@ EXPOSE 3001
 
 # Use dotnet instead of a native binary unless you self-contained
 ENTRYPOINT ["dotnet", "deelfabriek-backend.dll"]
+
+
+
+# docker build -t deelfabriek-backend
+# docker run -d -p 3001:3001 deelfabriek-backend
+#docker buildx build --platform linux/arm64 -t woutjuuh02/deelfabriek-kortrijk-2025-backend:arm64 --push -f backend/Dockerfile backend/
