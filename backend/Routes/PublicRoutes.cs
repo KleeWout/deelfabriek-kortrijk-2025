@@ -206,14 +206,14 @@ public static class PublicRoutes
     public static RouteGroupBuilder GroupPublicOpeningHours(this RouteGroupBuilder group)
     {
         // get all opening hours
-        group.MapGet("/", async (IOpeningsUrenService openingHourService) =>
+        group.MapGet("/", async (IOpeningHoursService openingHourService) =>
         {
-            var openingHours = await openingHourService.GetAllOpeningHoursAsync();
-            if (openingHours == null || !openingHours.Any())
+            var openingsHours = await openingHourService.GetAllOpeningHoursAsync();
+            if (openingsHours == null || !openingsHours.Any())
             {
                 return Results.NotFound();
             }
-            return Results.Ok(openingHours);
+            return Results.Ok(openingsHours);
         });
         return group;
     }

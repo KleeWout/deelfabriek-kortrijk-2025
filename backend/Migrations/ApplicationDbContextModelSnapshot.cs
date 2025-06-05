@@ -604,77 +604,93 @@ namespace deelfabriek_backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("OpeningUren", b =>
+            modelBuilder.Entity("OpeningsHours", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("IdDay")
+                        .HasColumnType("varchar(255)")
+                        .HasAnnotation("Relational:JsonPropertyName", "idDay");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    b.Property<TimeSpan?>("CloseTimeAfternoon")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "closeTimeAfternoon");
 
-                    b.Property<string>("close_time")
-                        .HasColumnType("longtext");
+                    b.Property<TimeSpan?>("CloseTimeMorning")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "closeTimeMorning");
 
-                    b.Property<string>("day")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<bool?>("Open")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "open");
 
-                    b.Property<string>("open_time")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<TimeSpan?>("OpenTimeAfternoon")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "openTimeAfternoon");
 
-                    b.HasKey("Id");
+                    b.Property<TimeSpan?>("OpenTimeMorning")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "openTimeMorning");
 
-                    b.ToTable("OpeningUren");
+                    b.HasKey("IdDay");
+
+                    b.ToTable("OpeningsHours");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            close_time = "09:00",
-                            day = "Maandag",
-                            open_time = "17:00"
+                            IdDay = "Monday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
                         },
                         new
                         {
-                            Id = 2,
-                            close_time = "09:00",
-                            day = "Dinsdag",
-                            open_time = "17:00"
+                            IdDay = "Tuesday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
                         },
                         new
                         {
-                            Id = 3,
-                            close_time = "09:00",
-                            day = "Woensdag",
-                            open_time = "17:00"
+                            IdDay = "Wednesday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
                         },
                         new
                         {
-                            Id = 4,
-                            close_time = "09:00",
-                            day = "Donderdag",
-                            open_time = "17:00"
+                            IdDay = "Thursday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
                         },
                         new
                         {
-                            Id = 5,
-                            close_time = "09:00",
-                            day = "Vrijdag",
-                            open_time = "17:00"
+                            IdDay = "Friday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
                         },
                         new
                         {
-                            Id = 6,
-                            close_time = "10:00",
-                            day = "Zaterdag",
-                            open_time = "14:00"
+                            IdDay = "Saturday",
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeMorning = new TimeSpan(0, 9, 0, 0, 0)
                         },
                         new
                         {
-                            Id = 7,
-                            day = "Zondag",
-                            open_time = "Gesloten"
+                            IdDay = "Sunday",
+                            Open = false
                         });
                 });
 

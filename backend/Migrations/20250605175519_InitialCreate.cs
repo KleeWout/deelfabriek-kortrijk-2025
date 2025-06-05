@@ -123,6 +123,24 @@ namespace deelfabriek_backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "OpeningsHours",
+                columns: table => new
+                {
+                    IdDay = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    OpenTimeMorning = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    CloseTimeMorning = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    OpenTimeAfternoon = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    CloseTimeAfternoon = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    Open = table.Column<bool>(type: "tinyint(1)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OpeningHours", x => x.IdDay);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -405,6 +423,20 @@ namespace deelfabriek_backend.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "OpeningsHours",
+                columns: new[] { "IdDay", "CloseTimeAfternoon", "CloseTimeMorning", "Open", "OpenTimeAfternoon", "OpenTimeMorning" },
+                values: new object[,]
+                {
+                    { "Friday", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Monday", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Saturday", null, new TimeSpan(0, 12, 0, 0, 0), true, null, new TimeSpan(0, 9, 0, 0, 0) },
+                    { "Sunday", null, null, false, null, null },
+                    { "Thursday", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Tuesday", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Wednesday", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) }
+                });
+
+            migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "Bus", "City", "CreatedAt", "Email", "FirstName", "IsAdmin", "IsBlocked", "LastName", "PhoneNumber", "PostalCode", "Street", "TotalFine" },
                 values: new object[] { 1, "A", "Amsterdam", new DateTime(2023, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "john@example.com", "John", false, false, "Doe", "123456789", "1012AB", "Hoofdstraat 1", 0m });
@@ -508,6 +540,9 @@ namespace deelfabriek_backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "ItemCategories");
+
+            migrationBuilder.DropTable(
+                name: "OpeningsHours");
 
             migrationBuilder.DropTable(
                 name: "Reservations");

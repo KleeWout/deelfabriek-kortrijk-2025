@@ -444,18 +444,18 @@ public static class AdminRoutes
     public static RouteGroupBuilder GroupAdminOpeningHours(this RouteGroupBuilder group)
     {
         // get all opening hours
-        group.MapGet("/", async (IOpeningsUrenService openingHourService) =>
+        group.MapGet("/", async (IOpeningHoursService openingHourService) =>
         {
-            var openingHours = await openingHourService.GetAllOpeningHoursAsync();
-            if (openingHours == null || !openingHours.Any())
+            var openingsHours = await openingHourService.GetAllOpeningHoursAsync();
+            if (openingsHours == null || !openingsHours.Any())
             {
                 return Results.NotFound();
             }
-            return Results.Ok(openingHours);
+            return Results.Ok(openingsHours);
         });
 
         // get by day (idDay)
-        group.MapGet("/{idDay}", async (string idDay, IOpeningsUrenService openingHourService) =>
+        group.MapGet("/{idDay}", async (string idDay, IOpeningHoursService openingHourService) =>
         {
             var openingHour = await openingHourService.GetOpeningHourByIdAsync(idDay);
             if (openingHour == null)
@@ -466,7 +466,7 @@ public static class AdminRoutes
         });
 
         // update opening hours for a day
-        group.MapPut("/{idDay}", async (string idDay, OpeningUren input, IOpeningsUrenService openingHourService) =>
+        group.MapPut("/{idDay}", async (string idDay, OpeningsHours input, IOpeningHoursService openingHourService) =>
         {
             try
             {
@@ -477,32 +477,32 @@ public static class AdminRoutes
                     return Results.NotFound($"Opening hour with ID {idDay} not found.");
                 }
 
-                var times = new[] { input.OpenTimeVm, input.CloseTimeVm, input.OpenTimeNm, input.CloseTimeNm };
+                var times = new[] { input.OpenTimeMorning, input.CloseTimeMorning, input.OpenTimeAfternoon, input.CloseTimeAfternoon };
                 int filled = times.Count(t => t.HasValue);
 
                 if (filled == 0)
                 {
-                    existing.OpenTimeVm = null;
-                    existing.CloseTimeVm = null;
-                    existing.OpenTimeNm = null;
-                    existing.CloseTimeNm = null;
+                    existing.OpenTimeMorning = null;
+                    existing.CloseTimeMorning = null;
+                    existing.OpenTimeAfternoon = null;
+                    existing.CloseTimeAfternoon = null;
                     existing.Open = false;
                 }
                 else if (filled == 2 || filled == 4)
                 {
-                    if (filled == 2 && (!input.OpenTimeVm.HasValue || !input.CloseTimeVm.HasValue))
+                    if (filled == 2 && (!input.OpenTimeMorning.HasValue || !input.CloseTimeMorning.HasValue))
                     {
-                        return Results.BadRequest("Als je 2 tijden opgeeft, moeten het openingstijden zijn voor de winkel.");
+                        return Results.BadRequest("If you provide 2 times, they must be opening times for the store.");
                     }
-                    existing.OpenTimeVm = input.OpenTimeVm;
-                    existing.CloseTimeVm = input.CloseTimeVm;
-                    existing.OpenTimeNm = input.OpenTimeNm;
-                    existing.CloseTimeNm = input.CloseTimeNm;
+                    existing.OpenTimeMorning = input.OpenTimeMorning;
+                    existing.CloseTimeMorning = input.CloseTimeMorning;
+                    existing.OpenTimeAfternoon = input.OpenTimeAfternoon;
+                    existing.CloseTimeAfternoon = input.CloseTimeAfternoon;
                     existing.Open = true;
                 }
                 else
                 {
-                    return Results.BadRequest("Je moet 0, 2 of 4 tijdswaarden meegeven (nooit 1 of 3).");
+                    return Results.BadRequest("You must provide 0, 2 or 4 time values (never 1 or 3).");
                 }
 
                 var updated = await openingHourService.UpdateOpeningHourAsync(existing);

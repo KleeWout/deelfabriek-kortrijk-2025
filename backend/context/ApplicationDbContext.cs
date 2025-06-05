@@ -2,14 +2,13 @@ namespace Deelkast.API.Context;
 
 public class ApplicationDbContext : IdentityDbContext
 {
-
     public DbSet<User> User { get; set; }
     public DbSet<Item> Items { get; set; }
     public DbSet<Locker> Lockers { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<ItemCategory> ItemCategories { get; set; }
-    public DbSet<OpeningUren> OpeningUren { get; set; }
+    public DbSet<OpeningsHours> OpeningsHours { get; set; }
 
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -214,71 +213,69 @@ public class ApplicationDbContext : IdentityDbContext
                 ItemId = 1,
                 LockerId = 1
             }
-        );
-
-        // Seed Opening Hours
-        modelBuilder.Entity<OpeningUren>().HasData(
-            new OpeningUren
+        );        // Seed Opening Hours
+        modelBuilder.Entity<OpeningsHours>().HasData(
+            new OpeningsHours
             {
-                IdDay = "Maandag",
-                OpenTimeVm = TimeSpan.Parse("08:00"),
-                CloseTimeVm = TimeSpan.Parse("12:00"),
-                OpenTimeNm = TimeSpan.Parse("13:00"),
-                CloseTimeNm = TimeSpan.Parse("17:00"),
+                IdDay = "Monday",
+                OpenTimeMorning = TimeSpan.Parse("08:00"),
+                CloseTimeMorning = TimeSpan.Parse("12:00"),
+                OpenTimeAfternoon = TimeSpan.Parse("13:00"),
+                CloseTimeAfternoon = TimeSpan.Parse("17:00"),
                 Open = true
             },
-            new OpeningUren
+            new OpeningsHours
             {
-                IdDay = "Dinsdag",
-                OpenTimeVm = TimeSpan.Parse("08:00"),
-                CloseTimeVm = TimeSpan.Parse("12:00"),
-                OpenTimeNm = TimeSpan.Parse("13:00"),
-                CloseTimeNm = TimeSpan.Parse("17:00"),
+                IdDay = "Tuesday",
+                OpenTimeMorning = TimeSpan.Parse("08:00"),
+                CloseTimeMorning = TimeSpan.Parse("12:00"),
+                OpenTimeAfternoon = TimeSpan.Parse("13:00"),
+                CloseTimeAfternoon = TimeSpan.Parse("17:00"),
                 Open = true
             },
-            new OpeningUren
+            new OpeningsHours
             {
-                IdDay = "Woensdag",
-                OpenTimeVm = TimeSpan.Parse("08:00"),
-                CloseTimeVm = TimeSpan.Parse("12:00"),
-                OpenTimeNm = TimeSpan.Parse("13:00"),
-                CloseTimeNm = TimeSpan.Parse("17:00"),
+                IdDay = "Wednesday",
+                OpenTimeMorning = TimeSpan.Parse("08:00"),
+                CloseTimeMorning = TimeSpan.Parse("12:00"),
+                OpenTimeAfternoon = TimeSpan.Parse("13:00"),
+                CloseTimeAfternoon = TimeSpan.Parse("17:00"),
                 Open = true
             },
-            new OpeningUren
+            new OpeningsHours
             {
-                IdDay = "Donderdag",
-                OpenTimeVm = TimeSpan.Parse("08:00"),
-                CloseTimeVm = TimeSpan.Parse("12:00"),
-                OpenTimeNm = TimeSpan.Parse("13:00"),
-                CloseTimeNm = TimeSpan.Parse("17:00"),
+                IdDay = "Thursday",
+                OpenTimeMorning = TimeSpan.Parse("08:00"),
+                CloseTimeMorning = TimeSpan.Parse("12:00"),
+                OpenTimeAfternoon = TimeSpan.Parse("13:00"),
+                CloseTimeAfternoon = TimeSpan.Parse("17:00"),
                 Open = true
             },
-            new OpeningUren
+            new OpeningsHours
             {
-                IdDay = "Vrijdag",
-                OpenTimeVm = TimeSpan.Parse("08:00"),
-                CloseTimeVm = TimeSpan.Parse("12:00"),
-                OpenTimeNm = TimeSpan.Parse("13:00"),
-                CloseTimeNm = TimeSpan.Parse("17:00"),
+                IdDay = "Friday",
+                OpenTimeMorning = TimeSpan.Parse("08:00"),
+                CloseTimeMorning = TimeSpan.Parse("12:00"),
+                OpenTimeAfternoon = TimeSpan.Parse("13:00"),
+                CloseTimeAfternoon = TimeSpan.Parse("17:00"),
                 Open = true
             },
-            new OpeningUren
+            new OpeningsHours
             {
-                IdDay = "Zaterdag",
-                OpenTimeVm = TimeSpan.Parse("09:00"),
-                CloseTimeVm = TimeSpan.Parse("12:00"),
-                OpenTimeNm = null,
-                CloseTimeNm = null,
+                IdDay = "Saturday",
+                OpenTimeMorning = TimeSpan.Parse("09:00"),
+                CloseTimeMorning = TimeSpan.Parse("12:00"),
+                OpenTimeAfternoon = null,
+                CloseTimeAfternoon = null,
                 Open = true
             },
-            new OpeningUren
+            new OpeningsHours
             {
-                IdDay = "Zondag",
-                OpenTimeVm = null,
-                CloseTimeVm = null,
-                OpenTimeNm = null,
-                CloseTimeNm = null,
+                IdDay = "Sunday",
+                OpenTimeMorning = null,
+                CloseTimeMorning = null,
+                OpenTimeAfternoon = null,
+                CloseTimeAfternoon = null,
                 Open = false
             }
         );

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace deelfabriek_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250604164300_InitialCreate")]
+    [Migration("20250605175519_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -605,6 +605,96 @@ namespace deelfabriek_backend.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("OpeningsHours", b =>
+                {
+                    b.Property<string>("IdDay")
+                        .HasColumnType("varchar(255)")
+                        .HasAnnotation("Relational:JsonPropertyName", "idDay");
+
+                    b.Property<TimeSpan?>("CloseTimeAfternoon")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "closeTimeAfternoon");
+
+                    b.Property<TimeSpan?>("CloseTimeMorning")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "closeTimeMorning");
+
+                    b.Property<bool?>("Open")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "open");
+
+                    b.Property<TimeSpan?>("OpenTimeAfternoon")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "openTimeAfternoon");
+
+                    b.Property<TimeSpan?>("OpenTimeMorning")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "openTimeMorning");
+
+                    b.HasKey("IdDay");
+
+                    b.ToTable("OpeningsHours");
+
+                    b.HasData(
+                        new
+                        {
+                            IdDay = "Monday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            IdDay = "Tuesday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            IdDay = "Wednesday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            IdDay = "Thursday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            IdDay = "Friday",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            IdDay = "Saturday",
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeMorning = new TimeSpan(0, 9, 0, 0, 0)
+                        },
+                        new
+                        {
+                            IdDay = "Sunday",
+                            Open = false
+                        });
                 });
 
             modelBuilder.Entity("Deelkast.API.Models.ItemCategory", b =>
