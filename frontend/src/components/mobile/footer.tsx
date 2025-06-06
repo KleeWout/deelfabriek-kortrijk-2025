@@ -52,6 +52,12 @@ export default function Footer() {
     'Zondag',
   ];
 
+  // Sort opening hours according to days array
+  const sortedHours = days.map(
+    (day) =>
+      openingHours.find((h) => h.idDay === day) || { idDay: day, open: false }
+  );
+
   return (
     <footer className="w-full bg-primarygreen-1 p-4 text-white flex flex-col gap-4">
       <Image
@@ -85,14 +91,11 @@ export default function Footer() {
         <div>
           <h4 className="text-lg font-bold">Openingsuren Deelfabriek</h4>
           <ul className="space-y-1">
-            {days.map((day) => {
-              const h = openingHours.find((o) => o.idDay === day);
-              return (
-                <li key={day}>
-                  {day.slice(0, 2).toLowerCase()}: {h ? formatDay(h) : '...'}
-                </li>
-              );
-            })}
+            {sortedHours.map((h, idx) => (
+              <li key={days[idx]}>
+                {days[idx].slice(0, 2).toLowerCase()}: {formatDay(h)}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
