@@ -84,11 +84,22 @@ Content-Type: application/json
 // get reservations for user
 ###
 // nog output maken 
-GET {{url}}/reservations/3
+GET {{url}}/reservations/1
 
 ###
 // get opening hours
 GET {{url}}/openingsuren
+
+###
+// POST Report
+POST {{url}}/reports
+Content-Type: application/json
+
+{
+  "reservationid": 1,
+  "rating": 1,
+  "remark": "Damaged"
+}
 
 
 

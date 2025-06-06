@@ -35,8 +35,10 @@ builder.Services.AddScoped<ILockerService, LockerService>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IOpeningsUrenRepository, OpeningsUrenRepository>();
-builder.Services.AddScoped<IOpeningsUrenService, OpeningsUrenService>();
-
+builder.Services.AddScoped<IOpeningsHoursService, OpeningsHoursService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IGenericRepository<Report>, GenericRepository<Report>>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<ItemValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
@@ -66,6 +68,7 @@ app.MapGroup("/users").GroupPublicUsers();
 app.MapGroup("/categories").GroupPublicCategories();
 app.MapGroup("/reservations").GroupReservations();
 app.MapGroup("/openingsuren").GroupPublicOpeningHours();
+app.MapGroup("/reports").GroupPublicReports();
 
 // add authorization later 
 var adminApi = app.MapGroup("/dashboard");
@@ -75,5 +78,6 @@ adminApi.MapGroup("/categories").GroupAdminCategories();
 adminApi.MapGroup("/users").GroupAdminUsers();
 adminApi.MapGroup("/reservations").GroupAdminReservations();
 adminApi.MapGroup("/openingsuren").GroupAdminOpeningHours();
+adminApi.MapGroup("/reports").GroupAdminReports();
 
 app.Run();

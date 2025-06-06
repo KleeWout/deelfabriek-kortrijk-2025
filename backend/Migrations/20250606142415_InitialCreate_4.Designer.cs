@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace deelfabriek_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250604164300_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250606142415_InitialCreate_4")]
+    partial class InitialCreate_4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -269,6 +269,47 @@ namespace deelfabriek_backend.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Deelkast.API.Models.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservationId");
+
+                    b.ToTable("Reports");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2023, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Rating = 3,
+                            Remark = "Slecht, niet goed",
+                            ReservationId = 1,
+                            Status = false
+                        });
+                });
+
             modelBuilder.Entity("Deelkast.API.Models.Reservation", b =>
                 {
                     b.Property<int>("Id")
@@ -390,7 +431,7 @@ namespace deelfabriek_backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -607,6 +648,96 @@ namespace deelfabriek_backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("OpeningHour", b =>
+                {
+                    b.Property<string>("DayId")
+                        .HasColumnType("varchar(255)")
+                        .HasAnnotation("Relational:JsonPropertyName", "dayId");
+
+                    b.Property<TimeSpan?>("CloseTimeAfternoon")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "closeTimeAfternoon");
+
+                    b.Property<TimeSpan?>("CloseTimeMorning")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "closeTimeMorning");
+
+                    b.Property<bool>("Open")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "open");
+
+                    b.Property<TimeSpan?>("OpenTimeAfternoon")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "openTimeAfternoon");
+
+                    b.Property<TimeSpan?>("OpenTimeMorning")
+                        .HasColumnType("time(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "openTimeMorning");
+
+                    b.HasKey("DayId");
+
+                    b.ToTable("OpeningHours");
+
+                    b.HasData(
+                        new
+                        {
+                            DayId = "Maandag",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            DayId = "Dinsdag",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            DayId = "Woensdag",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            DayId = "Donderdag",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            DayId = "Vrijdag",
+                            CloseTimeAfternoon = new TimeSpan(0, 17, 0, 0, 0),
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeAfternoon = new TimeSpan(0, 13, 0, 0, 0),
+                            OpenTimeMorning = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            DayId = "Zaterdag",
+                            CloseTimeMorning = new TimeSpan(0, 12, 0, 0, 0),
+                            Open = true,
+                            OpenTimeMorning = new TimeSpan(0, 9, 0, 0, 0)
+                        },
+                        new
+                        {
+                            DayId = "Zondag",
+                            Open = false
+                        });
+                });
+
             modelBuilder.Entity("Deelkast.API.Models.ItemCategory", b =>
                 {
                     b.HasOne("Deelkast.API.Models.Category", "Category")
@@ -634,6 +765,17 @@ namespace deelfabriek_backend.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("Deelkast.API.Models.Report", b =>
+                {
+                    b.HasOne("Deelkast.API.Models.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
                 });
 
             modelBuilder.Entity("Deelkast.API.Models.Reservation", b =>

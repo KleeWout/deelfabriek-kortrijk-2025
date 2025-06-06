@@ -1,24 +1,24 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-public class OpeningUren
+public class OpeningHour
 {
     [Key]
-    [JsonPropertyName("idDay")]
-    public string IdDay { get; set; }
+    [JsonPropertyName("dayId")]
+    public string DayId { get; set; } // was IdDay
 
-    [JsonPropertyName("openTimeVm")]
-    public TimeSpan? OpenTimeVm { get; set; }
+    [JsonPropertyName("openTimeMorning")]
+    public TimeSpan? OpenTimeMorning { get; set; } // was OpenTimeVm
 
-    [JsonPropertyName("closeTimeVm")]
-    public TimeSpan? CloseTimeVm { get; set; }
+    [JsonPropertyName("closeTimeMorning")]
+    public TimeSpan? CloseTimeMorning { get; set; } // was CloseTimeVm
 
-    [JsonPropertyName("openTimeNm")]
-    public TimeSpan? OpenTimeNm { get; set; }
+    [JsonPropertyName("openTimeAfternoon")]
+    public TimeSpan? OpenTimeAfternoon { get; set; } // was OpenTimeNm
 
-    [JsonPropertyName("closeTimeNm")]
-    public TimeSpan? CloseTimeNm { get; set; }
+    [JsonPropertyName("closeTimeAfternoon")]
+    public TimeSpan? CloseTimeAfternoon { get; set; } // was CloseTimeNm
 
     [JsonPropertyName("open")]
-    public bool? Open { get; set; }
+    public bool Open { get; set; }
 }

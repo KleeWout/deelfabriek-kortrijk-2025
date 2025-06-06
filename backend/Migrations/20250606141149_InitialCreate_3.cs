@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace deelfabriek_backend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreate_3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -123,7 +123,25 @@ namespace deelfabriek_backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "OpeningHours",
+                columns: table => new
+                {
+                    DayId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    OpenTimeMorning = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    CloseTimeMorning = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    OpenTimeAfternoon = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    CloseTimeAfternoon = table.Column<TimeSpan>(type: "time(6)", nullable: true),
+                    Open = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OpeningHours", x => x.DayId);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -151,7 +169,7 @@ namespace deelfabriek_backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -364,9 +382,34 @@ namespace deelfabriek_backend.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Reservations_User_UserId",
+                        name: "FK_Reservations_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "User",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Reports",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ReservationId = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: true),
+                    Remark = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reports_Reservations_ReservationId",
+                        column: x => x.ReservationId,
+                        principalTable: "Reservations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -405,7 +448,21 @@ namespace deelfabriek_backend.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "User",
+                table: "OpeningHours",
+                columns: new[] { "DayId", "CloseTimeAfternoon", "CloseTimeMorning", "Open", "OpenTimeAfternoon", "OpenTimeMorning" },
+                values: new object[,]
+                {
+                    { "Dinsdag", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Donderdag", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Maandag", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Vrijdag", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Woensdag", new TimeSpan(0, 17, 0, 0, 0), new TimeSpan(0, 12, 0, 0, 0), true, new TimeSpan(0, 13, 0, 0, 0), new TimeSpan(0, 8, 0, 0, 0) },
+                    { "Zaterdag", null, new TimeSpan(0, 12, 0, 0, 0), true, null, new TimeSpan(0, 9, 0, 0, 0) },
+                    { "Zondag", null, null, false, null, null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
                 columns: new[] { "Id", "Bus", "City", "CreatedAt", "Email", "FirstName", "IsAdmin", "IsBlocked", "LastName", "PhoneNumber", "PostalCode", "Street", "TotalFine" },
                 values: new object[] { 1, "A", "Amsterdam", new DateTime(2023, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "john@example.com", "John", false, false, "Doe", "123456789", "1012AB", "Hoofdstraat 1", 0m });
 
@@ -423,6 +480,11 @@ namespace deelfabriek_backend.Migrations
                 table: "Reservations",
                 columns: new[] { "Id", "ActualReturnDate", "ItemId", "LoanEnd", "LoanStart", "LockerId", "PickupCode", "PickupDeadline", "ReservationDate", "TotalPrice", "UserId", "Weeks" },
                 values: new object[] { 1, null, 1, null, null, 1, "123456", new DateTime(2023, 6, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 5.00m, 1, 1 });
+
+            migrationBuilder.InsertData(
+                table: "Reports",
+                columns: new[] { "Id", "CreatedAt", "Rating", "Remark", "ReservationId", "Status" },
+                values: new object[] { 1, new DateTime(2023, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "Slecht, niet goed", 1, false });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -473,6 +535,11 @@ namespace deelfabriek_backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reports_ReservationId",
+                table: "Reports",
+                column: "ReservationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reservations_ItemId",
                 table: "Reservations",
                 column: "ItemId");
@@ -510,7 +577,10 @@ namespace deelfabriek_backend.Migrations
                 name: "ItemCategories");
 
             migrationBuilder.DropTable(
-                name: "Reservations");
+                name: "OpeningHours");
+
+            migrationBuilder.DropTable(
+                name: "Reports");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -522,10 +592,13 @@ namespace deelfabriek_backend.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
+                name: "Reservations");
+
+            migrationBuilder.DropTable(
                 name: "Lockers");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Items");

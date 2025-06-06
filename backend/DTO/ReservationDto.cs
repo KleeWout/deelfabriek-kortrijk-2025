@@ -1,7 +1,5 @@
 namespace Deelkast.API.DTO;
 
-
-
 public class ReservationConfirmationDto
 {
     public string PickupCode { get; set; }

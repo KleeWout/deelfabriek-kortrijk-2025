@@ -1,33 +1,33 @@
 namespace Deelkast.API.Services;
 
-public interface IOpeningsUrenService
+public interface IOpeningsHoursService
 {
-    Task<List<OpeningUren>> GetAllOpeningHoursAsync();
-    Task<OpeningUren> GetOpeningHourByIdAsync(string idDay);
-    Task<OpeningUren> UpdateOpeningHourAsync(OpeningUren openingUren);
+    Task<List<OpeningHour>> GetAllOpeningHoursAsync();
+    Task<OpeningHour> GetOpeningHourByIdAsync(string idDay);
+    Task<OpeningHour> UpdateOpeningHourAsync(OpeningHour OpeningHour);
 }
 
-public class OpeningsUrenService : IOpeningsUrenService
+public class OpeningsHoursService : IOpeningsHoursService
 {
     private readonly IOpeningsUrenRepository _openingsUrenRepository;
 
-    public OpeningsUrenService(IOpeningsUrenRepository openingsUrenRepository)
+    public OpeningsHoursService(IOpeningsUrenRepository openingsUrenRepository)
     {
         _openingsUrenRepository = openingsUrenRepository;
     }
 
-    public async Task<List<OpeningUren>> GetAllOpeningHoursAsync()
+    public async Task<List<OpeningHour>> GetAllOpeningHoursAsync()
     {
         return await _openingsUrenRepository.GetAllOpeningHours();
     }
 
-    public async Task<OpeningUren> GetOpeningHourByIdAsync(string idDay)
+    public async Task<OpeningHour> GetOpeningHourByIdAsync(string idDay)
     {
         return await _openingsUrenRepository.GetOpeningHourByIdAsync(idDay);
     }
 
-    public async Task<OpeningUren> UpdateOpeningHourAsync(OpeningUren openingUren)
+    public async Task<OpeningHour> UpdateOpeningHourAsync(OpeningHour openingHour)
     {
-        return await _openingsUrenRepository.UpdateOpeningHourAsync(openingUren);
+        return await _openingsUrenRepository.UpdateOpeningHourAsync(openingHour);
     }
 }
