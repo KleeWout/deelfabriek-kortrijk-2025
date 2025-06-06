@@ -12,8 +12,7 @@ const days = [
   'Zondag',
 ];
 
-const BACKEND_URL =
-  'https://api-deelfabriek.woutjuuh02.be/dashboard/openingsuren';
+const BACKEND_URL = 'https://api-deelfabriek.woutjuuh02.be/openingshours';
 
 function pad(num: number) {
   return num.toString().padStart(2, '0');
