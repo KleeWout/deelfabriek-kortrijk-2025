@@ -12,7 +12,8 @@ const days = [
   'Zondag',
 ];
 
-const BACKEND_URL = 'https://api-deelfabriek.woutjuuh02.be/openingshours';
+const BACKEND_URL =
+  'https://api-deelfabriek.woutjuuh02.be/dashboard/openingshours';
 
 function pad(num: number) {
   return num.toString().padStart(2, '0');
@@ -42,7 +43,16 @@ export default function OpeningsurenPage() {
       .then(async (res) => {
         if (!res.ok) throw new Error('Fout bij ophalen openingsuren');
         const data = await res.json();
-        setOpeningHours(data);
+        setOpeningHours(
+          data.map((h: any) => ({
+            idDay: h.idDay,
+            openTimeVm: h.openTimeMorning ?? '',
+            closeTimeVm: h.closeTimeMorning ?? '',
+            openTimeNm: h.openTimeAfternoon ?? '',
+            closeTimeNm: h.closeTimeAfternoon ?? '',
+            gesloten: h.open === false,
+          }))
+        );
       })
       .catch(() => setError('Fout bij ophalen openingsuren'))
       .finally(() => setLoading(false));
@@ -64,10 +74,17 @@ export default function OpeningsurenPage() {
     try {
       await Promise.all(
         openingHours.map(async (h) => {
+          const body = {
+            openTimeMorning: h.openTimeVm || null,
+            closeTimeMorning: h.closeTimeVm || null,
+            openTimeAfternoon: h.openTimeNm || null,
+            closeTimeAfternoon: h.closeTimeNm || null,
+            open: !h.gesloten,
+          };
           const res = await fetch(`${BACKEND_URL}/${h.idDay}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(h),
+            body: JSON.stringify(body),
           });
           if (!res.ok) throw new Error();
         })
