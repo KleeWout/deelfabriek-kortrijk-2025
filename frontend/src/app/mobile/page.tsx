@@ -25,12 +25,12 @@ export default function MobilePage() {
         </h2>
 
         {/* Square image wrapper */}
-        <section className="flex gap-8 overflow-x-auto pb-4">
-          <InfoCard number={1} title="Ontdek & Reserveer" description="Blader door onze collectie van items die momenteel beschikbaar zitten in de locker. Van naaimachines tot tuingereedschap - vind wat je nodig hebt en reserveer." />
+        <section className="flex gap-8 overflow-x-auto pb-4 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen px-4">
+          <InfoCard number={1} title="Ontdek & Reserveer" description="Blader door onze collectie van items die momenteel beschikbaar zitten in de locker. Van naaimachines tot tuingereedschap - vind wat je nodig hebt en reserveer." className="ml-18" />
           <InfoCard number={2} title="Betaal bij afhaling" description="Betaal veilig online met Payconiq. Geen gedoe met contant geld - alles gebeurt digitaal en supersnel." />
           <InfoCard number={3} title="Ontvang je code" description="Krijg meteen een unieke toegangscode per e-mail. Deze code geeft je toegang tot jouw gereserveerde item." />
           <InfoCard number={4} title="Haal op" description="Ga naar de kast, voer je code in op de tablet en pak je item uit het juiste vakje." />
-          <InfoCard number={5} title="Gebruik & breng terug" description="Geniet van je geleende item en breng het optijd terug. Deel je ervaring via de tablet - zo helpen we elkaar!" />
+          <InfoCard number={5} title="Gebruik & breng terug" description="Geniet van je geleende item en breng het optijd terug. Deel je ervaring via de tablet - zo helpen we elkaar!" className="mr-18" />
         </section>
       </main>
       <Footer />

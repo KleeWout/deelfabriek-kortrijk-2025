@@ -1,7 +1,54 @@
 import Image from "next/image";
 import { Clock, EnvelopeSimple, House, MapPin, Phone } from "phosphor-react";
+import { useOpeningHours } from "@/context/OpeningHoursContext";
+
+// Helper function to format time
+const formatTime = (time: string | null): string => {
+  if (!time) return "";
+  return time.substring(0, 5); // Format "08:00:00" to "08:00"
+};
+
+// Helper to get a friendly display of opening hours
+const getDisplayHours = (day: any): string => {
+  if (!day.open) return "Gesloten";
+  
+  // Morning hours
+  let displayHours = "";
+  if (day.openTimeMorning && day.closeTimeMorning) {
+    displayHours += `${formatTime(day.openTimeMorning)}–${formatTime(day.closeTimeMorning)}`;
+  }
+  
+  // Afternoon hours
+  if (day.openTimeAfternoon && day.closeTimeAfternoon) {
+    displayHours += `, ${formatTime(day.openTimeAfternoon)}–${formatTime(day.closeTimeAfternoon)}`;
+  }
+  
+  return displayHours || "Gesloten";
+};
+
+// Map API day names to abbreviated display names
+const dayNameMap: { [key: string]: string } = {
+  "Maandag": "ma",
+  "Dinsdag": "di",
+  "Woensdag": "woe",
+  "Donderdag": "do",
+  "Vrijdag": "vr",
+  "Zaterdag": "za", 
+  "Zondag": "zo"
+};
+
+// Correct day order
+const dayOrder = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"];
 
 export default function Footer() {
+  const { openingHours, loading, error } = useOpeningHours();
+  
+  // Sort days in correct order
+  const sortedHours = openingHours 
+    ? [...openingHours].sort((a, b) => 
+        dayOrder.indexOf(a.idDay) - dayOrder.indexOf(b.idDay))
+    : [];
+
   return (
     <footer className="w-full bg-primarygreen-1 p-4 text-white flex flex-col gap-4">
       <Image src="/logo-stadkortrijk.png" alt="Kortrijk Logo" width="300" height="200" />
@@ -29,15 +76,17 @@ export default function Footer() {
         <Clock size={24} />
         <div>
           <h4 className="text-lg font-bold">Openingsuren Deelfabriek</h4>
-          <ul className="space-y-1">
-            <li>ma: 13:00–16:00</li>
-            <li>di: Gesloten</li>
-            <li>woe: 9:30–16:30</li>
-            <li>do: 9:00–12:00</li>
-            <li>vr: 13:30–18:00</li>
-            <li>za: Gesloten</li>
-            <li>zo: Gesloten</li>
-          </ul>
+          {loading && <p>Laden...</p>}
+          {error && <p>Kon openingsuren niet laden</p>}
+          {!loading && !error && (
+            <ul className="space-y-1">
+              {sortedHours.map(day => (
+                <li key={day.idDay}>
+                  {dayNameMap[day.idDay] || day.idDay}: {getDisplayHours(day)}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </footer>
