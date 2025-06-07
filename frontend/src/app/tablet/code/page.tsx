@@ -77,12 +77,16 @@ export default function TabletCodePage() {
               {n}
             </button>
           ))}
-          {/* Vraagteken knop */}
+          {/* Vraagteken knop (nu niet-primary) */}
           <button
-            className="aspect-square w-full flex items-center justify-center border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-[var(--color-primarygreen-1)] hover:bg-[#00664f] transition"
+            className="aspect-square w-full flex items-center justify-center border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition"
             onClick={handleHelp}
           >
-            <Question size={40} color="#fff" weight="bold" />
+            <Question
+              size={40}
+              className="text-[var(--color-primarygreen-1)]"
+              weight="bold"
+            />
           </button>
           {/* 0 knop */}
           <button
@@ -92,12 +96,16 @@ export default function TabletCodePage() {
           >
             0
           </button>
-          {/* Backspace knop */}
+          {/* Backspace knop (nu niet-primary) */}
           <button
-            className="aspect-square w-full flex items-center justify-center border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-[var(--color-primarygreen-1)] hover:bg-[#00664f] transition"
+            className="aspect-square w-full flex items-center justify-center border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition"
             onClick={handleDelete}
           >
-            <Backspace size={40} color="#fff" weight="bold" />
+            <Backspace
+              size={40}
+              className="text-[var(--color-primarygreen-1)]"
+              weight="bold"
+            />
           </button>
         </div>
         <button
