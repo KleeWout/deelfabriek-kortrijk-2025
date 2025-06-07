@@ -24,7 +24,7 @@ export default function OpenLockerPage() {
           Locker 02 is geopend
         </div>
         <div className="text-2xl text-[var(--color-primarytext-1)] text-center max-w-2xl mb-8 z-10">
-          Neem je item uit de locker en sluit deze goed dicht
+          Neem je item uit de locker en sluit de locker goed af.
         </div>
         <div className="flex items-center gap-3 mt-4 z-10">
           <Info size={32} className="text-[var(--color-primarygreen-1)]" />

@@ -196,6 +196,12 @@ export default function ReturnFlow() {
           </div>
         </div>
       </div>
+      {/* Na het sluiten van de locker */}
+      <div className="flex flex-col items-center mt-8">
+        <div className="bg-green-100 border border-green-600 text-green-900 rounded-xl px-8 py-6 text-2xl font-bold text-center shadow-lg">
+          Je item is succesvol teruggebracht! Bedankt om te delen.
+        </div>
+      </div>
     </div>
   );
 }

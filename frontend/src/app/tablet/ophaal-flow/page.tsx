@@ -69,22 +69,9 @@ export default function OphaalFlowPage() {
             </div>
             <div className="flex items-center gap-2 text-lg text-[var(--color-primarytext-1)] mb-1 whitespace-nowrap">
               Gereserveerd voor <span className="font-bold ml-1">1 week</span>
-              <button
-                className="ml-2 text-[var(--color-primarygreen-1)] hover:text-[var(--color-primarypink-1)] focus:outline-none"
-                onClick={() => setShowInfo((v) => !v)}
-                aria-label="Meer info"
-              >
-                <Info size={22} weight="bold" />
-              </button>
             </div>
             {/* Info-balk met fade-in */}
-            <div
-              className={`transition-all duration-300 ${showInfo ? 'opacity-100 max-h-20 mb-2' : 'opacity-0 max-h-0 mb-0'} overflow-hidden`}
-            >
-              <div className="flex items-center gap-2 bg-[var(--color-secondarygreen-1)] text-[var(--color-primarygreen-1)] rounded-lg px-4 py-2 text-base font-semibold w-full min-h-[40px]">
-                Je kunt later verlengen op de website
-              </div>
-            </div>
+            {/* VERWIJDERD: Je kunt later verlengen op de website */}
             <div className="flex items-center gap-2 text-base text-[var(--color-primarytext-1)] mb-1">
               <Calendar
                 size={20}
