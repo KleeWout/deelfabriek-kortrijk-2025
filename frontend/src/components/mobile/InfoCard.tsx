@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 interface FeatureCardProps {
   number: number;
@@ -7,18 +7,20 @@ interface FeatureCardProps {
   imageSrc?: string;
 }
 
-export default function 
-FeatureCard({
+export default function FeatureCard({
   number,
   title,
   description,
-  imageSrc = "/PlaceholderFoto.webp",
+  imageSrc,
 }: FeatureCardProps) {
+  // Gebruik standaard dummy images uit public als imageSrc niet is opgegeven
+  const defaultImage = `/dummy${number}.jpg`;
+  const src = imageSrc || defaultImage;
   return (
     <article className="flex flex-col items-center gap-4">
       <div className="w-52 h-52 relative">
         <Image
-          src={imageSrc}
+          src={src}
           alt="Voorbeeld afbeelding"
           fill
           className="object-cover object-center rounded-xl"
