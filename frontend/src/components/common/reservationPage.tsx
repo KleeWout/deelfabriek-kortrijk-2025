@@ -6,6 +6,7 @@ import { ReturnButton } from '@/components/common/ReturnButton';
 import Navigation from '@/components/mobile/nav';
 import itemsDetails from '@/data/itemDetails.json';
 import { addWeeks, format } from 'date-fns';
+import { Fragment } from 'react';
 
 export default function ReservationPage() {
   const params = useParams();
@@ -46,6 +47,8 @@ export default function ReservationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(addWeeks(new Date(), 1));
+
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Get item details
   const item = itemsDetails.find((item) => item.id === id);
@@ -136,12 +139,15 @@ export default function ReservationPage() {
       return;
     }
 
-    setIsSubmitting(true);
+    setShowConfirm(true);
+  };
 
+  const handleConfirm = async () => {
+    setShowConfirm(false);
+    setIsSubmitting(true);
     try {
       // Api call voor het versturen van de reservering
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       // Navigate to the appropriate confirmation page based on route type
       if (isTabletRoute) {
         router.push(`/tablet/payment/${id}`);
@@ -150,13 +156,16 @@ export default function ReservationPage() {
       }
     } catch (error) {
       console.error('Error submitting reservation:', error);
-      //TODO: aparte pagina of een popup
       alert(
         'Er is een fout opgetreden bij het versturen van je reservering. Probeer het later opnieuw.'
       );
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCancel = () => {
+    setShowConfirm(false);
   };
 
   const totalPrice = (item.price * formData.duration)
@@ -445,6 +454,33 @@ export default function ReservationPage() {
               : 'Reserveren'}
         </button>
       </div>
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full flex flex-col items-center border border-primarygreen-1">
+            <h2 className="text-2xl font-bold text-primarygreen-1 mb-4 text-center">
+              Bevestig je reservatie
+            </h2>
+            <p className="text-lg text-center mb-6">
+              Is alle info juist en ben je zeker dat je een{' '}
+              <span className="font-bold">{item.title}</span> wil reserveren?
+            </p>
+            <div className="flex gap-6 w-full justify-center">
+              <button
+                onClick={handleConfirm}
+                className="bg-primarygreen-1 text-white font-bold px-6 py-3 rounded-lg shadow hover:bg-green-900 transition-colors"
+              >
+                Ja, reserveren
+              </button>
+              <button
+                onClick={handleCancel}
+                className="bg-gray-200 text-primarygreen-1 font-bold px-6 py-3 rounded-lg shadow hover:bg-gray-300 transition-colors"
+              >
+                Nee, terug
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
