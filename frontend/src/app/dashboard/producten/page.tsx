@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import item from "@/data/items.json";
 import ItemProps from "@/models/ItemProps";
 import { PencilSimpleLine, Trash } from "phosphor-react";
+import { ItemCard } from "@/components/common/ItemCard";
+import { getItems } from "@/app/api/items";
 
-// interface Product {
+// interface Item {
 //   id: number;
 //   title: string;
 //   price: number;
@@ -14,10 +16,12 @@ import { PencilSimpleLine, Trash } from "phosphor-react";
 //   categoryId: string;
 // }
 
-export default function ProductsPage() {
-  const [products, setProducts] = useState<ItemProps[]>([]);
+export default function ItemsPage() {
+  // const [items, setItems] = useState<ItemProps[]>([]);
+  const [items, setItems] = useState<ItemProps[]>([]);
+
   const [currentView, setCurrentView] = useState("list"); // 'list' or 'form'
-  const [editingProduct, setEditingProduct] = useState<ItemProps | null>(null);
+  const [editingItem, setEditingItem] = useState<ItemProps | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -31,11 +35,30 @@ export default function ProductsPage() {
     imageSrc: "",
   });
   useEffect(() => {
-    setProducts(item);
+    setItems(item);
   }, []);
 
-  const handleAddProduct = () => {
-    setEditingProduct(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const data = await getItems();
+        setItems(data);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to load items");
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  const handleAddItem = () => {
+    setEditingItem(null);
     setFormData({
       title: "",
       category: "",
@@ -51,8 +74,8 @@ export default function ProductsPage() {
     setCurrentView("form");
   };
 
-  const handleEditProduct = (item: ItemProps) => {
-    setEditingProduct(item);
+  const handleEditItem = (item: ItemProps) => {
+    setEditingItem(item);
     setFormData({
       title: item.title || "",
       category: item.category || "",
@@ -70,29 +93,29 @@ export default function ProductsPage() {
 
   const handleCancel = () => {
     setCurrentView("list");
-    setEditingProduct(null);
+    setEditingItem(null);
   };
 
   const handleSave = () => {
     // Here you would typically save to your backend/data source
-    console.log("Saving product:", formData);
+    console.log("Saving item:", formData);
 
-    if (editingProduct) {
-      // Update existing product
-      setProducts(products.map((p) => (p.id === editingProduct.id ? { ...p, ...formData, price: parseFloat(formData.price) } : p)));
+    if (editingItem) {
+      // Update existing item
+      setItems(items.map((p) => (p.id === editingItem.id ? { ...p, ...formData, price: parseFloat(formData.price) } : p)));
     } else {
-      // Add new product
-      const newProduct = {
+      // Add new item
+      const newItem = {
         ...formData,
-        id: Math.max(...products.map((p) => p.id)) + 1,
+        id: Math.max(...items.map((p) => p.id)) + 1,
         price: parseFloat(formData.price),
         status: "Beschikbaar",
       };
-      setProducts([...products, newProduct]);
+      setItems([...items, newItem]);
     }
 
     setCurrentView("list");
-    setEditingProduct(null);
+    setEditingItem(null);
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
@@ -102,14 +125,14 @@ export default function ProductsPage() {
     }));
   };
 
-  const handleDeleteProduct = (productId: number) => {
+  const handleDeleteItem = (productId: number) => {
     // Show confirmation dialog
-    if (window.confirm("Weet je zeker dat je dit product wilt verwijderen?")) {
-      // Remove the product from the products state
-      setProducts(products.filter((product) => product.id !== productId));
+    if (window.confirm("Weet je zeker dat je dit item wilt verwijderen?")) {
+      // Remove the item from the items state
+      setItems(items.filter((item) => item.id !== productId));
 
       // Here you would typically also delete from your backend
-      console.log("Product deleted:", productId);
+      console.log("Item deleted:", productId);
     }
   };
 
@@ -117,9 +140,9 @@ export default function ProductsPage() {
     return (
       <div className="p-6 bg-gray-100 min-h-screen">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Producten</h1>
-          <button className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors" onClick={handleAddProduct}>
-            Voeg product toe
+          <h1 className="text-2xl font-bold text-gray-800">Itemen</h1>
+          <button className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors" onClick={handleAddItem}>
+            Voeg item toe
           </button>
         </div>
 
@@ -128,7 +151,7 @@ export default function ProductsPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categorie</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prijs per week</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -136,32 +159,33 @@ export default function ProductsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {products.map((product) => (
-                  <tr key={product.id}>
+                
+                {items.map((item) => (
+                  <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <img className="h-10 w-10 rounded-lg object-cover" src={product.imageSrc} alt={product.title} />
+                          <img className="h-10 w-10 rounded-lg object-cover" src={item.imageSrc} alt={item.title} />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{product.title}</div>
+                          <div className="text-sm font-medium text-gray-900">{item.title}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{(product.category ?? "Geen categorie").charAt(0).toUpperCase() + (product.category ?? "Geen categorie").slice(1)}</div>
+                      <div className="text-sm text-gray-900">{(item.category ?? "Geen categorie").charAt(0).toUpperCase() + (item.category ?? "Geen categorie").slice(1)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">€{product.pricePerWeek?.toFixed(2)}</div>
+                      <div className="text-sm text-gray-900">€{item.pricePerWeek?.toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.status === "Beschikbaar" ? "bg-green-100 text-green-800" : product.status === "Gereserveerd" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>{product.status}</span>
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.status === "Beschikbaar" ? "bg-green-100 text-green-800" : item.status === "Gereserveerd" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>{item.status}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-[#004431] hover:text-[#003422] mr-4" onClick={() => handleEditProduct(product)}>
+                      <button className="text-[#004431] hover:text-[#003422] mr-4" onClick={() => handleEditItem(item)}>
                         <PencilSimpleLine size={20} />
                       </button>
-                      <button className="text-red-600 hover:text-red-800" onClick={() => handleDeleteProduct(product.id)}>
+                      <button className="text-red-600 hover:text-red-800" onClick={() => handleDeleteItem(item.id)}>
                         <Trash size={20} />
                       </button>
                     </td>
@@ -180,7 +204,7 @@ export default function ProductsPage() {
         {/* Header */}
 
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Producten</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Itemen</h1>
           <div className="flex space-x-3">
             <button onClick={handleCancel} className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
               Annuleren
@@ -193,14 +217,14 @@ export default function ProductsPage() {
         {/* Form Content */}
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-700">{editingProduct ? "Product bewerken" : "Product aanmaken en bewerken"}</h2>
+            <h2 className="text-xl font-semibold text-gray-700">{editingItem ? "Item bewerken" : "Item aanmaken en bewerken"}</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column */}
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 ">Product naam</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2 ">Item naam</label>
                 <input type="text" value={formData.title} onChange={(e) => handleInputChange("title", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="naaimachine" />
               </div>
 
@@ -239,10 +263,10 @@ export default function ProductsPage() {
             {/* Right Column */}
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Product foto</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Item foto</label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-white">
                   {formData.imageSrc ? (
-                    <img src={formData.imageSrc} alt="Product" className="mx-auto max-h-40 rounded-lg" />
+                    <img src={formData.imageSrc} alt="Item" className="mx-auto max-h-40 rounded-lg" />
                   ) : (
                     <div className="text-gray-400">
                       <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -271,3 +295,6 @@ export default function ProductsPage() {
     );
   }
 }
+
+
+

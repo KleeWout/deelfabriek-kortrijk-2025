@@ -85,8 +85,8 @@ export default function ItemDetailPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex flex-col lg:flex-row lg:gap-8">
             <div className="w-full lg:w-1/2 mb-4">
-              <div className={`${gradientClass} p-4 rounded-lg flex items-center justify-center h-[300px]`}>
-                <Image src={imageSrc} width={300} height={300} alt={item.title} className="object-contain max-w-full max-h-full" />
+              <div className={`${gradientClass} p-4 rounded-lg flex items-center justify-center h-[350px]`}>
+                <Image src={imageSrc} width={350} height={350} alt={item.title} className="object-contain max-w-full max-h-full" />
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -97,29 +97,34 @@ export default function ItemDetailPage() {
                   </span>
                 ))}
               </div>
+            </div>
 
-              <div className="mt-4">
+            <div className="w-full lg:w-1/2">
+              <div className="mb-6">
                 <h1 className="text-3xl font-bold text-primarytext-1">{item.title}</h1>
                 <p className="text-xl text-primarygreen-1 font-medium my-2">€ {item.pricePerWeek.toFixed(2).replace(".", ",")} per week</p>
               </div>
 
-              <div className="mt-4">
+              <div className="mb-6">
                 <h2 className="text-xl font-semibold text-primarytext-1">Beschrijving</h2>
                 <p className="text-gray-700 mt-1" style={{ whiteSpace: "pre-line" }}>
                   {item.description || "Geen beschrijving beschikbaar."}
                 </p>
               </div>
-            </div>
 
-            <div className="w-full lg:w-1/2">
-              {item.howToUse && (
-                <div className="mt-6">
-                  <h2 className="text-xl font-semibold text-primarytext-1">Hoe gebruiken?</h2>
-                  <div className="text-gray-700 mt-1 whitespace-pre-wrap break-words">{item.howToUse}</div>
+              {howToUse && howToUse.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-primarytext-1">Gebruiksinstructies</h2>
+                  <ul className="mt-1 text-gray-700">
+                    {howToUse.map((howToUse, index) => (
+                      <li key={index}>{howToUse}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
+
               {accessories && accessories.length > 0 && (
-                <div className="mt-6">
+                <div className="mb-6">
                   <h2 className="text-xl font-semibold text-primarytext-1">Accessoires</h2>
                   <ul className="mt-1 list-disc list-inside text-gray-700">
                     {accessories.map((accessory, index) => (
@@ -128,7 +133,8 @@ export default function ItemDetailPage() {
                   </ul>
                 </div>
               )}
-              <div className="mt-6">
+
+              <div className="mb-6">
                 <h2 className="text-xl font-semibold text-primarytext-1">Gewicht en afmeting</h2>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   {item.dimensions && (
@@ -162,18 +168,20 @@ export default function ItemDetailPage() {
                   )}
                 </div>
               </div>
+
               {item.tip && (
-                <div className="mt-6 p-3 bg-pink-50 border-l-4 border-pink-500 rounded">
+                <div className="mb-6 p-3 bg-pink-50 border-l-4 border-pink-500 rounded">
                   <h2 className="text-lg font-semibold text-pink-700">Tip</h2>
                   <p className="text-pink-700">{item.tip}</p>
                 </div>
-              )}{" "}
+              )}
+
               {item.status === "Beschikbaar" ? (
-                <button onClick={handleReservation} className="mt-6 w-full bg-primarygreen-1 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                <button onClick={handleReservation} className="w-full bg-primarygreen-1 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
                   {isTabletRoute ? "Huur nu" : "Reserveren"}
                 </button>
               ) : (
-                <div className="mt-6 p-3 bg-amber-50 border-l-4 border-amber-500 rounded">
+                <div className="p-3 bg-amber-50 border-l-4 border-amber-500 rounded">
                   <p className="text-amber-700">Dit item is momenteel niet beschikbaar</p>
                 </div>
               )}

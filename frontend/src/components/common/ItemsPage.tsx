@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { ItemCard } from "@/components/common/ItemCard";
 import { getItems } from "@/app/api/items";
 import ItemProps from "@/models/ItemProps";
-import { useRouter, usePathname } from "next/navigation";
 
 interface ItemPageProps {
   baseRoute?: string; // Optional prop to specify the base route
