@@ -7,7 +7,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Locker> Lockers { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Category> Categories { get; set; }
-    public DbSet<ItemCategory> ItemCategories { get; set; }
     public DbSet<OpeningsHours> OpeningsHours { get; set; }
 
 
@@ -19,19 +18,6 @@ public class ApplicationDbContext : IdentityDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        // ItemCategory (Many-to-Many between Item and Category)
-        modelBuilder.Entity<ItemCategory>()
-            .HasKey(ic => new { ic.ItemId, ic.CategoryId });
-
-        modelBuilder.Entity<ItemCategory>()
-            .HasOne(ic => ic.Item)
-            .WithMany(i => i.ItemCategories)
-            .HasForeignKey(ic => ic.ItemId);
-
-        modelBuilder.Entity<ItemCategory>()
-            .HasOne(ic => ic.Category)
-            .WithMany(c => c.ItemCategories)
-            .HasForeignKey(ic => ic.CategoryId);
 
         // Item - Locker (1:1)
         modelBuilder.Entity<Item>()
@@ -107,7 +93,8 @@ public class ApplicationDbContext : IdentityDbContext
             Accesories = "4 spoeltjes",
             Weight = null,
             Dimensions = null,
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            Category = "Elektrisch"
         },
         new Item
         {
@@ -121,7 +108,8 @@ public class ApplicationDbContext : IdentityDbContext
             HowToUse = "Zie handleiding: https://www.icmsmakita.eu/cms/custom/nl/attachments/user_manual/DHP485_20240320_885653D991_DU884.pdf",
             Accesories = "1x 18 V Klopboor-/schroefmachine, 2x 3.0 Ah accu, 1x Snellader, 1x Mbox",
             Weight = 1.5m,
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            Category = "Tuingereedschap"
         },
         new Item
         {
@@ -135,7 +123,8 @@ public class ApplicationDbContext : IdentityDbContext
             Accesories = "1 x kraanstuk, 1 x adapter, 1 x slangstuk, 1 x waterstop, 1 x tuinspuit",
             Weight = null,
             Dimensions = null,
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            Category = "Tuingereedschap"
         },
         new Item
         {
@@ -149,7 +138,8 @@ public class ApplicationDbContext : IdentityDbContext
             Accesories = "/",
             Weight = 7.9m,
             Dimensions = "44 x 29.7 cm",
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            Category = "Elektrisch"
         },
         new Item
         {
@@ -165,19 +155,11 @@ public class ApplicationDbContext : IdentityDbContext
             Weight = 7.0m,
             Dimensions = "41 x 24 cm",
             Tip = "Controleer of de kom (20 x 16.5 cm) in je vriezer past.",
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            Category = "Keukenapparatuur"
         }
-
         );
 
-
-
-        // Seed ItemCategory (join table)
-        modelBuilder.Entity<ItemCategory>().HasData(
-            new ItemCategory { ItemId = 1, CategoryId = 1 }, // Boormachine → Elektrisch
-            new ItemCategory { ItemId = 2, CategoryId = 2 }, // Houten trein → Speelgoed
-            new ItemCategory { ItemId = 2, CategoryId = 3 }  // Houten trein → Tuingereedschap
-        );
         // Seed Lockers
         modelBuilder.Entity<Locker>().HasData(
             new Locker
@@ -213,7 +195,9 @@ public class ApplicationDbContext : IdentityDbContext
                 ItemId = 1,
                 LockerId = 1
             }
-        );        // Seed Opening Hours
+        );        
+        
+        // Seed Opening Hours
         modelBuilder.Entity<OpeningsHours>().HasData(
             new OpeningsHours
             {
@@ -279,11 +263,5 @@ public class ApplicationDbContext : IdentityDbContext
                 Open = false
             }
         );
-        // review seed
-
     }
-
-
-
-
 }

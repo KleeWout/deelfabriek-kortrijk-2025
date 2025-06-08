@@ -6,8 +6,8 @@ public class ItemValidator : AbstractValidator<Item>
 {
     public ItemValidator()
     {
-        RuleFor(x => x.ImageSrc)
-            .NotEmpty().WithMessage("Image URL is required");
+        // RuleFor(x => x.ImageSrc)
+            // .NotEmpty().WithMessage("Image URL is required");
             // .Must(BeAValidUrl).WithMessage("Image URL must be a valid URL");
 
         RuleFor(x => x.PricePerWeek)

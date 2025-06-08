@@ -112,13 +112,13 @@ public static class PublicRoutes
 
         group.MapGet("/", async (int? categoryId, IItemService itemService) =>
         {
-            if (categoryId.HasValue)
-            {
-                Console.WriteLine($"Filtering by categoryId: {categoryId.Value}");
-                var items = await itemService.GetItemsByCategoryAsync(categoryId.Value);
-                Console.WriteLine($"Found {items.Count} items for category {categoryId.Value}");
-                return items.Any() ? Results.Ok(items) : Results.NotFound($"No items found for category {categoryId.Value}");
-            }
+            // if (categoryId.HasValue)
+            // {
+            //     Console.WriteLine($"Filtering by categoryId: {categoryId.Value}");
+            //     var items = await itemService.GetItemsByCategoryAsync(categoryId.Value);
+            //     Console.WriteLine($"Found {items.Count} items for category {categoryId.Value}");
+            //     return items.Any() ? Results.Ok(items) : Results.NotFound($"No items found for category {categoryId.Value}");
+            // }
 
             var allItems = await itemService.GetAllItemsPage();
             if (allItems == null || !allItems.Any())
@@ -142,14 +142,21 @@ public static class PublicRoutes
         });
 
         // Parameterized route last
-        group.MapGet("/{id:int}", async (int id, IItemService itemService) =>
+        // group.MapGet("/{id:int}", async (int id, IItemService itemService) =>
+        // {
+        //     var item = await itemService.GetItemByIdDto(id);
+        //     if (item == null)
+        //     {
+        //         return Results.NotFound();
+        //     }
+        //     return Results.Ok(item);
+        // });
+         //get all items that are in lockers
+        group.MapGet("/lockers", async (IItemService itemService) =>
         {
-            var item = await itemService.GetItemByIdDto(id);
-            if (item == null)
-            {
-                return Results.NotFound();
-            }
-            return Results.Ok(item);
+            var items = await itemService.GetItemsWithLocker();
+            return Results.Ok(items);
+
         });
 
 

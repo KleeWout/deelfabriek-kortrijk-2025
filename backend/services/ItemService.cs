@@ -4,24 +4,26 @@ public interface IItemService
 {
     Task<List<ItemDetailDto>> GetAllItemsAdmin();
     Task<List<ItemsPageDto>> GetAllItemsPage();
-    Task<ItemDetailDto> GetItemByIdDto(int id);
+    // Task<ItemDetailDto> GetItemByIdDto(int id);
     Task<Item> GetItemById(int id);
     Task AddItem(Item item);
     Task UpdateItem(Item item);
     Task DeleteItem(int id);
 
-    Task<List<ItemsPageDto>> GetItemsByCategoryAsync(int categoryId);
+    // Task<List<ItemsPageDto>> GetItemsByCategoryAsync(int categoryId);
     Task<List<ItemNameDto>> GetAvailableItems();
 
     // category related methods
 
-    Task<Item> GetItemByIdWithCategories(int id);
+    // Task<Item> GetItemByIdWithCategories(int id);
     Task<IEnumerable<CategoryDto>> GetAllCategories();
-    Task<Category> GetCategoryById(int id);
+    // Task<Category> GetCategoryById(int id);
     Task AddCategory(Category category);
     Task DeleteCategory(int id);
 
-    Task UpdateItemWithCategories(Item item);
+    Task<List<ItemsPageDto>> GetItemsWithLocker();
+
+    // Task UpdateItemWithCategories(Item item);
 }
 
 
@@ -30,6 +32,7 @@ public class ItemService : IItemService
 
     private readonly IGenericRepository<Item> _itemRepository;
     private readonly IGenericRepository<Category> _categoryRepository;
+    private readonly ILockerRepository _lockerRepository;
 
     private readonly IItemRepository _customItemRepository;
     private readonly IMapper _mapper;
@@ -38,11 +41,13 @@ public class ItemService : IItemService
     IGenericRepository<Item> itemRepository,
     IItemRepository customItemRepository,
     IGenericRepository<Category> categoryRepository,
+    ILockerRepository lockerRepository,
     IMapper mapper)
     {
         _itemRepository = itemRepository;
         _customItemRepository = customItemRepository;
         _categoryRepository = categoryRepository;
+        _lockerRepository = lockerRepository;
         _mapper = mapper;
     }
 
@@ -64,22 +69,22 @@ public class ItemService : IItemService
         return await _itemRepository.GetByIdAsync(id);
     }
 
-    public async Task<Item> GetItemByIdWithCategories(int id)
-    {
-        return await _customItemRepository.GetItemByIdWithCategories(id);
+    // public async Task<Item> GetItemByIdWithCategories(int id)
+    // {
+    //     return await _customItemRepository.GetItemByIdWithCategories(id);
 
-    }
+    // }
 
-    public async Task<ItemDetailDto> GetItemByIdDto(int id)
-    {
-        var item = await _customItemRepository.GetItemByIdWithCategories(id);
-        if (item == null)
-        {
-            return null; // or throw an exception, depending on your error handling strategy
-        }
-        return _mapper.Map<ItemDetailDto>(item);
+    // public async Task<ItemDetailDto> GetItemByIdDto(int id)
+    // {
+    //     var item = await _customItemRepository.GetItemByIdWithCategories(id);
+    //     if (item == null)
+    //     {
+    //         return null; // or throw an exception, depending on your error handling strategy
+    //     }
+    //     return _mapper.Map<ItemDetailDto>(item);
 
-    }
+    // }
 
     public async Task AddItem(Item item)
     {
@@ -88,24 +93,25 @@ public class ItemService : IItemService
 
     public async Task UpdateItem(Item item)
     {
-        await _itemRepository.UpdateAsync(item);
+        // Use the custom repository method to avoid tracking issues
+        await _customItemRepository.UpdateItem(item.Id, item);
     }
 
-    public async Task UpdateItemWithCategories(Item item)
-    {
-        await _customItemRepository.UpdateItemWithCategories(item);
-    }
+    // public async Task UpdateItemWithCategories(Item item)
+    // {
+    //     await _customItemRepository.UpdateItemWithCategories(item);
+    // }
 
     public async Task DeleteItem(int id)
     {
         await _itemRepository.DeleteAsync(id);
     }
 
-    public async Task<List<ItemsPageDto>> GetItemsByCategoryAsync(int categoryId)
-    {
-        var items = await _customItemRepository.GetItemsByCategoryAsync(categoryId);
-        return _mapper.Map<List<ItemsPageDto>>(items);
-    }
+    // public async Task<List<ItemsPageDto>> GetItemsByCategoryAsync(int categoryId)
+    // {
+    //     var items = await _customItemRepository.GetItemsByCategoryAsync(categoryId);
+    //     return _mapper.Map<List<ItemsPageDto>>(items);
+    // }
 
 
 
@@ -137,7 +143,9 @@ public class ItemService : IItemService
     }
 
 
-
-
-
+    public async Task<List<ItemsPageDto>> GetItemsWithLocker()
+    {
+        var items = await _customItemRepository.GetItemsWithLocker();
+        return _mapper.Map<List<ItemsPageDto>>(items);
+    }
 }

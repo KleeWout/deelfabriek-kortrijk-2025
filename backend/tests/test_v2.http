@@ -1,0 +1,49 @@
+@url = http://0.0.0.0:3001
+# @url = http://api-deelfabriek.woutjuuh02.be
+
+//dashboard-items
+###
+GET {{url}}/dashboard/items
+
+###
+POST {{url}}/dashboard/items
+Content-Type: application/json
+
+{
+  "Title": "test item",
+  "Description": "test description",
+  "PricePerWeek": 5.00,
+  "Status": "Beschikbaar",
+  "Category": "Elektrisch",
+  "ImageSrc": "https://example.com/image.jpg"
+}
+
+###
+PUT {{url}}/dashboard/items/9
+Content-Type: application/json
+
+{
+ "Category": "",
+  "PricePerWeek": 50,
+  "Title": "test put",
+  "Description": "test sdescription",
+  "Dimensions": "",
+  "HowToUse": "npt",
+  "ImageSrc": "",
+  "Status": "Beschikbaar",
+  "Tip": "",
+  "Accesories": "",
+  "Weight": 1
+}
+
+###
+DELETE {{url}}/dashboard/items/8
+
+
+
+
+### items
+GET {{url}}/items
+
+### All items from inside the lockers
+GET {{url}}/items/lockers

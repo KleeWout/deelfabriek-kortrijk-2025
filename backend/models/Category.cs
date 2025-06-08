@@ -10,7 +10,7 @@ public class Category: IEntity
 
         public string IconName { get; set; } 
 
-        public List<ItemCategory> ItemCategories { get; set; } = new();
+        // public List<ItemCategory> ItemCategories { get; set; } = new();
     }
 
 public class CategoryProfile : Profile

@@ -5,7 +5,7 @@ import item from "@/data/items.json";
 import ItemProps from "@/models/ItemProps";
 import { PencilSimpleLine, Trash } from "phosphor-react";
 import { ItemCard } from "@/components/common/ItemCard";
-import { getItems } from "@/app/api/items";
+import { createItem, deleteItem, getItemsDashboard, updateItem } from "@/app/api/items";
 
 // interface Item {
 //   id: number;
@@ -30,7 +30,7 @@ export default function ItemsPage() {
     howToUse: "",
     whatsIncluded: "",
     tip: "",
-    weight: "",
+    weight: 0,
     dimensions: "",
     imageSrc: "",
   });
@@ -38,14 +38,13 @@ export default function ItemsPage() {
     setItems(item);
   }, []);
 
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const data = await getItems();
+        const data = await getItemsDashboard();
         setItems(data);
         setLoading(false);
       } catch (err) {
@@ -62,12 +61,12 @@ export default function ItemsPage() {
     setFormData({
       title: "",
       category: "",
-      price: "",
+      price: "0",
       description: "",
       howToUse: "",
       whatsIncluded: "",
       tip: "",
-      weight: "",
+      weight: 0,
       dimensions: "",
       imageSrc: "",
     });
@@ -84,7 +83,7 @@ export default function ItemsPage() {
       howToUse: item.howToUse || "",
       whatsIncluded: item.whatsIncluded || "",
       tip: item.tip || "",
-      weight: item.weight || "",
+      weight: item.weight || 0,
       dimensions: item.dimensions || "",
       imageSrc: item.imageSrc || "",
     });
@@ -96,26 +95,46 @@ export default function ItemsPage() {
     setEditingItem(null);
   };
 
-  const handleSave = () => {
-    // Here you would typically save to your backend/data source
-    console.log("Saving item:", formData);
+  const handleSave = async () => {
+    try {
+      setLoading(true);
 
-    if (editingItem) {
-      // Update existing item
-      setItems(items.map((p) => (p.id === editingItem.id ? { ...p, ...formData, price: parseFloat(formData.price) } : p)));
-    } else {
-      // Add new item
-      const newItem = {
-        ...formData,
-        id: Math.max(...items.map((p) => p.id)) + 1,
-        price: parseFloat(formData.price),
+      // Convert form data to the right format
+      const itemData = {
+        title: formData.title,
+        category: formData.category,
+        pricePerWeek: parseFloat(formData.price),
+        description: formData.description,
+        howToUse: formData.howToUse,
+        whatsIncluded: formData.whatsIncluded,
+        tip: formData.tip,
+        weight: formData.weight,
+        dimensions: formData.dimensions,
+        imageSrc: formData.imageSrc,
         status: "Beschikbaar",
       };
-      setItems([...items, newItem]);
-    }
 
-    setCurrentView("list");
-    setEditingItem(null);
+      if (editingItem) {
+        // Update existing item
+        console.log("Updating item:", editingItem.id, itemData);
+        await updateItem(editingItem.id, itemData);
+      } else {
+        // Add new item
+        await createItem(itemData);
+      }
+
+      // Refresh the item list
+      const updatedItems = await getItemsDashboard();
+      setItems(updatedItems);
+
+      setCurrentView("list");
+      setEditingItem(null);
+    } catch (err) {
+      console.error("Error saving item:", err);
+      alert("Failed to save item. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
@@ -125,14 +144,23 @@ export default function ItemsPage() {
     }));
   };
 
-  const handleDeleteItem = (productId: number) => {
+  const handleDeleteItem = async (productId: number) => {
     // Show confirmation dialog
     if (window.confirm("Weet je zeker dat je dit item wilt verwijderen?")) {
-      // Remove the item from the items state
-      setItems(items.filter((item) => item.id !== productId));
+      try {
+        setLoading(true);
 
-      // Here you would typically also delete from your backend
-      console.log("Item deleted:", productId);
+        // Delete from the API
+        await deleteItem(productId);
+
+        // Remove the item from the local state
+        setItems(items.filter((item) => item.id !== productId));
+      } catch (err) {
+        console.error("Error deleting item:", err);
+        alert("Failed to delete item. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -159,7 +187,6 @@ export default function ItemsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                
                 {items.map((item) => (
                   <tr key={item.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -280,8 +307,8 @@ export default function ItemsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Gewicht</label>
-                <input type="text" value={formData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Gewicht (kg)</label>
+                <input type="number" step="0.01" value={formData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="0.00" />
               </div>
 
               <div>
@@ -295,6 +322,3 @@ export default function ItemsPage() {
     );
   }
 }
-
-
-

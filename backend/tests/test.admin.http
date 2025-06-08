@@ -1,4 +1,5 @@
 @url = http://0.0.0.0:3001
+# @url = http://api-deelfabriek.woutjuuh02.be
 
 //USERS 
 
@@ -59,7 +60,7 @@ Content-Type: application/json
 ###
 // still need to make an api to update with the image, this one works without image upload
 //werkt
-PUT {{url}}/dashboard/items/5
+PUT {{url}}/dashboard/items/6
 Content-Type: application/json
 
 {
@@ -80,6 +81,15 @@ Content-Type: application/json
     }
   ]
 }
+###
+
+PUT {{url}}/dashboard/items/6
+Content-Type: application/json
+
+{
+  "title": "Updated Item Title"
+}
+
 ###
 //werkt 
 DELETE {{url}}/dashboard/items/6

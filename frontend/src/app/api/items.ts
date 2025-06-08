@@ -19,15 +19,15 @@ export interface ItemResponse {
   tip: string | null;
   createdAt: string;
   lockerId: number;
-  categoryNames: string[];
+  category: string;
 }
 
-// const url = "http://localhost:3001";
-const url = "https://api-deelfabriek.woutjuuh02.be";
+const url = "http://localhost:3001";
+// const url = "https://api-deelfabriek.woutjuuh02.be";
 
 export const getItems = async (): Promise<ItemProps[]> => {
   try {
-    const response = await fetch(`${url}/items`);
+    const response = await fetch(`${url}/items/lockers`);
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -67,7 +67,70 @@ export const getItemById = async (id: number): Promise<ItemResponse> => {
       tip: null,
       createdAt: "",
       lockerId: 0,
-      categoryNames: [],
+      category: "",
     };
   }
 };
+
+//dashboard
+
+export const getItemsDashboard = async (): Promise<ItemProps[]> => {
+  try {
+    const response = await fetch(`${url}/dashboard/items`);
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data: ItemProps[] = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch items:", error);
+    return [];
+  }
+};
+
+// Create a new item
+export async function createItem(item: Omit<ItemProps, "id">): Promise<ItemProps> {
+  const response = await fetch(`${url}/dashboard/items`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(item),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to create item: ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+// Update an existing item
+export async function updateItem(id: number, item: Partial<ItemProps>): Promise<ItemProps> {
+  const response = await fetch(`${url}/dashboard/items/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(item),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to update item: ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+// Delete an item
+export async function deleteItem(id: number): Promise<void> {
+  const response = await fetch(`${url}/dashboard/items/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete item: ${response.status}`);
+  }
+}

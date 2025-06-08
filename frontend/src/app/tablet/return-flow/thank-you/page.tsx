@@ -1,15 +1,17 @@
-"use client";
-import { useEffect, useState, Suspense } from "react";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle } from "phosphor-react";
+'use client';
+import { useEffect, useState, Suspense } from 'react';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { CheckCircle } from 'phosphor-react';
 
 // Wrapper component that uses searchParams
 function ThankYouContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [countdown, setCountdown] = useState(5);
-  const hasFeedback = searchParams.get("feedback") === "true";
+  const [countdown, setCountdown] = useState(8);
+  const hasFeedback = searchParams.get('feedback') === 'true';
+  const itemName = searchParams.get('item') || 'je item';
+  const reservatieCode = searchParams.get('code') || '-';
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
   // This effect handles countdown
@@ -33,7 +35,7 @@ function ThankYouContent() {
     if (shouldRedirect) {
       // Use a small timeout to ensure this happens after render is complete
       const redirectTimeout = setTimeout(() => {
-        router.push("/tablet");
+        router.push('/tablet');
       }, 100);
 
       return () => clearTimeout(redirectTimeout);
@@ -45,23 +47,40 @@ function ThankYouContent() {
         <div className="bg-white rounded-2xl shadow-xl p-12 flex flex-col items-center">
           {/* Logo */}
           <div className="mb-12">
-            <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={320} height={120} />
+            <Image
+              src="/deelfabriek-website-labels-boven_v2.svg"
+              alt="Deelfabriek Logo"
+              width={320}
+              height={120}
+            />
           </div>
 
           {/* Success Icon */}
           <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mb-8">
-            <CheckCircle size={64} weight="fill" className="text-[var(--color-primarygreen-1)]" />
+            <CheckCircle
+              size={64}
+              weight="fill"
+              className="text-[var(--color-primarygreen-1)]"
+            />
           </div>
 
           {/* Message */}
           <div className="text-center max-w-2xl">
-            <h1 className="text-3xl font-bold text-[var(--color-primarygreen-1)] mb-6">{hasFeedback ? "Bedankt voor je feedback!" : "Bedankt voor het uitlenen!"}</h1>
-            <p className="text-xl text-gray-700 mb-8">{hasFeedback ? "We waarderen je feedback en zullen deze gebruiken om onze service te verbeteren. We hopen je snel terug te zien bij de Deelfabriek!" : "Bedankt voor het uitlenen van een product bij de Deelfabriek. We hopen je snel terug te zien!"}</p>
+            <h1 className="text-3xl font-bold text-[var(--color-primarygreen-1)] mb-6">
+              Bedankt voor het terugbrengen van {itemName} met reservatiecode{' '}
+              {reservatieCode}.
+            </h1>
+            <p className="text-xl text-gray-700 mb-8">
+              Dit is succesvol geregistreerd, je krijgt ook nog een email later.
+            </p>
           </div>
 
           {/* Countdown */}
           <div className="mt-8 text-center">
-            <p className="text-gray-600">Je wordt over {countdown} seconden doorgestuurd naar het beginscherm...</p>
+            <p className="text-gray-600">
+              Je wordt over {countdown} seconden doorgestuurd naar het
+              beginscherm...
+            </p>
           </div>
         </div>
       </div>
@@ -76,7 +95,12 @@ function ThankYouPageLoading() {
       <div className="w-full max-w-4xl mx-auto px-8">
         <div className="bg-white rounded-2xl shadow-xl p-12 flex flex-col items-center">
           <div className="mb-12">
-            <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={320} height={120} />
+            <Image
+              src="/deelfabriek-website-labels-boven_v2.svg"
+              alt="Deelfabriek Logo"
+              width={320}
+              height={120}
+            />
           </div>
           <p className="text-gray-600">Laden...</p>
         </div>
