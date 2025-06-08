@@ -19,6 +19,9 @@ export default function ReservationPayPage() {
   const [paid, setPaid] = useState(false);
   const [qrCode, setQrCode] = useState<string>('');
   const [paymentId, setPaymentId] = useState<string>('');
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [isCancelled, setIsCancelled] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
     const initializePayment = async () => {
@@ -39,18 +42,42 @@ export default function ReservationPayPage() {
 
   useEffect(() => {
     if (paymentId) {
+      let checkCount = 0;
+      const maxChecks = 30; // 1 minute maximum (2 seconds * 30)
+
       const checkPayment = async () => {
         try {
           const status = await checkPaymentStatus(paymentId);
           if (status === 'SUCCEEDED') {
             setPaid(true);
+          } else if (
+            status === 'CANCELLED' ||
+            status === 'EXPIRED' ||
+            status === 'FAILED'
+          ) {
+            setIsCancelled(true);
+            if (status === 'EXPIRED') {
+              setSessionExpired(true);
+            }
           }
         } catch (error) {
           console.error('Failed to check payment status:', error);
+          // If we can't check the status, assume it's cancelled
+          setIsCancelled(true);
         }
       };
 
-      const interval = setInterval(checkPayment, 2000); // Check every 2 seconds
+      const interval = setInterval(() => {
+        checkCount++;
+        if (checkCount >= maxChecks) {
+          clearInterval(interval);
+          setSessionExpired(true);
+          setIsCancelled(true);
+        } else {
+          checkPayment();
+        }
+      }, 2000); // Check every 2 seconds
+
       return () => clearInterval(interval);
     }
   }, [paymentId]);
@@ -63,6 +90,27 @@ export default function ReservationPayPage() {
       return () => clearTimeout(t);
     }
   }, [paid, id, router]);
+
+  useEffect(() => {
+    if (isCancelled) {
+      const t = setTimeout(() => {
+        router.back();
+      }, 3000);
+      return () => clearTimeout(t);
+    }
+  }, [isCancelled, router]);
+
+  const handleCancel = () => {
+    setShowCancelConfirm(true);
+  };
+
+  const confirmCancel = () => {
+    setIsCancelled(true);
+  };
+
+  const closeCancelConfirm = () => {
+    setShowCancelConfirm(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#f3f6f8] flex flex-col">
@@ -81,7 +129,7 @@ export default function ReservationPayPage() {
           </div>
 
           {/* Content */}
-          {!paid ? (
+          {!paid && !isCancelled ? (
             <div className="flex flex-col items-center justify-start px-8 py-10 gap-8 flex-1 border-2 border-primarygreen-1">
               <div className="flex items-center gap-6 w-full mb-2 bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <Image
@@ -125,10 +173,21 @@ export default function ReservationPayPage() {
 
               <button
                 className="w-full max-w-[300px] py-4 mt-4 rounded-lg border-2 border-primarygreen-1 text-primarygreen-1 text-lg font-bold bg-white hover:bg-[var(--color-primarygreen-1)] hover:text-white transition-all"
-                onClick={() => router.back()}
+                onClick={handleCancel}
               >
                 Annuleren
               </button>
+            </div>
+          ) : isCancelled ? (
+            <div className="flex flex-col items-center justify-center px-12 py-16 gap-10 flex-1">
+              <div className="text-3xl font-bold text-red-600 text-center">
+                {sessionExpired ? 'Sessie verlopen' : 'Transactie geannuleerd'}
+              </div>
+              <div className="text-lg text-gray-700 text-center">
+                {sessionExpired
+                  ? 'De betalingssessie is verlopen. Probeer het opnieuw.'
+                  : 'Je wordt zo teruggestuurd...'}
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center px-12 py-16 gap-10 flex-1">
@@ -150,6 +209,35 @@ export default function ReservationPayPage() {
           )}
         </div>
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Betaling annuleren?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Weet je zeker dat je de betaling wilt annuleren? Je kunt later
+              opnieuw proberen te betalen.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={closeCancelConfirm}
+                className="flex-1 py-3 rounded-lg border-2 border-gray-300 text-gray-700 font-medium hover:bg-gray-50"
+              >
+                Terug
+              </button>
+              <button
+                onClick={confirmCancel}
+                className="flex-1 py-3 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"
+              >
+                Annuleren
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
