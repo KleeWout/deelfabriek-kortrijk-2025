@@ -8,7 +8,7 @@ public static class AdminRoutes
         // get lockers
         group.MapGet("/", async (ILockerService lockerService) =>
         {
-            var lockers = await lockerService.GetAllLockers();
+            var lockers = await lockerService.GetAllLockersWithItems();
             if (lockers == null || !lockers.Any())
             {
                 return Results.NotFound();
@@ -433,6 +433,23 @@ public static class AdminRoutes
             }
             return Results.Ok(reservations);
         });
+
+        group.MapDelete("/{id}", async (int id, IReservationService reservationService) =>
+        {
+            var existingReservation = await reservationService.GetReservationbyId(id);
+            if (existingReservation == null)
+            {
+                return Results.NotFound();
+            }
+
+            await reservationService.DeleteReservation(id);
+            return Results.NoContent();
+        });
+
+  
+        
+
+
 
         return group;
     }

@@ -22,5 +22,6 @@ public class LockerProfile : Profile
     {
         CreateMap<Locker, LockerDto>();
         CreateMap<LockerDto, Locker>();
+        CreateMap<Locker, LockerWithItemDto>();
     }
 }

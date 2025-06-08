@@ -166,8 +166,6 @@ public static class PublicRoutes
 
     public static RouteGroupBuilder GroupReservations(this RouteGroupBuilder group)
     {
-        // Implement reservation routes here
-        // e.g., group.MapGet("/reservations", ...);
         group.MapPost("/", async (CreateReservationDto dto, IReservationService reservationService) =>
         {
             try
@@ -191,6 +189,31 @@ public static class PublicRoutes
 
             return Results.Ok(reservation);
         });
+        group.MapGet("/code/{pickupCode}", async (int pickupCode, IReservationService service) =>
+        {
+            try
+            {
+                var reservation = await service.HandleReservationByCode(pickupCode);
+                return Results.Ok(reservation); 
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
+        });
+
+        group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
+        {
+            try
+            {
+                var reservation = await service.MarkAsPaidAndStarLoan(pickupCode);
+                return Results.Ok(reservation);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
+        });
 
         return group;
     }
@@ -207,6 +230,7 @@ public static class PublicRoutes
             }
             return Results.Ok(categories);
         });
+
 
         return group;
     }

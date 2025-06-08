@@ -11,6 +11,8 @@ public interface ILockerRepository
     Task<bool> AnyOtherLockerWithNumber(int id, int lockerNumber);
 
     Task<Locker?> GetLockerByItemId(int itemId);
+    
+    Task<List<Locker>> GetAllLockersWithItems();
 
 
     Task<List<Locker>> GetAllLockersAsync();
@@ -25,6 +27,15 @@ public class LockerRepository : ILockerRepository
     public LockerRepository(ApplicationDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<List<Locker>> GetAllLockersWithItems()
+    {
+        return await _context.Lockers
+            .Include(l => l.Item)
+                .ThenInclude(i => i.ItemCategories)
+                    .ThenInclude(ic => ic.Category)
+            .ToListAsync();
     }
 
     public async Task<Locker?> GetByLockerNumber(int lockerNumber)

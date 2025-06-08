@@ -46,8 +46,7 @@ public enum ItemStatus
 {
     Beschikbaar,
     Geleend,
-    Niet_Beschikbaar,
-    Onderhoud
+    Niet_Beschikbaar
 }
 
 public class ITemProfile : Profile

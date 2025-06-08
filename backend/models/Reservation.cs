@@ -5,7 +5,7 @@ namespace Deelkast.API.Models;
 public class Reservation : IEntity
 {
     public int Id { get; set; }
-    public string PickupCode { get; set; }
+    public int PickupCode { get; set; }
     public DateTime ReservationDate { get; set; } = DateTime.UtcNow;
     public DateTime? LoanStart { get; set; }
     public DateTime? LoanEnd { get; set; }
@@ -23,7 +23,7 @@ public class Reservation : IEntity
     public User User { get; set; }
     public Item Item { get; set; }
     public Locker Locker { get; set; }
-    // public ReservationStatus Status { get; set; } = ReservationStatus.Active;
+    public ReservationStatus Status { get; set; } = ReservationStatus.Not_Active;
 }
 
 
@@ -34,15 +34,21 @@ public enum ReservationStatus
     Not_Active,
     Active,
     Expired,
-    Completed,
-    Cancelled
+    Completed
 }
 
 public class ReservationProfile : Profile
 {
     public ReservationProfile()
     {
-        CreateMap<Reservation, ReservationConfirmationDto>();
-        CreateMap<CreateReservationDto, Reservation>();
+        // In your mapping profile
+        CreateMap<Reservation, ReservationViewDto>()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
+            .ForMember(dest => dest.ItemTitle, opt => opt.MapFrom(src => src.Item.Title))
+            .ForMember(dest => dest.LockerNumber, opt => opt.MapFrom(src => src.Locker.LockerNumber));
+        CreateMap<ReservationViewDto, Reservation>();
+        CreateMap<Reservation, ReservationViewKioskDto>()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
+            .ForMember(dest => dest.LockerNumber, opt => opt.MapFrom(src => src.Locker.LockerNumber));
     }
 }
