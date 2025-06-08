@@ -168,8 +168,25 @@ PUT {{url}}/dashboard/openingsuren/Maandag
 Content-Type: application/json
 
 {
-  "openTimeVm": "13:00",
-  "closeTimeVm": "19:00"
+  "openTimeMorning": "13:00",
+  "closeTimeMorning": "19:00",
+  "openTimeAfternoon": "20:00",
+  "closeTimeAfternoon": "23:00"
+}
+
+###
+// GET Rapports
+GET {{url}}/dashboard/rapports
+###
+// GET Rapport by id
+GET {{url}}/dashboard/rapports/1
+###
+// POST Rapport
+POST {{url}}/dashboard/rapports
+Content-Type: application/json
+
+{
+
 }
 ###
 // delete reservation 

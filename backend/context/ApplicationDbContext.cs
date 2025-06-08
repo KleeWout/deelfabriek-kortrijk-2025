@@ -1,6 +1,8 @@
-namespace Deelkast.API.Context;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Deelkast.API.Models;
 
-public class ApplicationDbContext : IdentityDbContext
+namespace Deelkast.API.Context
 {
     public DbSet<User> User { get; set; }
     public DbSet<Item> Items { get; set; }
@@ -12,8 +14,18 @@ public class ApplicationDbContext : IdentityDbContext
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
+        public DbSet<User> Users { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<Locker> Lockers { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<ItemCategory> ItemCategories { get; set; }
+        public DbSet<OpeningHour> OpeningHours { get; set; } // was OpeningUren
+        public DbSet<Report> Reports { get; set; }
 
-    }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,60 +38,47 @@ public class ApplicationDbContext : IdentityDbContext
             .HasForeignKey<Locker>(l => l.ItemId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // Reservation - Item (Many-to-One)
-        modelBuilder.Entity<Reservation>()
-            .HasOne(r => r.Item)
-            .WithMany() // No reverse navigation
-            .HasForeignKey(r => r.ItemId)
-            .OnDelete(DeleteBehavior.Cascade);
+            // One-to-One: Item - Locker
+            modelBuilder.Entity<Item>()
+                .HasOne(i => i.Locker)
+                .WithOne(l => l.Item)
+                .HasForeignKey<Locker>(l => l.ItemId)
+                .OnDelete(DeleteBehavior.SetNull);
 
-        // Reservation - User (Many-to-One)
-        modelBuilder.Entity<Reservation>()
-            .HasOne(r => r.User)
-            .WithMany() // No reverse navigation
-            .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            // Reservation - Item (Many-to-One)
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.Item)
+                .WithMany()
+                .HasForeignKey(r => r.ItemId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-        // Reservation - Locker (Many-to-One)
-        modelBuilder.Entity<Reservation>()
-            .HasOne(r => r.Locker)
-            .WithMany() // No reverse navigation
-            .HasForeignKey(r => r.LockerId)
-            .OnDelete(DeleteBehavior.SetNull);
+            // Reservation - User (Many-to-One)
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            // Reservation - Locker (Many-to-One)
+            modelBuilder.Entity<Reservation>()
+                .HasOne(r => r.Locker)
+                .WithMany()
+                .HasForeignKey(r => r.LockerId)
+                .OnDelete(DeleteBehavior.SetNull);
 
-        // Optioneel: enums als strings opslaan
-        modelBuilder.Entity<Item>()
-        .Property(i => i.Status)
-        .HasConversion<string>();
+            // Item Status as string
+            modelBuilder.Entity<Item>()
+                .Property(i => i.Status)
+                .HasConversion<string>();
 
-        // Seed Categories
-        modelBuilder.Entity<Category>().HasData(
-            new Category { Id = 1, Name = "Elektrisch", IconName = "electricity" },
-            new Category { Id = 2, Name = "Speelgoed", IconName = "toy" },
-            new Category { Id = 3, Name = "Tuingereedschap", IconName = "garden-tools" },
-            new Category { Id = 4, Name = "Keukenapparatuur", IconName = "kitchen-appliances" }
-        );
+            // Rapport - Reservation (Many-to-One)
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Reservation)
+                .WithMany()
+                .HasForeignKey(r => r.ReservationId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-        // Seed Users
-        modelBuilder.Entity<User>().HasData(
-            new User
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                PhoneNumber = "123456789",
-                Email = "john@example.com",
-                IsAdmin = false,
-                IsBlocked = false,
-                TotalFine = 0,
-                CreatedAt = new DateTime(2023, 6, 5),
-                Street = "Hoofdstraat 1",
-                City = "Amsterdam",
-                Bus = "A",
-                PostalCode = "1012AB",
-            }
-        );
+            // Rapport - Review (Many-to-One)
 
         // Seed Items
         modelBuilder.Entity<Item>().HasData(
@@ -169,7 +168,7 @@ public class ApplicationDbContext : IdentityDbContext
                 IsOpen = true,
                 ItemId = 1 
             },
-            new Locker
+            new Item
             {
                 Id = 2,
                 LockerNumber = 102,

@@ -34,9 +34,11 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<ILockerService, LockerService>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
-builder.Services.AddScoped<IOpeningHoursRepository, OpeningHoursRepository>();
-builder.Services.AddScoped<IOpeningHoursService, OpeningHoursService>();
-
+builder.Services.AddScoped<IOpeningsUrenRepository, OpeningsUrenRepository>();
+builder.Services.AddScoped<IOpeningsHoursService, OpeningsHoursService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IGenericRepository<Report>, GenericRepository<Report>>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<ItemValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
@@ -67,7 +69,8 @@ app.MapGroup("/items").GroupPublicItems();
 app.MapGroup("/users").GroupPublicUsers();
 app.MapGroup("/categories").GroupPublicCategories();
 app.MapGroup("/reservations").GroupReservations();
-app.MapGroup("/openingshours").GroupPublicOpeningHours();
+app.MapGroup("/openingsuren").GroupPublicOpeningHours();
+app.MapGroup("/reports").GroupPublicReports();
 
 // add authorization later 
 var adminApi = app.MapGroup("/dashboard");
@@ -76,7 +79,8 @@ adminApi.MapGroup("/lockers").GroupAdminLockers();
 adminApi.MapGroup("/categories").GroupAdminCategories();
 adminApi.MapGroup("/users").GroupAdminUsers();
 adminApi.MapGroup("/reservations").GroupAdminReservations();
-adminApi.MapGroup("/openingshours").GroupAdminOpeningHours();
+adminApi.MapGroup("/openingsuren").GroupAdminOpeningHours();
+adminApi.MapGroup("/reports").GroupAdminReports();
 
 
 

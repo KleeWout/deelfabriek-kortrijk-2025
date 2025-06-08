@@ -248,4 +248,22 @@ public static class PublicRoutes
         });
         return group;
     }
+    public static RouteGroupBuilder GroupPublicReports(this RouteGroupBuilder group)
+    {
+        // POST: Create a new report
+        group.MapPost("/", async (Report report, IReportService reportService) =>
+        {
+            try
+            {
+                await reportService.AddReport(report);
+                return Results.Created($"/reports/{report.Id}", report);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred while creating the report: {ex.Message}");
+            }
+        });
+
+        return group;
+    }
 }
