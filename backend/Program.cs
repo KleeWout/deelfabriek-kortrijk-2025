@@ -38,6 +38,8 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 // builder.Services.AddAuthorizationBuilder();
 // builder.Services.AddAuthentication().AddBearerToken();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddHostedService<ReservationExpirationService>();
+
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 // app.UseAuthentication();
@@ -58,4 +60,8 @@ adminApi.MapGroup("/categories").GroupAdminCategories();
 adminApi.MapGroup("/users").GroupAdminUsers();
 adminApi.MapGroup("/reservations").GroupAdminReservations();
 
+
+
 app.Run();
+
+public partial class Program { }

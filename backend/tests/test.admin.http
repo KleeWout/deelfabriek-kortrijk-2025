@@ -29,7 +29,7 @@ DELETE {{url}}/dashboard/users/2
 ###
 //ITEMS
 // -------------------------------
-// werkt (miss nog een dto voor betere output)
+// werkt 
 GET {{url}}/dashboard/items
 ###
 // there is an api that also sends the image to upload and stores the png in database http://http://0.0.0.0:3001/dashbaoard/items/with-image (api name still needs to change)  
@@ -41,7 +41,7 @@ Content-Type: application/json
   "Title": "machine",
   "description": "Sterke elektrische boormachine voor thuisgebruik",
   "pricePerWeek": 11.50,
-  "status": 3,
+  "status": 2,
   "ImageSrc": "https://example.com/images/boormachine.jpg",
   "howToUse": "Gebruik met beschermbril.",
   "Accesories": "Boormachine, oplader, handleiding",
@@ -105,7 +105,7 @@ DELETE {{url}}/dashboard/categories/4
 //LOCKERS
 // -------------------------------
 ###
-//werkt
+//werkt 
 GET {{url}}/dashboard/lockers
 ###
 //werkt
@@ -117,8 +117,8 @@ POST {{url}}/dashboard/lockers
 Content-Type: application/json
 
 {
-  "LockerNumber": 32,
-  "itemId": 5
+  "LockerNumber": 21,
+  "itemId": 3
 }
 //still need to see if it can be uploaded without an itemId
 ###
@@ -128,7 +128,7 @@ Content-Type: application/json
 
 {
   "LockerNumber": 122,
-  "itemId": 2
+  "itemId": 3
 }
 
 ###
@@ -140,3 +140,7 @@ DELETE {{url}}/dashboard/lockers/3
 // -------------------------------
 // werkt (dto betere output)
 GET {{url}}/dashboard/reservations
+
+###
+// delete reservation 
+DELETE {{url}}/dashboard/reservations/5

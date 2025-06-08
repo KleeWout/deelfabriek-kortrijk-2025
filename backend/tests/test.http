@@ -19,7 +19,7 @@ Content-Type: application/json
   "firstname": "Lisa",
   "lastname": "example",
   "phoneNumber": "32470123456",
-  "email": "efhlzeuhfzeuifglz",
+  "email": "efhlzeuhfrrrezr@zeuifglz",
   "street": "Main Street 123",
   "city": "Kortrijk",
   "bus": null,
@@ -47,12 +47,11 @@ Content-Type: application/json
 //ITEMS
 // -------------------------------
 ###
-// all products page  -werkt
+// all products page  -werkt // only with lockerid
 GET {{url}}/items
-
 ###
 // detail product page  -werkt
-GET {{url}}/items/5
+GET {{url}}/items/2
 ###
 // get item with status available 
 // Werkt
@@ -76,12 +75,17 @@ POST {{url}}/reservations
 Content-Type: application/json
 
 {
-  "itemId": 2,
+  "itemId": 4,
   "userId": 1,
   "weeks": 2
 }
 
 // get reservations for user
 ###
-// nog output maken 
-GET {{url}}/reservations/3
+GET {{url}}/reservations/9
+###
+GET {{url}}/reservations/code/611838
+###
+PUT {{url}}/reservations/code/611838/ispayed
+
+

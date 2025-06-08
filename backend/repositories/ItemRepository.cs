@@ -11,6 +11,7 @@ public interface IItemRepository
     Task<List<Item>> GetItemsByCategoryAsync(int categoryId);
     Task UpdateItemWithCategories(Item item);
     Task<Item> GetItemByIdWithCategories(int id);
+
 }
 
 public class ItemRepository : GenericRepository<Item>, IItemRepository
@@ -39,13 +40,14 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
             .ToListAsync();
     }
 
-    public async Task<Item> GetItemByIdWithCategories(int id)
-    {
-        return await _context.Items
-            .Include(i => i.ItemCategories)
-                .ThenInclude(ic => ic.Category)
-            .FirstOrDefaultAsync(i => i.Id == id);
-    }
+public async Task<Item> GetItemByIdWithCategories(int id)
+{
+    return await _context.Items
+        .Include(i => i.ItemCategories)
+            .ThenInclude(ic => ic.Category)
+        .FirstOrDefaultAsync(i => i.Id == id);
+}
+
 
     public async Task<List<Item>> GetAvailableItemsAsync()
     {

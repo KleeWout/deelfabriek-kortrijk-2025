@@ -70,6 +70,10 @@ public class ApplicationDbContext : IdentityDbContext
         .Property(i => i.Status)
         .HasConversion<string>();
 
+        modelBuilder.Entity<Reservation>()
+        .Property(i => i.Status)
+        .HasConversion<string>();
+
 
 
         // Seed Categories
@@ -107,12 +111,13 @@ public class ApplicationDbContext : IdentityDbContext
             Id = 1,
             Title = "Naaimachine",
             PricePerWeek = 5.00m,
-            Status = ItemStatus.Beschikbaar,
+            Status = ItemStatus.Geleend,
             TimesLoaned = 0,
             Accesories = "4 spoeltjes",
             Weight = null,
             Dimensions = null,
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            LockerId = 1,
         },
         new Item
         {
@@ -120,13 +125,14 @@ public class ApplicationDbContext : IdentityDbContext
             Title = "Schroef- en Klopboormachine",
             Description = "Uiterst geschikt voor allround (klop)boor- en schroefwerkzaamheden. 3 functies: schroeven, boren en klopboren. Hoog werkcomfort door uitstekende machinebalans en compact formaat.",
             PricePerWeek = 5.00m,
-            Status = ItemStatus.Beschikbaar,
+            Status = ItemStatus.Geleend,
             ImageSrc = "https://shop.lecot.be/nl-be/makita-accu-schroef-en-klopboormachine-dhp485rfj-18v-2-x-3-ah-li-ion",
             TimesLoaned = 0,
             HowToUse = "Zie handleiding: https://www.icmsmakita.eu/cms/custom/nl/attachments/user_manual/DHP485_20240320_885653D991_DU884.pdf",
             Accesories = "1x 18 V Klopboor-/schroefmachine, 2x 3.0 Ah accu, 1x Snellader, 1x Mbox",
             Weight = 1.5m,
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            LockerId = 2
         },
         new Item
         {
@@ -190,14 +196,14 @@ public class ApplicationDbContext : IdentityDbContext
                 Id = 1,
                 LockerNumber = 101,
                 IsOpen = true,
-                ItemId = null // Geen item toegewezen
+                ItemId = 1 
             },
             new Locker
             {
                 Id = 2,
                 LockerNumber = 102,
                 IsOpen = true,
-                ItemId = null // Geen item toegewezen
+                ItemId = 2 
             }
         );
 
@@ -206,7 +212,7 @@ public class ApplicationDbContext : IdentityDbContext
             new Reservation
             {
                 Id = 1,
-                PickupCode = "123456",
+                PickupCode = 123456,
                 ReservationDate = new DateTime(2023, 6, 5),
                 LoanStart = null,
                 LoanEnd = null,
@@ -216,8 +222,26 @@ public class ApplicationDbContext : IdentityDbContext
                 TotalPrice = 5.00m,
                 UserId = 1,
                 ItemId = 1,
-                LockerId = 1
+                LockerId = 1,
+                Status = ReservationStatus.Not_Active
+            },
+            new Reservation
+            {
+                Id = 2,
+                PickupCode = 654321,
+                ReservationDate = new DateTime(2023, 6, 5),
+                LoanStart = new DateTime(2023, 6, 6),
+                LoanEnd = new DateTime(2023, 6, 20),
+                ActualReturnDate = null,
+                Weeks = 2,
+                PickupDeadline = new DateTime(2023, 6, 9),
+                TotalPrice = 10.00m,
+                UserId = 1,
+                ItemId = 2,
+                LockerId = 2,
+                Status = ReservationStatus.Active
             }
+
         );
         // review seed
 

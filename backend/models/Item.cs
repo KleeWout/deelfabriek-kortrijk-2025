@@ -46,8 +46,7 @@ public enum ItemStatus
 {
     Beschikbaar,
     Geleend,
-    Niet_Beschikbaar,
-    Onderhoud
+    Niet_Beschikbaar
 }
 
 public class ITemProfile : Profile
@@ -56,9 +55,10 @@ public class ITemProfile : Profile
     {
         CreateMap<Item, ItemNameDto>();
         // This is likely causing the null reference
-        CreateMap<Item, ItemDetailDto>()
-            .ForMember(dest => dest.CategoryNames, 
-                opt => opt.MapFrom(src => src.ItemCategories.Select(ic => ic.Category.Name).ToList()));
+    CreateMap<Item, ItemDetailDto>()
+    .ForMember(dest => dest.CategoryNames,
+        opt => opt.MapFrom(src => src.ItemCategories.Select(ic => ic.Category.Name).ToList()));
+
         CreateMap<Item, ItemsPageDto>()
             .ForMember(dest => dest.CategoryNames, opt => opt.MapFrom(src =>
                 src.ItemCategories.Select(ic => ic.Category.Name).ToList()));

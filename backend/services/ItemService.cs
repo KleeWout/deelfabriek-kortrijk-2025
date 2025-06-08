@@ -56,9 +56,16 @@ public class ItemService : IItemService
 
     public async Task<List<ItemsPageDto>> GetAllItemsPage()
     {
+        // Haal alle items op
         var items = await _customItemRepository.GetItems();
-        return _mapper.Map<List<ItemsPageDto>>(items);
+
+        // Filter enkel items die een LockerId hebben (dus fysiek beschikbaar zijn)
+        var itemsWithLockers = items.Where(i => i.LockerId != null).ToList();
+
+        // Map naar DTO en retourneer
+        return _mapper.Map<List<ItemsPageDto>>(itemsWithLockers);
     }
+
 
     public async Task<Item> GetItemById(int id)
     {
