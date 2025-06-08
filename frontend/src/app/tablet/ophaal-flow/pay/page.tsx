@@ -2,10 +2,11 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { MagnifyingGlass, User, CreditCard } from 'phosphor-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import animationData from './Animation - 1748702795819.json';
 import React from 'react';
+import { createPayconiqPayment, checkPaymentStatus } from '@/services/payconiq';
 
 const LottiePlayer = dynamic(() => import('react-lottie-player'), {
   ssr: false,
@@ -14,10 +15,47 @@ const LottiePlayer = dynamic(() => import('react-lottie-player'), {
 export default function PayconiqPayPage() {
   const router = useRouter();
   const [paid, setPaid] = useState(false);
-  const amount = '€5,00'; // Make dynamic if needed
+  const [qrCode, setQrCode] = useState<string>('');
+  const [paymentId, setPaymentId] = useState<string>('');
+  const amount = 0.1; // Tijdelijk testbedrag van 10 cent
+
+  useEffect(() => {
+    const initializePayment = async () => {
+      try {
+        const payment = await createPayconiqPayment(
+          amount,
+          'Deelfabriek Kortrijk - Item ophalen'
+        );
+        setQrCode(payment._links.qrcode.href);
+        setPaymentId(payment.paymentId);
+      } catch (error) {
+        console.error('Failed to initialize payment:', error);
+      }
+    };
+
+    initializePayment();
+  }, [amount]);
+
+  useEffect(() => {
+    if (paymentId) {
+      const checkPayment = async () => {
+        try {
+          const status = await checkPaymentStatus(paymentId);
+          if (status === 'SUCCEEDED') {
+            setPaid(true);
+          }
+        } catch (error) {
+          console.error('Failed to check payment status:', error);
+        }
+      };
+
+      const interval = setInterval(checkPayment, 2000); // Check every 2 seconds
+      return () => clearInterval(interval);
+    }
+  }, [paymentId]);
 
   // Redirect na animatie
-  React.useEffect(() => {
+  useEffect(() => {
     if (paid) {
       const t = setTimeout(() => {
         router.push('/tablet/ophaal-flow/pay/open-locker');
@@ -97,7 +135,9 @@ export default function PayconiqPayPage() {
           {/* Card header */}
           <div className="flex justify-between items-center bg-[var(--color-primarygreen-1)] rounded-t-xl px-6 py-3">
             <span className="text-lg font-bold text-white">Te betalen</span>
-            <span className="text-lg font-bold text-white">{amount}</span>
+            <span className="text-lg font-bold text-white">
+              €{amount.toFixed(2)}
+            </span>
           </div>
           {/* Instructie en QR */}
           {!paid ? (
@@ -116,23 +156,23 @@ export default function PayconiqPayPage() {
                   om je betaling te voltooien
                 </span>
               </div>
-              {/* Dummy QR-code */}
+              {/* QR-code */}
               <div className="flex justify-center items-center w-full mt-2 mb-4">
-                <div
-                  className="bg-white border-2 border-gray-400 w-44 h-44 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg transition"
-                  onClick={() => setPaid(true)}
-                  title="Klik om te betalen"
-                >
-                  <svg width="140" height="140" viewBox="0 0 120 120">
-                    <rect x="0" y="0" width="120" height="120" fill="#fff" />
-                    <rect x="10" y="10" width="30" height="30" fill="#000" />
-                    <rect x="80" y="10" width="30" height="30" fill="#000" />
-                    <rect x="10" y="80" width="30" height="30" fill="#000" />
-                    <rect x="50" y="50" width="10" height="10" fill="#000" />
-                    <rect x="70" y="70" width="10" height="10" fill="#000" />
-                    <rect x="90" y="90" width="10" height="10" fill="#000" />
-                  </svg>
-                </div>
+                {qrCode ? (
+                  <div className="bg-white border-2 border-gray-400 w-44 h-44 rounded-lg flex items-center justify-center overflow-hidden">
+                    <Image
+                      src={qrCode}
+                      alt="Payconiq QR Code"
+                      width={176}
+                      height={176}
+                      className="object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-white border-2 border-gray-400 w-44 h-44 rounded-lg flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primarygreen-1)]"></div>
+                  </div>
+                )}
               </div>
               <button
                 className="w-full max-w-[220px] py-3 rounded-lg border-2 border-[var(--color-primarygreen-1)] text-[var(--color-primarygreen-1)] text-lg font-bold bg-white hover:bg-[var(--color-primarygreen-1)] hover:text-white transition"
