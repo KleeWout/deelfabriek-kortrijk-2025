@@ -37,7 +37,7 @@ public class Item : IEntity
     public int? LockerId { get; set; }
     public Locker? Locker { get; set; }
     
-    public List<ItemCategory> ItemCategories { get; set; } = new();
+    public string? Category { get; set; }
 
 }
 
@@ -55,12 +55,11 @@ public class ITemProfile : Profile
     public ITemProfile()
     {
         CreateMap<Item, ItemNameDto>();
-        // This is likely causing the null reference
         CreateMap<Item, ItemDetailDto>()
-            .ForMember(dest => dest.CategoryNames, 
-                opt => opt.MapFrom(src => src.ItemCategories.Select(ic => ic.Category.Name).ToList()));
+            .ForMember(dest => dest.Category, 
+            opt => opt.MapFrom(src => src.Category));
         CreateMap<Item, ItemsPageDto>()
-            .ForMember(dest => dest.CategoryNames, opt => opt.MapFrom(src =>
-                src.ItemCategories.Select(ic => ic.Category.Name).ToList()));
+            .ForMember(dest => dest.Category, 
+            opt => opt.MapFrom(src => src.Category));
     }
 }

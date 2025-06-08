@@ -9,8 +9,11 @@ public interface ILockerRepository
     Task<bool> LockerNumberExist(int lockerNumber);
 
     Task<bool> AnyOtherLockerWithNumber(int id, int lockerNumber);
-    
+
     Task<Locker?> GetLockerByItemId(int itemId);
+
+
+    Task<List<Locker>> GetAllLockersAsync();
 
 }
 
@@ -44,5 +47,11 @@ public class LockerRepository : ILockerRepository
         return await _context.Lockers
             .FirstOrDefaultAsync(l => l.ItemId == itemId);
     }
+
+    public async Task<List<Locker>> GetAllLockersAsync()
+    {
+        return await _context.Lockers.ToListAsync();
+    }
+    
 
 }

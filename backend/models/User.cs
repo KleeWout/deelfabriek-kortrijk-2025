@@ -41,11 +41,8 @@ public class User : IEntity
 
 public class IuserProfile : Profile
 {
-    public IuserProfile()
-    {
-         CreateMap<Item, ItemDetailDto>()
-            .ForMember(dest => dest.CategoryNames, opt => opt.MapFrom(src =>
-                src.ItemCategories.Select(ic => ic.Category.Name).ToList()));
-
-    }
+    // public IuserProfile()
+    // {
+    //      CreateMap<User, UserDto>();
+    // }
 }

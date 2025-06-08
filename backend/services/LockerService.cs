@@ -13,7 +13,9 @@ public interface ILockerService
     Task<bool> LockerNumberExist(int lockerNumber);
 
     Task<bool> AnyOtherLockerWithNumber(int id, int lockerNumber);
-    
+
+
+
 }
 
 public class LockerService : ILockerService
@@ -141,4 +143,5 @@ public class LockerService : ILockerService
     {
         return await _lockerCustomRepository.AnyOtherLockerWithNumber(id, lockerNumber);
     }
+    
 }

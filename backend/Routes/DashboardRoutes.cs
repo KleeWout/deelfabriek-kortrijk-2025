@@ -4,6 +4,7 @@ public static class AdminRoutes
 {
     public static RouteGroupBuilder GroupAdminLockers(this RouteGroupBuilder group)
     {
+
         // get lockers
         group.MapGet("/", async (ILockerService lockerService) =>
         {
@@ -59,11 +60,7 @@ public static class AdminRoutes
                 return Results.BadRequest(ex.Message);
             }
         });
-        group.MapPut("/{id:int}", async (
-            int id,
-            Locker locker,
-            ILockerService lockerService,
-            IValidator<Locker> validator
+        group.MapPut("/{id:int}", async (int id, Locker locker, ILockerService lockerService, IValidator<Locker> validator
         ) =>
         {
             locker.Id = id;
@@ -143,24 +140,24 @@ public static class AdminRoutes
         });
 
         // delete category
-        group.MapDelete("/{id}", async (int id, IItemService itemService) =>
-        {
-            var existingCategory = await itemService.GetCategoryById(id);
-            if (existingCategory == null)
-            {
-                return Results.NotFound();
-            }
+        // group.MapDelete("/{id}", async (int id, IItemService itemService) =>
+        // {
+        //     var existingCategory = await itemService.GetCategoryById(id);
+        //     if (existingCategory == null)
+        //     {
+        //         return Results.NotFound();
+        //     }
 
-            try
-            {
-                await itemService.DeleteCategory(id);
-                return Results.NoContent();
-            }
-            catch (Exception ex)
-            {
-                return Results.Problem($"An error occurred while deleting the category: {ex.Message}");
-            }
-        });
+        //     try
+        //     {
+        //         await itemService.DeleteCategory(id);
+        //         return Results.NoContent();
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return Results.Problem($"An error occurred while deleting the category: {ex.Message}");
+        //     }
+        // });
 
 
         return group;
@@ -377,6 +374,9 @@ public static class AdminRoutes
         //edit item
         group.MapPut("/{id}", async (int id, Item item, IItemService itemService, ItemValidator validator) =>
         {
+            // Set the ID to ensure we're updating the correct item
+            item.Id = id;
+
             // Validate the item
             var validationResult = await validator.ValidateAsync(item);
             if (!validationResult.IsValid)
@@ -385,23 +385,18 @@ public static class AdminRoutes
                 return Results.BadRequest(warnings);
             }
 
-            var existingItem = await itemService.GetItemById(id);
-            if (existingItem == null)
-            {
-                return Results.NotFound($"Item with ID {id} not found.");
-            }
-
-            // Set the ID to ensure we're updating the correct item
-            item.Id = id;
-
             try
             {
-                // Use the new method that handles categories properly
-                await itemService.UpdateItemWithCategories(item);
+                // Our modified repository method now handles retrieving the existing item
+                await itemService.UpdateItem(item);
 
                 // Get the updated item to return
                 var updatedItem = await itemService.GetItemById(id);
                 return Results.Ok(updatedItem);
+            }
+            catch (InvalidOperationException iex)
+            {
+                return Results.NotFound(iex.Message);
             }
             catch (Exception ex)
             {
@@ -412,7 +407,7 @@ public static class AdminRoutes
         // delete item
         group.MapDelete("/{id}", async (int id, IItemService itemService) =>
         {
-            var existingItem = await itemService.GetItemByIdDto(id);
+            var existingItem = await itemService.GetItemById(id);
             if (existingItem == null)
             {
                 return Results.NotFound();

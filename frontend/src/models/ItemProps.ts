@@ -8,7 +8,7 @@ export default interface ItemProps {
   howToUse?: string;
   accessories?: string[];
   dimensions?: string;
-  weight?: string;
+  weight?: number;
   tip?: string;
   whatsIncluded?: string;
   category?: string;
