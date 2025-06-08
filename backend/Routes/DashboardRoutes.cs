@@ -6,7 +6,7 @@ public static class AdminRoutes
         // get lockers
         group.MapGet("/", async (ILockerService lockerService) =>
         {
-            var lockers = await lockerService.GetAllLockersWithItems();
+            var lockers = await lockerService.GetAllLockers();
             if (lockers == null || !lockers.Any())
             {
                 return Results.NotFound();
@@ -440,8 +440,8 @@ public static class AdminRoutes
             return Results.NoContent();
         });
 
-  
-        
+
+
 
 
 
@@ -464,7 +464,7 @@ public static class AdminRoutes
         // get by day (idDay)
         group.MapGet("/{idDay}", async (string idDay, IOpeningHoursService openingHourService) =>
         {
-            var openingHour = await openingHourService.GetOpeningHourByIdAsync(dayId);
+            var openingHour = await openingHourService.GetOpeningHourByIdAsync(idDay);
             if (openingHour == null)
             {
                 return Results.NotFound();
@@ -477,11 +477,11 @@ public static class AdminRoutes
         {
             try
             {
-                Console.WriteLine($"Updating opening hours for day: {dayId}");
-                var existing = await openingHourService.GetOpeningHourByIdAsync(dayId);
+                Console.WriteLine($"Updating opening hours for day: {idDay}");
+                var existing = await openingHourService.GetOpeningHourByIdAsync(idDay);
                 if (existing == null)
                 {
-                    return Results.NotFound($"Opening hour with ID {dayId} not found.");
+                    return Results.NotFound($"Opening hour with ID {idDay} not found.");
                 }
 
                 var times = new[] { input.OpenTimeMorning, input.CloseTimeMorning, input.OpenTimeAfternoon, input.CloseTimeAfternoon };

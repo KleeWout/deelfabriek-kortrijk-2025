@@ -14,7 +14,6 @@ public interface ILockerService
 
     Task<bool> AnyOtherLockerWithNumber(int id, int lockerNumber);
 
-    Task<List<LockerWithItemDto>> GetAllLockersWithItems();
     
 }
 
@@ -129,11 +128,7 @@ public class LockerService : ILockerService
         await _lockerRepository.DeleteAsync(id);
     }
 
-    public async Task<List<LockerWithItemDto>> GetAllLockersWithItems()
-    {
-        var lockers = await _lockerCustomRepository.GetAllLockersWithItems();
-        return _mapper.Map<List<LockerWithItemDto>>(lockers);
-    }
+
 
     public async Task<Locker> GetLockerByNumber(int lockerNumber)
     {

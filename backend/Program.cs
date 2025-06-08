@@ -34,11 +34,12 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<ILockerService, LockerService>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
-builder.Services.AddScoped<IOpeningsUrenRepository, OpeningsUrenRepository>();
-builder.Services.AddScoped<IOpeningsHoursService, OpeningsHoursService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IGenericRepository<Report>, GenericRepository<Report>>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IOpeningHoursRepository, OpeningHoursRepository>();
+builder.Services.AddScoped<IOpeningHoursService, OpeningHoursService>();
+
 
 builder.Services.AddValidatorsFromAssemblyContaining<ItemValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();

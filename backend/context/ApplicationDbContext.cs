@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Deelkast.API.Models;
 
-namespace Deelkast.API.Context
+namespace Deelkast.API.Context;
+
+public class ApplicationDbContext : IdentityDbContext
 {
     public DbSet<User> User { get; set; }
     public DbSet<Item> Items { get; set; }
@@ -14,18 +16,7 @@ namespace Deelkast.API.Context
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<Item> Items { get; set; }
-        public DbSet<Locker> Lockers { get; set; }
-        public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<ItemCategory> ItemCategories { get; set; }
-        public DbSet<OpeningHour> OpeningHours { get; set; } // was OpeningUren
-        public DbSet<Report> Reports { get; set; }
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,48 +29,75 @@ namespace Deelkast.API.Context
             .HasForeignKey<Locker>(l => l.ItemId)
             .OnDelete(DeleteBehavior.SetNull);
 
-            // One-to-One: Item - Locker
-            modelBuilder.Entity<Item>()
-                .HasOne(i => i.Locker)
-                .WithOne(l => l.Item)
-                .HasForeignKey<Locker>(l => l.ItemId)
-                .OnDelete(DeleteBehavior.SetNull);
+        // One-to-One: Item - Locker
+        modelBuilder.Entity<Item>()
+            .HasOne(i => i.Locker)
+            .WithOne(l => l.Item)
+            .HasForeignKey<Locker>(l => l.ItemId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-            // Reservation - Item (Many-to-One)
-            modelBuilder.Entity<Reservation>()
-                .HasOne(r => r.Item)
-                .WithMany()
-                .HasForeignKey(r => r.ItemId)
-                .OnDelete(DeleteBehavior.Cascade);
+        // Reservation - Item (Many-to-One)
+        modelBuilder.Entity<Reservation>()
+            .HasOne(r => r.Item)
+            .WithMany()
+            .HasForeignKey(r => r.ItemId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            // Reservation - User (Many-to-One)
-            modelBuilder.Entity<Reservation>()
-                .HasOne(r => r.User)
-                .WithMany()
-                .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+        // Reservation - User (Many-to-One)
+        modelBuilder.Entity<Reservation>()
+            .HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            // Reservation - Locker (Many-to-One)
-            modelBuilder.Entity<Reservation>()
-                .HasOne(r => r.Locker)
-                .WithMany()
-                .HasForeignKey(r => r.LockerId)
-                .OnDelete(DeleteBehavior.SetNull);
+        // Reservation - Locker (Many-to-One)
+        modelBuilder.Entity<Reservation>()
+            .HasOne(r => r.Locker)
+            .WithMany()
+            .HasForeignKey(r => r.LockerId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-            // Item Status as string
-            modelBuilder.Entity<Item>()
-                .Property(i => i.Status)
-                .HasConversion<string>();
+        // Item Status as string
+        modelBuilder.Entity<Item>()
+            .Property(i => i.Status)
+            .HasConversion<string>();
 
-            // Rapport - Reservation (Many-to-One)
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.Reservation)
-                .WithMany()
-                .HasForeignKey(r => r.ReservationId)
-                .OnDelete(DeleteBehavior.Cascade);
+        // Rapport - Reservation (Many-to-One)
+        modelBuilder.Entity<Report>()
+            .HasOne(r => r.Reservation)
+            .WithMany()
+            .HasForeignKey(r => r.ReservationId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            // Rapport - Review (Many-to-One)
+        // Rapport - Review (Many-to-One)
 
+        // Seed Categories
+        modelBuilder.Entity<Category>().HasData(
+            new Category { Id = 1, Name = "Elektrisch", IconName = "electricity" },
+            new Category { Id = 2, Name = "Speelgoed", IconName = "toy" },
+            new Category { Id = 3, Name = "Tuingereedschap", IconName = "garden-tools" },
+            new Category { Id = 4, Name = "Keukenapparatuur", IconName = "kitchen-appliances" }
+        );
+
+        // Seed Users
+        modelBuilder.Entity<User>().HasData(
+            new User
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                PhoneNumber = "123456789",
+                Email = "john@example.com",
+                IsAdmin = false,
+                IsBlocked = false,
+                TotalFine = 0,
+                CreatedAt = new DateTime(2023, 6, 5),
+                Street = "Hoofdstraat 1",
+                City = "Amsterdam",
+                Bus = "A",
+                PostalCode = "1012AB",
+            }
+        );
         // Seed Items
         modelBuilder.Entity<Item>().HasData(
         new Item
@@ -93,7 +111,7 @@ namespace Deelkast.API.Context
             Weight = null,
             Dimensions = null,
             CreatedAt = new DateTime(2023, 6, 5),
-            Category = "Elektrisch"
+            LockerId = 1,
         },
         new Item
         {
@@ -108,7 +126,7 @@ namespace Deelkast.API.Context
             Accesories = "1x 18 V Klopboor-/schroefmachine, 2x 3.0 Ah accu, 1x Snellader, 1x Mbox",
             Weight = 1.5m,
             CreatedAt = new DateTime(2023, 6, 5),
-            Category = "Tuingereedschap"
+            LockerId = 2
         },
         new Item
         {
@@ -122,8 +140,7 @@ namespace Deelkast.API.Context
             Accesories = "1 x kraanstuk, 1 x adapter, 1 x slangstuk, 1 x waterstop, 1 x tuinspuit",
             Weight = null,
             Dimensions = null,
-            CreatedAt = new DateTime(2023, 6, 5),
-            Category = "Tuingereedschap"
+            CreatedAt = new DateTime(2023, 6, 5)
         },
         new Item
         {
@@ -137,8 +154,7 @@ namespace Deelkast.API.Context
             Accesories = "/",
             Weight = 7.9m,
             Dimensions = "44 x 29.7 cm",
-            CreatedAt = new DateTime(2023, 6, 5),
-            Category = "Elektrisch"
+            CreatedAt = new DateTime(2023, 6, 5)
         },
         new Item
         {
@@ -154,10 +170,11 @@ namespace Deelkast.API.Context
             Weight = 7.0m,
             Dimensions = "41 x 24 cm",
             Tip = "Controleer of de kom (20 x 16.5 cm) in je vriezer past.",
-            CreatedAt = new DateTime(2023, 6, 5),
-            Category = "Keukenapparatuur"
+            CreatedAt = new DateTime(2023, 6, 5)
         }
+
         );
+
 
         // Seed Lockers
         modelBuilder.Entity<Locker>().HasData(
@@ -166,14 +183,14 @@ namespace Deelkast.API.Context
                 Id = 1,
                 LockerNumber = 101,
                 IsOpen = true,
-                ItemId = 1 
+                ItemId = 1
             },
-            new Item
+            new Locker
             {
                 Id = 2,
                 LockerNumber = 102,
                 IsOpen = true,
-                ItemId = 2 
+                ItemId = 2
             }
         );
 
@@ -211,8 +228,9 @@ namespace Deelkast.API.Context
                 LockerId = 2,
                 Status = ReservationStatus.Active
             }
-        );        
-        
+
+        );
+
         // Seed Opening Hours
         modelBuilder.Entity<OpeningsHours>().HasData(
             new OpeningsHours
