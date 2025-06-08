@@ -38,10 +38,6 @@ export default function ReturnFlow() {
       setSelectedReasons(selectedReasons.filter((r) => r !== reason));
       setWarning('');
     } else {
-      if (selectedReasons.length >= 3) {
-        setWarning('Je mag maximaal 3 opties aanduiden.');
-        return;
-      }
       setSelectedReasons([...selectedReasons, reason]);
       setWarning('');
     }
@@ -66,6 +62,10 @@ export default function ReturnFlow() {
   const showOtherInput = selectedReasons.includes('Anders');
   const lockerNumber = 2;
 
+  // Voorbeeld: deze waarden moeten uit de echte flow/data komen
+  const itemName = 'Naaimachine'; // TODO: dynamisch maken
+  const reservatieCode = '999999'; // TODO: dynamisch maken
+
   const handleSubmit = () => {
     if (rating === 0) {
       toast.error('Geef eerst een beoordeling door sterren aan te klikken');
@@ -77,11 +77,15 @@ export default function ReturnFlow() {
       return;
     }
 
-    router.push('/tablet/return-flow/thank-you?feedback=true');
+    router.push(
+      `/tablet/return-flow/thank-you?feedback=true&item=${encodeURIComponent(itemName)}&code=${encodeURIComponent(reservatieCode)}`
+    );
   };
 
   const handleSkip = () => {
-    router.push('/tablet/return-flow/thank-you?feedback=false');
+    router.push(
+      `/tablet/return-flow/thank-you?feedback=false&item=${encodeURIComponent(itemName)}&code=${encodeURIComponent(reservatieCode)}`
+    );
   };
 
   return (
@@ -109,7 +113,7 @@ export default function ReturnFlow() {
               Locker {lockerNumber.toString().padStart(2, '0')} is geopend.
             </span>
             <span className="text-xl text-[var(--color-primarytext-1)] text-center">
-              Plaats je item erin en sluit hem weer.
+              Plaats je item in de locker en sluit de locker.
             </span>
           </div>
         </div>
@@ -150,9 +154,7 @@ export default function ReturnFlow() {
                         type="button"
                         onClick={() => handleReasonToggle(reason)}
                         className={`flex items-center gap-2 px-5 py-3 rounded-full border-2 text-base md:text-lg font-semibold transition-all
-                          ${active ? 'bg-[var(--color-primarygreen-1)] text-white border-[var(--color-primarygreen-1)]' : 'bg-white text-[var(--color-primarygreen-1)] border-[var(--color-primarygreen-1)] hover:bg-[var(--color-primarygreen-2)]'}
-                          ${selectedReasons.length >= 3 && !active ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={selectedReasons.length >= 3 && !active}
+                          ${active ? 'bg-[var(--color-primarygreen-1)] text-white border-[var(--color-primarygreen-1)]' : 'bg-white text-[var(--color-primarygreen-1)] border-[var(--color-primarygreen-1)] hover:bg-[var(--color-primarygreen-2)]'}`}
                       >
                         {active && <Check size={20} weight="bold" />}
                         {reason}
@@ -196,6 +198,7 @@ export default function ReturnFlow() {
           </div>
         </div>
       </div>
+      {/* Na het sluiten van de locker */}
     </div>
   );
 }
