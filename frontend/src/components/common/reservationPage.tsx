@@ -146,7 +146,7 @@ export default function ReservationPage() {
 
       // Navigate to the appropriate confirmation page based on route type
       if (isTabletRoute) {
-        router.push(`/tablet/payment/${id}`);
+        router.push(`/tablet/payment/`);
       } else {
         router.push("/mobile/reserveer/confirmation");
       }

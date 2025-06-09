@@ -185,7 +185,7 @@ public static class PublicRoutes
             var reservation = await reservationService.GetReservationbyId(id);
             if (reservation == null)
             {
-                return Results.NotFound();
+                return Results.NotFound(new { error = "Reservation not found" });
             }
 
             return Results.Ok(reservation);
@@ -199,7 +199,7 @@ public static class PublicRoutes
             }
             catch (Exception ex)
             {
-                return Results.BadRequest(new { error = ex.Message });
+                return Results.NotFound(new { error = ex.Message });
             }
         });
 

@@ -27,6 +27,8 @@ public class ReservationViewKioskDto
 
     public int ItemId { get; set; }
     public ItemDetailDto? Item { get; set; }
+
+     public ReservationStatus Status { get; set; } 
 }
 
 

@@ -49,6 +49,11 @@ export default function ReservationPayPage() {
   useEffect(() => {
     const initializePayment = async () => {
       try {
+        // Only proceed if we have reservationData
+        if (!reservationData) {
+          return; // Exit early if no data yet
+        }
+
         const reservationId = reservationData?.pickupCode || "unknown";
         const payment = await createPayconiqPayment(amount, `Deelfabriek Kortrijk - Reservatie #${reservationId}`);
         setQrCode(payment._links.qrcode.href + "&s=XL&f=PNG");
@@ -59,7 +64,7 @@ export default function ReservationPayPage() {
     };
 
     initializePayment();
-  }, [amount, id]);
+  }, [amount, id, reservationData]); // reservationData as a dependency, runt pas als localdata is ingeladen
 
   useEffect(() => {
     if (paymentId) {
@@ -114,6 +119,7 @@ export default function ReservationPayPage() {
 
       const t = setTimeout(() => {
         // Pass the pickup code from the reservation data if available
+        console.log("pickupCode:", reservationData?.pickupCode);
         router.push(`/tablet/payment/locker-open`);
       }, 5000);
       return () => clearTimeout(t);

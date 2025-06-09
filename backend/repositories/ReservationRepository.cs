@@ -38,7 +38,8 @@ public class ReservationRepository : IReservationRepository
             .Include(r => r.Item)
             .Include(r => r.User)
             .Include(r => r.Locker)
-            .FirstOrDefaultAsync(r => r.PickupCode == pickupCode) ?? throw new Exception($"Reservation with pickup code {pickupCode} not found");
+            .FirstOrDefaultAsync(r => r.PickupCode == pickupCode)
+            ?? throw new Exception($"Reservation with pickup code {pickupCode} not found");
     }
 
     public async Task<List<Reservation>> GetAllAsync()

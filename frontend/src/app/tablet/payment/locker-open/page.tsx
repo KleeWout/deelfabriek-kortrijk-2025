@@ -19,13 +19,31 @@ export default function LockerOpenPage() {
       try {
         setIsLoading(true);
 
-        // In a production environment, you would get this from the URL or context
-        // For this example, we use the code from the prompt
-        const code = "999272";
+        // Get the payment details from localStorage
+        const storedPaymentDetails = localStorage.getItem("paymentDetails");
+        if (!storedPaymentDetails) {
+          setError("No payment details found. Please try again.");
+          return;
+        }
 
-        const data = await markReservationAsPaid(code);
+        // Parse the stored payment details
+        const paymentDetails = JSON.parse(storedPaymentDetails);
+        console.log("Retrieved payment details from localStorage:", paymentDetails);
+
+        // Use the pickupCode from localStorage data
+        const pickupCode = paymentDetails.pickupCode;
+        if (!pickupCode) {
+          setError("Invalid payment details. Missing pickup code.");
+          return;
+        }
+
+        // Call the API to mark the reservation as paid
+        const data = await markReservationAsPaid(pickupCode);
         setPaymentData(data);
         console.log("Payment confirmation data from API:", data);
+
+        // After successful API call, remove the item from localStorage
+        localStorage.removeItem("paymentDetails");
       } catch (error) {
         console.error("Error fetching reservation data:", error);
         setError("Failed to load locker information. Please try again.");

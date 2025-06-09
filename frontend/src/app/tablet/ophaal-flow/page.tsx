@@ -28,7 +28,7 @@ export default function OphaalFlowPage() {
     }
   }, []); // Empty dependency array ensures this runs only once on mount
 
-  // Use the locker ID as the item ID for gradient, fallback to 1 if not available
+  // Use the locker ID as the item ID for gradient
   const itemId = reservationData?.lockerId || 1;
   const gradientClass = getGradientClassForBackground(itemId);
 

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Question, Backspace } from "phosphor-react";
 import { useRouter } from "next/navigation";
 import { getReservationByCode } from "@/app/api/reservations";
+import { el } from "date-fns/locale";
 
 const MAX_CODE_LENGTH = 6;
 
@@ -39,11 +40,21 @@ export default function TabletCodePage() {
 
       // Store data in localStorage for the next page
       localStorage.setItem("reservationDetails", JSON.stringify(reservationData));
-
-      // Navigate to the ophaal-flow page
-      router.push("/tablet/ophaal-flow");
+      if (reservationData.status === "Not_Active") {
+        router.push("/tablet/ophaal-flow");
+      }
+      else if (reservationData.status === "Completed") {
+        router.push(`/tablet/return-flow`);
+      }
+      else{
+        setError("Ongeldige code");
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2000);
+        return;
+      }
     } catch (error) {
       console.error("Error fetching reservation data:", error);
+      
 
       // Handle specific error for invalid codes
       if (error instanceof Error && error.message === "Reservation not found") {
