@@ -39,10 +39,13 @@ public class User : IEntity
 
 }
 
-public class IuserProfile : Profile
-{
-    // public IuserProfile()
-    // {
-    //      CreateMap<User, UserDto>();
-    // }
-}
+  public class UserProfile : Profile
+    {
+        public UserProfile()
+        {
+            // Add mapping for User
+            CreateMap<newUserDto, User>();
+            
+            // Add any other mappings your application needs
+        }
+    }

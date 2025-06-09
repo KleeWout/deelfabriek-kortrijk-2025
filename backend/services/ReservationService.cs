@@ -1,9 +1,10 @@
+using Deelkast.API.Exceptions;
 namespace Deelkast.API.Services;
 
 
 public interface IReservationService
 {
-    Task<Reservation> CreateReservation(CreateReservationDto dto);
+    Task<ReservationCreatedDto> CreateReservation(CreateReservationDto dto);
 
     Task<IEnumerable<ReservationViewDto>> GetAllReservations();
 
@@ -32,17 +33,20 @@ public class ReservationService : IReservationService
 
     private readonly IReservationRepository _customreservationRepository;
 
+    private readonly IUserRepository _customUserRepository;
+
     private readonly IMapper _mapper;
 
     public ReservationService(IGenericRepository<Item> itemRepo,
                               IGenericRepository<User> userRepo,
-                              IGenericRepository<Reservation> resRepo, IMapper mapper, IReservationRepository customreservationRepository)
+                              IGenericRepository<Reservation> resRepo, IMapper mapper, IReservationRepository customreservationRepository, IUserRepository customUserRepository)
     {
         _itemRepo = itemRepo;
         _userRepo = userRepo;
         _resRepo = resRepo;
         _mapper = mapper;
         _customreservationRepository = customreservationRepository;
+        _customUserRepository = customUserRepository;
     }
 
     public async Task<IEnumerable<ReservationViewDto>> GetAllReservations()
@@ -55,9 +59,8 @@ public class ReservationService : IReservationService
     {
         var reservation = await _customreservationRepository.GetByIdAsync(id);
         return _mapper.Map<ReservationViewDto>(reservation);
-     
-    }
 
+    }
     public async Task DeleteReservation(int id)
     {
         var reservation = await _customreservationRepository.GetByIdAsync(id);
@@ -65,47 +68,62 @@ public class ReservationService : IReservationService
 
         // Change item status back to beschikbaar
         var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
-        if (item != null)
-        {
-            item.Status = ItemStatus.Beschikbaar;
-            await _itemRepo.UpdateAsync(item);
-        }
+        if (item == null) throw new ItemNotFoundException($"Item with ID {reservation.ItemId} not found");
 
-        await _resRepo.DeleteAsync(id);
+        // Use a transaction for consistency
+        using (var transaction = await _customreservationRepository.BeginTransactionAsync())
+        {
+            try
+            {
+                item.Status = ItemStatus.Beschikbaar;
+                await _itemRepo.UpdateAsync(item);
+                await _resRepo.DeleteAsync(id);
+
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Failed to delete reservation: {ex.Message}", ex);
+            }
+        }
     }
 
-
-
-    public async Task<Reservation> CreateReservation(CreateReservationDto dto)
+    public async Task<ReservationCreatedDto> CreateReservation(CreateReservationDto dto)
     {
-        var user = await _userRepo.GetByIdAsync(dto.UserId);
+        // Load necessary data
+
+        //Get userid based on user email or create new user if not exists
+        var user = await _customUserRepository.GetUser(dto.User);
         var item = await _itemRepo.GetByIdAsync(dto.ItemId);
 
-        if (user == null) throw new Exception("User not found");
-        if (item == null) throw new Exception("Item not found");
-        // een user kan maar 2 reserveringen tegelijk hebben
-        var activeReservations = await _resRepo.GetAllAsync();
-        var userReservations = activeReservations
-            .Where(r => r.UserId == dto.UserId && r.LoanEnd == null)
-            .ToList();
-        if (userReservations.Count >= 2) throw new Exception("User already has 2 active reservations");
+        // Validation with proper exception types
+        if (item == null) throw new ItemNotFoundException($"Item with ID {dto.ItemId} not found");
 
-        if (item.Status != 0) throw new Exception("Item not available");
-        if (dto.Weeks < 1 || dto.Weeks > 2) throw new Exception("-max 2 weeks allowed");
+        // Check active reservations count using optimized query
+        int activeReservationsCount = await _customreservationRepository.CountActiveReservationsForUserAsync(user.Id);
+        if (activeReservationsCount >= 2) throw new ReservationLimitExceededException(user.Id);
+
+        // Item availability check with proper enum usage
+        if (item.Status != ItemStatus.Beschikbaar) throw new ItemNotAvailableException(dto.ItemId);
+
+        // Duration validation
+        if (dto.Weeks < 1 || dto.Weeks > 2) throw new InvalidReservationDurationException();
+
+        // Locker validation
+        if (item.LockerId == null) throw new NoLockerAssignedException(dto.ItemId);
 
         var now = DateTime.Now;
         var pickupDeadline = now.AddHours(48);
         var totalPrice = item.PricePerWeek * dto.Weeks;
 
-        if (item.LockerId == null)
-            throw new Exception("Item does not have an assigned LockerId");
-
+        // Create the reservation object
         var reservation = new Reservation
         {
-            UserId = dto.UserId,
+            UserId = user.Id,
             ItemId = dto.ItemId,
-            LockerId = (int)item.LockerId,
-            PickupCode = Generate6DigitCode(),
+            LockerId = item.LockerId,
+            PickupCode = await GenerateUnique6DigitCode(), // Using the improved code generator
             ReservationDate = now,
             PickupDeadline = pickupDeadline,
             Weeks = dto.Weeks,
@@ -113,14 +131,42 @@ public class ReservationService : IReservationService
             LoanEnd = null,
             TotalPrice = totalPrice
         };
-        // change item status to geleend 
-        item.Status = ItemStatus.Geleend;
-        item.TimesLoaned += 1;
-        // update item in repo
-        await _itemRepo.UpdateAsync(item);
 
-        await _resRepo.AddAsync(reservation);
-        return reservation;
+        // Use a transaction to ensure consistency
+        using (var transaction = await _customreservationRepository.BeginTransactionAsync())
+        {
+            try
+            {
+                // Update item status
+                item.Status = ItemStatus.Geleend;
+                item.TimesLoaned += 1;
+                await _itemRepo.UpdateAsync(item);
+
+                // Add reservation
+                await _resRepo.AddAsync(reservation);
+
+                // Commit the transaction
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                // Roll back the transaction if anything fails
+                await transaction.RollbackAsync();
+                throw new Exception($"Failed to create reservation: {ex.Message}", ex);
+            }
+        }
+
+        var response = new ReservationCreatedDto
+        {
+            LockerId = reservation.LockerId,
+            PickupCode = reservation.PickupCode,
+            ItemName = reservation.Item.Title,
+            PersonName = $"{reservation.User.FirstName} {reservation.User.LastName}",
+            Price = reservation.TotalPrice,
+            PickupDeadline = reservation.PickupDeadline
+        };
+
+        return response;
     }
 
     // making reservation is already complete 
@@ -133,10 +179,9 @@ public class ReservationService : IReservationService
 
     public async Task<Reservation> GetReservationByCode(int pickupCode)
     {
- 
+
         return await _customreservationRepository.GetReservationByCode(pickupCode);
     }
-
     public async Task<ReservationViewKioskDto> HandleReservationByCode(int pickupCode)
     {
         var reservation = await GetReservationByCode(pickupCode);
@@ -152,13 +197,28 @@ public class ReservationService : IReservationService
         }
         else if (reservation.Status == ReservationStatus.Active)
         {
-            reservation.ActualReturnDate = DateTime.Now;
-            reservation.Status = ReservationStatus.Completed;
-            
-            // Update item status back to beschikbaar
-            reservation.Item.Status = ItemStatus.Beschikbaar;
-            await _itemRepo.UpdateAsync(reservation.Item);
-            await _resRepo.UpdateAsync(reservation);
+            // Use a transaction for consistency when completing a reservation
+            using (var transaction = await _customreservationRepository.BeginTransactionAsync())
+            {
+                try
+                {
+                    reservation.ActualReturnDate = DateTime.Now;
+                    reservation.Status = ReservationStatus.Completed;
+
+                    // Update item status back to beschikbaar
+                    reservation.Item.Status = ItemStatus.Beschikbaar;
+                    await _itemRepo.UpdateAsync(reservation.Item);
+                    await _resRepo.UpdateAsync(reservation);
+
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception($"Failed to complete reservation: {ex.Message}", ex);
+                }
+            }
+
             return _mapper.Map<ReservationViewKioskDto>(reservation);
         }
 
@@ -171,7 +231,6 @@ public class ReservationService : IReservationService
         // ...
         return _mapper.Map<ReservationViewKioskDto>(reservation);
     }
-
     public async Task<ReservationViewDto> MarkAsPaidAndStarLoan(int pickupCode)
     {
         var reservation = await GetReservationByCode(pickupCode);
@@ -181,10 +240,24 @@ public class ReservationService : IReservationService
         if (reservation.Status != ReservationStatus.Not_Active)
             throw new Exception("Reservation is already active or completed");
 
-        reservation.LoanStart = DateTime.Now;
-        reservation.LoanEnd = reservation.LoanStart.Value.AddDays(reservation.Weeks * 7);
-        reservation.Status = ReservationStatus.Active;
-        await _resRepo.UpdateAsync(reservation);
+        // Use a transaction for consistency
+        using (var transaction = await _customreservationRepository.BeginTransactionAsync())
+        {
+            try
+            {
+                reservation.LoanStart = DateTime.Now;
+                reservation.LoanEnd = reservation.LoanStart.Value.AddDays(reservation.Weeks * 7);
+                reservation.Status = ReservationStatus.Active;
+                await _resRepo.UpdateAsync(reservation);
+
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Failed to mark reservation as paid: {ex.Message}", ex);
+            }
+        }
 
         // open locker where the item is in that reservation
         // locker.IsOpen = true; 
@@ -192,26 +265,63 @@ public class ReservationService : IReservationService
 
         return _mapper.Map<ReservationViewDto>(reservation);
     }
-
-
-   public async Task ExpireOverdueReservations()
-{
-    var now = DateTime.Now;
-    var expiredReservations = await _customreservationRepository.GetOverdueReservations(now);
-
-    foreach (var reservation in expiredReservations)
+    public async Task ExpireOverdueReservations()
     {
-        reservation.Status = ReservationStatus.Expired;
-        reservation.Item.Status = ItemStatus.Beschikbaar;
-        await _itemRepo.UpdateAsync(reservation.Item);
-        await _resRepo.UpdateAsync(reservation);
+        var now = DateTime.Now;
+        var expiredReservations = await _customreservationRepository.GetOverdueReservations(now);
+
+        foreach (var reservation in expiredReservations)
+        {
+            // Process each expired reservation in its own transaction
+            using (var transaction = await _customreservationRepository.BeginTransactionAsync())
+            {
+                try
+                {
+                    reservation.Status = ReservationStatus.Expired;
+                    reservation.Item.Status = ItemStatus.Beschikbaar;
+                    await _itemRepo.UpdateAsync(reservation.Item);
+                    await _resRepo.UpdateAsync(reservation);
+
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    // Log the error but continue with other reservations
+                    Console.WriteLine($"Failed to expire reservation {reservation.Id}: {ex.Message}");
+                }
+            }
+        }
     }
-}
-
-
     private int Generate6DigitCode()
     {
         var random = new Random();
         return random.Next(100000, 999999); // Generates a random 6-digit number
+    }
+
+    private async Task<int> GenerateUnique6DigitCode()
+    {
+        int code;
+        bool isUnique = false;
+
+        do
+        {
+            code = new Random().Next(100000, 999999);
+            // Check if code already exists
+            try
+            {
+                var existing = await _customreservationRepository.GetReservationByCode(code);
+                // If we get here, a reservation with this code exists
+                isUnique = false;
+            }
+            catch (Exception)
+            {
+                // If an exception is thrown, no reservation with this code exists
+                isUnique = true;
+            }
+        }
+        while (!isUnique);
+
+        return code;
     }
 }

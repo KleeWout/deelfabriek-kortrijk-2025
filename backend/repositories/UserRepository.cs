@@ -2,6 +2,7 @@ namespace Deelkast.API.Repositories;
 
 
 
+
 public interface IUserRepository
 {
 
@@ -11,6 +12,8 @@ public interface IUserRepository
     // unblock user
     Task UnblockUser(int userId);
 
+    Task<User> GetUser(newUserDto user);
+
 }
 
 public class UserRepository : IUserRepository
@@ -18,12 +21,28 @@ public class UserRepository : IUserRepository
     private readonly IGenericRepository<User> _genericRepository;
 
     private readonly ApplicationDbContext _context;
+    private readonly IMapper _mapper;
 
 
-    public UserRepository(IGenericRepository<User> genericRepository, ApplicationDbContext context)
+    public UserRepository(IGenericRepository<User> genericRepository, ApplicationDbContext context, IMapper mapper)
     {
         _genericRepository = genericRepository;
         _context = context;
+        _mapper = mapper;
+    }
+
+    public async Task<User> GetUser(newUserDto user)
+     {
+        // Using FirstOrDefaultAsync since email should be unique
+        var result = await _context.User.FirstOrDefaultAsync(u => u.Email == user.Email);
+        if (result == null)
+        {
+            // Map DTO to User entity
+            var newUser = _mapper.Map<User>(user);
+            await _genericRepository.AddAsync(newUser);
+            result = newUser;
+        }
+        return result;
     }
 
 

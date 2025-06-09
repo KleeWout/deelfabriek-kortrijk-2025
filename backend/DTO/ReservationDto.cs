@@ -32,9 +32,19 @@ public class ReservationViewKioskDto
 
 public class CreateReservationDto
 {
-    public int UserId { get; set; }
+    public newUserDto User { get; set; }
+    
     public int ItemId { get; set; }
     public int Weeks { get; set; }
 }
 
+public class ReservationCreatedDto
+{
+    public int PickupCode { get; set; }
+    public int? LockerId { get; set; }
+    public string PersonName { get; set; }
+    public string ItemName { get; set; }
+    public DateTime PickupDeadline { get; set; }
+    public decimal? Price { get; set; }
+}
 //

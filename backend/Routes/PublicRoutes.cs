@@ -151,7 +151,7 @@ public static class PublicRoutes
             }
             return Results.Ok(item);
         });
-         //get all items that are in lockers
+        //get all items that are in lockers
         group.MapGet("/lockers", async (IItemService itemService) =>
         {
             var items = await itemService.GetItemsWithLocker();
@@ -166,12 +166,13 @@ public static class PublicRoutes
 
     public static RouteGroupBuilder GroupReservations(this RouteGroupBuilder group)
     {
-        group.MapPost("/", async (CreateReservationDto dto, IReservationService reservationService) =>
+        group.MapPost("/", async (CreateReservationDto dto, IReservationService reservationService, UserRegistrationValidator validator) =>
         {
             try
             {
+                var validationResult = await validator.ValidateAsync(dto.User);
                 var reservation = await reservationService.CreateReservation(dto);
-                return Results.Ok(new { ReservationId = reservation.Id }); // Only return the ID
+                return Results.Ok(reservation);
             }
             catch (Exception ex)
             {
@@ -194,7 +195,7 @@ public static class PublicRoutes
             try
             {
                 var reservation = await service.HandleReservationByCode(pickupCode);
-                return Results.Ok(reservation); 
+                return Results.Ok(reservation);
             }
             catch (Exception ex)
             {
