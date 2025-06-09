@@ -23,6 +23,7 @@ public class ReservationViewKioskDto
     public decimal TotalPrice { get; set; }
     public string UserName { get; set; }
     public string LockerNumber { get; set; }
+    public int Weeks { get; set; } 
 
     public int ItemId { get; set; }
     public ItemDetailDto? Item { get; set; }

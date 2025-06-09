@@ -27,3 +27,21 @@ export async function createReservation(data: ReservationData): Promise<any> {
     throw error;
   }
 }
+
+export async function getReservationByCode(code: string): Promise<any> {
+  try {
+    const response = await fetch(`${url}/reservations/code/${code}`);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Reservation not found");
+      }
+      throw new Error(`Failed to get reservation: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching reservation data:", error);
+    throw error;
+  }
+}
