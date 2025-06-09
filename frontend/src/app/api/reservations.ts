@@ -45,3 +45,44 @@ export async function getReservationByCode(code: string): Promise<any> {
     throw error;
   }
 }
+
+export interface ReservationResponse {
+  pickupCode: string;
+  itemTitle: string;
+  totalPrice: number;
+  userName: string;
+  lockerNumber: string;
+  loanStart: string;
+  loanEnd: string;
+  reservationDate: string;
+  actualReturnDate: string | null;
+  pickupDeadline: string;
+  status: string;
+  weeks: number;
+  item?: {
+    title: string;
+  };
+}
+
+export async function markReservationAsPaid(code: string): Promise<ReservationResponse> {
+  try {
+    const response = await fetch(`${url}/reservations/code/${code}/ispayed`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Reservation not found");
+      }
+      throw new Error(`Failed to mark reservation as paid: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error marking reservation as paid:", error);
+    throw error;
+  }
+}
