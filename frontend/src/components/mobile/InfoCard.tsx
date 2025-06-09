@@ -9,8 +9,8 @@ interface FeatureCardProps {
 }
 
 export default function FeatureCard({ number, title, description, imageSrc = "/PlaceholderFoto.webp", className = "" }: FeatureCardProps) {
-  const src = imageSrc || defaultImage;
   const defaultImage = `/dummy${number}.jpg`;
+  const src = imageSrc || defaultImage;
   
   return (
     <article className={`flex flex-col items-center gap-4 ${className}`}>

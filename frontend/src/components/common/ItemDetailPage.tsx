@@ -3,8 +3,6 @@
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ReturnButton } from "@/components/common/ReturnButton";
-import Navigation from "@/components/mobile/nav";
 import { getGradientClassForBackground } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 import { getItemById, ItemResponse } from "@/app/api/items";
@@ -91,11 +89,8 @@ export default function ItemDetailPage() {
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className={`px-3 py-1 rounded-full text-white text-sm ${item.status === "Beschikbaar" ? "bg-primarygreen-1" : item.status === "Uitgeleend" ? "bg-amber-600" : "bg-primarypink-1"}`}>{item.status.toUpperCase()}</span>
-                {item.categoryNames.map((category, index) => (
-                  <span key={index} className="px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm">
-                    {category}
-                  </span>
-                ))}
+
+                <span className="px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm">{item.category}</span>
               </div>
             </div>
 
