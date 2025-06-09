@@ -142,15 +142,15 @@ public static class PublicRoutes
         });
 
         // Parameterized route last
-        // group.MapGet("/{id:int}", async (int id, IItemService itemService) =>
-        // {
-        //     var item = await itemService.GetItemByIdDto(id);
-        //     if (item == null)
-        //     {
-        //         return Results.NotFound();
-        //     }
-        //     return Results.Ok(item);
-        // });
+        group.MapGet("/{id:int}", async (int id, IItemService itemService) =>
+        {
+            var item = await itemService.GetItemById(id);
+            if (item == null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(item);
+        });
          //get all items that are in lockers
         group.MapGet("/lockers", async (IItemService itemService) =>
         {

@@ -26,11 +26,11 @@ export function ItemCard({
   const router = useRouter();
   const pathname = usePathname();
 
-  // Only allow local images from /assets/items/
-  let safeImageSrc = imageSrc;
-  if (!safeImageSrc.startsWith('/assets/items/')) {
-    safeImageSrc = '/assets/items/naaimachine.png';
-  }
+  // // Only allow local images from /assets/items/
+  // let safeImageSrc = imageSrc;
+  // if (!safeImageSrc.startsWith('/assets/items/')) {
+  //   safeImageSrc = '/assets/items/naaimachine.png';
+  // }
 
   // If baseRoute is not provided, determine it from the current path
   const resolvedBaseRoute =
@@ -60,7 +60,7 @@ export function ItemCard({
         {' '}
         {/* <p>{imageSrc}</p> */}
         <Image
-          src={safeImageSrc}
+          src={imageSrc}
           width={120}
           height={90}
           alt={title}

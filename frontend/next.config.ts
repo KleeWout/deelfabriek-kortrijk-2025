@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true, // Ignore ESLint errors during build
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: process.env.BACKEND_URL || "http://backend:3001/:path*", // Proxy to Backend
+      },
+    ];
+  },
 };
 
 export default nextConfig;

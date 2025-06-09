@@ -70,7 +70,7 @@ app.MapGroup("/items").GroupPublicItems();
 app.MapGroup("/users").GroupPublicUsers();
 app.MapGroup("/categories").GroupPublicCategories();
 app.MapGroup("/reservations").GroupReservations();
-app.MapGroup("/openingsuren").GroupPublicOpeningHours();
+app.MapGroup("/openingshours").GroupPublicOpeningHours();
 app.MapGroup("/reports").GroupPublicReports();
 
 // add authorization later 
@@ -80,7 +80,7 @@ adminApi.MapGroup("/lockers").GroupAdminLockers();
 adminApi.MapGroup("/categories").GroupAdminCategories();
 adminApi.MapGroup("/users").GroupAdminUsers();
 adminApi.MapGroup("/reservations").GroupAdminReservations();
-adminApi.MapGroup("/openingsuren").GroupAdminOpeningHours();
+adminApi.MapGroup("/openingshours").GroupAdminOpeningHours();
 adminApi.MapGroup("/reports").GroupAdminReports();
 
 

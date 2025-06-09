@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Clock, EnvelopeSimple, House, MapPin, Phone } from "phosphor-react";
-import { useOpeningHours } from "@/context/OpeningHoursContext";
+import { useOpeningsHours } from "@/context/OpeningHoursContext";
 
 // Helper function to format time
 const formatTime = (time: string | null): string => {
@@ -41,7 +41,7 @@ const dayNameMap: { [key: string]: string } = {
 const dayOrder = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"];
 
 export default function Footer() {
-  const { openingHours, loading, error } = useOpeningHours();
+  const { openingHours, loading, error } = useOpeningsHours();
   
   // Sort days in correct order
   const sortedHours = openingHours 

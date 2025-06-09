@@ -1,15 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { OpeningHoursData, fetchOpeningsHours } from "../app/api/getOpeningshours";
 
-type OpeningHoursData = {
-  idDay: string;
-  openTimeMorning: string | null;
-  closeTimeMorning: string | null;
-  openTimeAfternoon: string | null;
-  closeTimeAfternoon: string | null;
-  open: boolean;
-};
 
 type OpeningHoursContextType = {
   openingHours: OpeningHoursData[] | null;
@@ -23,9 +16,9 @@ const OpeningHoursContext = createContext<OpeningHoursContextType>({
   error: null,
 });
 
-export const useOpeningHours = () => useContext(OpeningHoursContext);
+export const useOpeningsHours = () => useContext(OpeningHoursContext);
 
-export const OpeningHoursProvider = ({ children }: { children: React.ReactNode }) => {
+export const OpeningsHoursProvider = ({ children }: { children: React.ReactNode }) => {
   const [openingHours, setOpeningHours] = useState<OpeningHoursData[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,14 +26,14 @@ export const OpeningHoursProvider = ({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     if (!fetched) {
-      const fetchOpeningHours = async () => {
+      const getOpeningHours = async () => {
         try {
-          const response = await fetch("https://api-deelfabriek.woutjuuh02.be/openingshours");
-          if (!response.ok) {
-            throw new Error("Failed to fetch opening hours");
+          const data = await fetchOpeningsHours();
+          if (data) {
+            setOpeningHours(data);
+          } else {
+            throw new Error("No data returned");
           }
-          const data: OpeningHoursData[] = await response.json();
-          setOpeningHours(data);
           setLoading(false);
           setFetched(true);
         } catch (err) {
@@ -49,7 +42,7 @@ export const OpeningHoursProvider = ({ children }: { children: React.ReactNode }
         }
       };
 
-      fetchOpeningHours();
+      getOpeningHours();
     }
   }, [fetched]);
 

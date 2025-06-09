@@ -22,8 +22,16 @@ export interface ItemResponse {
   category: string;
 }
 
-const url = "http://localhost:3001";
+// Local development URL
+// const url = "http://localhost:3001";
+//public URL
 // const url = "https://api-deelfabriek.woutjuuh02.be";
+//docker URL
+// const url = 'http://backend:3001'
+
+// Using relative URL for client-side requests
+// This ensures requests are made to the same origin as the frontend
+const url = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export const getItems = async (): Promise<ItemProps[]> => {
   try {
