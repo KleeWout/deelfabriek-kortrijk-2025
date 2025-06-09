@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const PAYCONIQ_API_KEY = 'f0dca81c-f417-48de-bfb7-12ea87b212d4';
+const payconiqApiKey = process.env.PAYCONIQ_API_KEY;
 const MERCHANT_ID = '62823079e6c35c3c4ba944e6';
 
 export async function POST(req: NextRequest) {
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const payconiqRes = await fetch('https://api.payconiq.com/v3/payments', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${PAYCONIQ_API_KEY}`,
+        Authorization: `Bearer ${payconiqApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const PAYCONIQ_API_KEY = 'f0dca81c-f417-48de-bfb7-12ea87b212d4';
+const payconiqApiKey = process.env.PAYCONIQ_API_KEY;
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
       `https://api.payconiq.com/v3/payments/${paymentId}`,
       {
         headers: {
-          Authorization: `Bearer ${PAYCONIQ_API_KEY}`,
+          Authorization: `Bearer ${payconiqApiKey}`,
         },
       }
     );

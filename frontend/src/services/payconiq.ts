@@ -1,7 +1,3 @@
-const PAYCONIQ_API_KEY = 'f0dca81c-f417-48de-bfb7-12ea87b212d4';
-const MERCHANT_ID = '62823079e6c35c3c4ba944e6';
-const PAYMENT_ID = '68414221eb380165e1655e74';
-
 interface PayconiqPaymentResponse {
   paymentId: string;
   qrCode: string;

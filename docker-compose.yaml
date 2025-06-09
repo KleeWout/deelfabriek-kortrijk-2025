@@ -10,6 +10,8 @@ services:
       context: ./frontend
       platforms:
         - linux/arm64
+      environment:
+        - PAYCONIQ_API_KEY=${PAYCONIQ_API_KEY}
     ports:
       - "3000:3000"
     restart: unless-stopped
