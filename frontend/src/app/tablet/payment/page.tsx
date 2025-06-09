@@ -51,7 +51,7 @@ export default function ReservationPayPage() {
       try {
         const reservationId = reservationData?.pickupCode || "unknown";
         const payment = await createPayconiqPayment(amount, `Deelfabriek Kortrijk - Reservatie #${reservationId}`);
-        setQrCode(payment._links.qrcode.href);
+        setQrCode(payment._links.qrcode.href + "&s=XL&f=PNG");
         setPaymentId(payment.paymentId);
       } catch (error) {
         console.error("Failed to initialize payment:", error);
@@ -101,13 +101,20 @@ export default function ReservationPayPage() {
 
   useEffect(() => {
     if (paid) {
-      // store the payment confirmation in localStorage
-      localStorage.setItem("paymentConfirmed", "true");
+      // Store more detailed payment confirmation
+      localStorage.setItem(
+        "paymentConfirmation",
+        JSON.stringify({
+          confirmed: true,
+          timestamp: new Date().toISOString(),
+          pickupCode: reservationData?.pickupCode,
+          amount: amount,
+        })
+      );
 
       const t = setTimeout(() => {
         // Pass the pickup code from the reservation data if available
-        const pickupCode = reservationData?.pickupCode || id;
-        router.push(`/tablet/payment/${pickupCode}/locker-open`);
+        router.push(`/tablet/payment/locker-open`);
       }, 5000);
       return () => clearTimeout(t);
     }
