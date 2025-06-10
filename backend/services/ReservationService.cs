@@ -24,6 +24,8 @@ public interface IReservationService
 
     // delete reservation
     public Task DeleteReservation(int id);
+
+    public Task DeleteReservationByCode(int pickupCode);
 }
 
 public class ReservationService : IReservationService
@@ -79,6 +81,33 @@ public class ReservationService : IReservationService
                 item.Status = ItemStatus.Beschikbaar;
                 await _itemRepo.UpdateAsync(item);
                 await _resRepo.DeleteAsync(id);
+
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Failed to delete reservation: {ex.Message}", ex);
+            }
+        }
+    }
+    public async Task DeleteReservationByCode(int pickupCode)
+    {
+        var reservation = await GetReservationByCode(pickupCode);
+        if (reservation == null) throw new Exception("Reservation not found");
+
+        // Change item status back to beschikbaar
+        var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
+        if (item == null) throw new ItemNotFoundException($"Item with ID {reservation.ItemId} not found");
+
+        // Use a transaction for consistency
+        using (var transaction = await _customreservationRepository.BeginTransactionAsync())
+        {
+            try
+            {
+                item.Status = ItemStatus.Beschikbaar;
+                await _itemRepo.UpdateAsync(item);
+                await _resRepo.DeleteAsync(reservation.Id);
 
                 await transaction.CommitAsync();
             }

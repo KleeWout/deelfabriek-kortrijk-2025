@@ -7,6 +7,8 @@ import dynamic from "next/dynamic";
 import animationData from "@/app/tablet/ophaal-flow/pay/Animation - 1748702795819.json";
 import Stepper, { TabletHeader } from "@/components/tabletHeader";
 import { createPayconiqPayment, checkPaymentStatus } from "@/services/payconiq";
+import { cancelReservation } from "@/app/api/reservations";
+
 
 const LottiePlayer = dynamic(() => import("react-lottie-player"), {
   ssr: false,
@@ -17,7 +19,7 @@ export default function ReservationPayPage() {
   const { id } = useParams();
   const [reservationData, setReservationData] = useState<any>(null);
   // Use the reservation data to get the amount if available, otherwise fallback to test amount
-  const [amount, setAmount] = useState(0.1); // Tijdelijk testbedrag van 10 cent
+  const [amount, setAmount] = useState(0.1);
   const [paid, setPaid] = useState(false);
   const [qrCode, setQrCode] = useState<string>("");
   const [paymentId, setPaymentId] = useState<string>("");
@@ -35,8 +37,8 @@ export default function ReservationPayPage() {
         console.log("Retrieved payment details:", parsedData);
 
         // Update the payment amount if available in the reservation data
-        if (parsedData.totalPrice) {
-          setAmount(parsedData.totalPrice);
+        if (parsedData.price) {
+          setAmount(parsedData.price);
         }
       } else {
         console.error("No payment details found in localStorage");
@@ -55,9 +57,9 @@ export default function ReservationPayPage() {
         }
 
         const reservationId = reservationData?.pickupCode || "unknown";
-        // const payment = await createPayconiqPayment(amount, `Deelfabriek Kortrijk - Reservatie #${reservationId}`);
-        // setQrCode(payment._links.qrcode.href + "&s=XL&f=PNG");
-        // setPaymentId(payment.paymentId);
+        const payment = await createPayconiqPayment(amount, `Deelfabriek Kortrijk - Reservatie #${reservationId}`);
+        setQrCode(payment._links.qrcode.href + "&s=XL&f=PNG");
+        setPaymentId(payment.paymentId);
       } catch (error) {
         console.error("Failed to initialize payment:", error);
       }
@@ -80,6 +82,29 @@ export default function ReservationPayPage() {
             setIsCancelled(true);
             if (status === "EXPIRED") {
               setSessionExpired(true);
+              // Make sure to cancel the reservation when session expires
+              if (reservationData.pickupCode) {
+                cancelReservation(reservationData.pickupCode)
+                  .then(() => {
+                    console.log("Reservation cancelled due to expired payment session");
+                  })
+                  .catch((error) => {
+                    console.error("Failed to cancel reservation on expiry:", error);
+                  });
+              }
+            } else if (status === "FAILED") {
+              // Set a payment failed state
+              console.log("Payment failed with status:", status);
+              // Cancel the reservation immediately on payment failure
+              if (reservationData.pickupCode) {
+                cancelReservation(reservationData.pickupCode)
+                  .then(() => {
+                    console.log("Reservation cancelled due to failed payment");
+                  })
+                  .catch((error) => {
+                    console.error("Failed to cancel reservation after payment failure:", error);
+                  });
+              }
             }
           }
         } catch (error) {
@@ -127,12 +152,23 @@ export default function ReservationPayPage() {
 
   useEffect(() => {
     if (isCancelled) {
+      // Cancel the reservation when payment is cancelled or failed
+      if (reservationData.pickupCode) {
+        cancelReservation(reservationData.pickupCode)
+          .then(() => {
+            console.log("Reservation cancelled successfully");
+          })
+          .catch((error) => {
+            console.error("Failed to cancel reservation:", error);
+          });
+      }
+
       const t = setTimeout(() => {
         router.back();
       }, 3000);
       return () => clearTimeout(t);
     }
-  }, [isCancelled, router]);
+  }, [isCancelled, router, reservationData]);
 
   const handleCancel = () => {
     setShowCancelConfirm(true);

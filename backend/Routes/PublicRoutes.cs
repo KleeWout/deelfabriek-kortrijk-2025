@@ -228,6 +228,18 @@ public static class PublicRoutes
             }
         });
 
+        group.MapDelete("/code/{pickupCode}", async (int pickupCode, IReservationService reservationService) =>
+        {
+            var existingReservation = await reservationService.GetReservationByCode(pickupCode);
+            if (existingReservation == null)
+            {
+                return Results.NotFound();
+            }
+
+            await reservationService.DeleteReservationByCode(pickupCode);
+            return Results.Ok();
+        });
+
         return group;
     }
 

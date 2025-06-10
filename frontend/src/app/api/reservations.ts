@@ -104,3 +104,18 @@ export async function markReservationAsReturned(code: string): Promise<Reservati
     throw error;
   }
 }
+
+export async function cancelReservation(reservationId: string): Promise<any> {
+  try {
+    const response = await fetch(`${url}/reservations/code/${reservationId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error cancelling reservation:", error);
+    throw error;
+  }
+}

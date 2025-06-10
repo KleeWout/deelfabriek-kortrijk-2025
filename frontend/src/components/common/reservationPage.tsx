@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import { ReturnButton } from "@/components/common/ReturnButton";
 import Navigation from "@/components/mobile/nav";
-import itemsDetails from "@/data/itemDetails.json";
 import { addWeeks, format } from "date-fns";
 import { Fragment } from "react";
 import { createReservation } from "@/app/api/reservations";
@@ -52,7 +51,8 @@ export default function ReservationPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Get item details
-  const item = itemsDetails.find((item) => item.id === id);
+  const item = JSON.parse(localStorage.getItem("item") || "{}");
+  console.log("Item from localStorage:", item);
 
   useEffect(() => {
     // Update end date when duration changes
@@ -138,16 +138,14 @@ export default function ReservationPage() {
         weeks: formData.duration,
       };
 
-      // Call the API and get the response
       const response = await createReservation(reservationData);
-
       // Store the response in localStorage
       localStorage.setItem("reservationDetails", JSON.stringify(response));
-
       // Navigate to the appropriate confirmation page based on route type
       if (isTabletRoute) {
         router.push(`/tablet/payment/`);
       } else {
+        // Call the API and get the response
         router.push("/mobile/reserveer/confirmation");
       }
     } catch (error) {
@@ -162,7 +160,7 @@ export default function ReservationPage() {
     setShowConfirm(false);
   };
 
-  const totalPrice = (item.price * formData.duration).toFixed(2).replace(".", ",");
+  const totalPrice = (item.pricePerWeek * formData.duration).toFixed(2).replace(".", ",");
 
   return (
     <div className="min-h-screen  pb-16  ">
@@ -187,9 +185,9 @@ export default function ReservationPage() {
                 Einddatum: <p className="font-bold">{format(endDate, "dd/MM/yyyy")}</p>
               </div>
             </div>
-            <div className="text-center text-sm text-primarytext-1 m-4">Prijs: €{item.price.toFixed(2).replace(".", ",")} per week</div>
+            <div className="text-center text-sm text-primarytext-1 m-4">Prijs: € {item.pricePerWeek.toFixed(2).replace(".", ",")} per week</div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primarygreen-1 mb-4">€{totalPrice}</div>
+              <div className="text-3xl font-bold text-primarygreen-1 mb-4">€ {totalPrice}</div>
               {!isTabletRoute && (
                 <div className="bg-gray-50 rounded-lg  text-center px-3 py-2">
                   <p className="text-gray-600 text-sm font-semibold">Betaling gebeurd via Payconiq bij ophalen</p>

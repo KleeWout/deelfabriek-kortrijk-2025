@@ -25,6 +25,7 @@ export default function ItemDetailPage() {
       try {
         setLoading(true);
         const data = await getItemById(id);
+        localStorage.setItem(`item`, JSON.stringify(data)); 
         setItem(data);
       } catch (err) {
         setError("Er ging iets mis bij het ophalen van dit item.");
