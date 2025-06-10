@@ -14,9 +14,6 @@ export default function LockerOpenPage() {
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
   useEffect(() => {
-    // Fetch reservation data from API
-    console.log("i fire once");
-
     const fetchReservationData = async () => {
       try {
         setIsLoading(true);
@@ -30,7 +27,7 @@ export default function LockerOpenPage() {
 
         // Parse the stored payment details
         const reservationDetails = JSON.parse(storedReservationDetails);
-        console.log("Retrieved reservation details from localStorage:", reservationDetails);
+        console.error("Retrieved reservation details from localStorage:", reservationDetails);
 
         // Use the pickupCode from localStorage data
         const pickupCode = reservationDetails.pickupCode;
@@ -42,11 +39,9 @@ export default function LockerOpenPage() {
         // Call the API to mark the reservation as paid
         const data = await markReservationAsPaid(pickupCode);
         setPaymentData(data);
-        console.log("Payment confirmation data from API:", data);
-
-        // After successful API call, remove the item from localStorage
-        // localStorage.removeItem("reservationDetails");
-        // localStorage.removeItem("paymentConfirmation");
+        console.log("Payment confirmation data from API:", data); // After successful API call, remove the items from localStorage
+        localStorage.removeItem("reservationDetails");
+        localStorage.removeItem("paymentConfirmation");
       } catch (error) {
         console.error("Error fetching reservation data:", error);
         setError("Failed to load locker information. Please try again.");

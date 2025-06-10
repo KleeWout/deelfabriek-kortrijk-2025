@@ -107,15 +107,57 @@ export async function markReservationAsReturned(code: string): Promise<Reservati
 
 export async function cancelReservation(reservationId: string): Promise<any> {
   try {
+     console.log(`Attempting to cancel reservation with ID: ${reservationId}`);
+    // Check if the reservation was already cancelled to prevent duplicate requests
+    const key = `cancelled_${reservationId}`;
+    const alreadyCancelled = localStorage.getItem(key);
+
+    if (alreadyCancelled === "completed") {
+      console.log(`Reservation ${reservationId} was already cancelled, skipping`);
+      return { success: true, status: "already_cancelled" };
+    }
+
+    localStorage.setItem(key, "in_progress");
+
     const response = await fetch(`${url}/reservations/code/${reservationId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
     });
-    return await response.json();
+
+    // Handle the response based on status and content
+    if (response.ok) {
+      localStorage.setItem(key, "completed");
+
+      // Check if there's actually JSON content to parse
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        try {
+          // Try to parse JSON, but handle empty response
+          const text = await response.text();
+          return text ? JSON.parse(text) : { success: true };
+        } catch (parseError) {
+          // If parsing fails, return a success object
+          console.log("Response wasn't valid JSON, but cancellation was successful");
+          return { success: true };
+        }
+      } else {
+        // For non-JSON responses that were successful
+        return { success: true };
+      }
+    } else {
+      // For error responses
+      if (response.status === 404) {
+        // Reservation not found is not an error - it's already gone
+        localStorage.setItem(key, "completed");
+        return { success: true, status: "not_found" };
+      }
+      throw new Error(`Failed to cancel reservation: ${response.status}`);
+    }
   } catch (error) {
     console.error("Error cancelling reservation:", error);
-    throw error;
+    // Don't throw the error, just return a standardized error object
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
   }
 }

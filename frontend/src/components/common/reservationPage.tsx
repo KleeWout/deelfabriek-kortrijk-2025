@@ -47,12 +47,16 @@ export default function ReservationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(addWeeks(new Date(), 1));
-
+  const [item, setItem] = useState<any>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Get item details
-  const item = JSON.parse(localStorage.getItem("item") || "{}");
-  console.log("Item from localStorage:", item);
+  useEffect(() => {
+    // Log item details only once when component mounts
+    const loadedItem = JSON.parse(localStorage.getItem("item") || "{}");
+    console.log("Item from localStorage:", loadedItem);
+    setItem(loadedItem);
+  }, []);
 
   useEffect(() => {
     // Update end date when duration changes

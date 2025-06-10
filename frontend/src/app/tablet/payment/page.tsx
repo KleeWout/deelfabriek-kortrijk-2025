@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
-// Removing unused imports
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import animationData from "@/app/tablet/ophaal-flow/pay/Animation - 1748702795819.json";
@@ -17,7 +16,6 @@ export default function ReservationPayPage() {
   const router = useRouter();
   const { id } = useParams();
   const [reservationData, setReservationData] = useState<any>(null);
-  // Use the reservation data to get the amount if available, otherwise fallback to test amount
   const [amount, setAmount] = useState(0.1);
   const [paid, setPaid] = useState(false);
   const [qrCode, setQrCode] = useState<string>("");
@@ -25,6 +23,7 @@ export default function ReservationPayPage() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [isCancelled, setIsCancelled] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [navigatingToConfirmation, setNavigatingToConfirmation] = useState(false);
 
   // Get reservation data from localStorage when component mounts
   useEffect(() => {
@@ -33,9 +32,8 @@ export default function ReservationPayPage() {
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         setReservationData(parsedData);
-        console.log("Retrieved payment details:", parsedData);
 
-        // Update the payment amount if available in the reservation data
+        // payconiq amount
         if (parsedData.price) {
           setAmount(parsedData.price);
         }
@@ -45,16 +43,14 @@ export default function ReservationPayPage() {
     } catch (error) {
       console.error("Error parsing payment details:", error);
     }
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []); // only run once when component mounts
 
   useEffect(() => {
     const initializePayment = async () => {
       try {
-        // Only proceed if we have reservationData
         if (!reservationData) {
           return; // Exit early if no data yet
         }
-
         const reservationId = reservationData?.pickupCode || "unknown";
         const payment = await createPayconiqPayment(amount, `Deelfabriek Kortrijk - Reservatie #${reservationId}`);
         setQrCode(payment._links.qrcode.href + "&s=XL&f=PNG");
@@ -78,38 +74,30 @@ export default function ReservationPayPage() {
           if (status === "SUCCEEDED") {
             setPaid(true);
           } else if (status === "CANCELLED" || status === "EXPIRED" || status === "FAILED") {
-            setIsCancelled(true);              if (status === "EXPIRED") {
-              setSessionExpired(true);
-              // Make sure to cancel the reservation when session expires
-              if (reservationData.pickupCode) {
-                // Remove data from localStorage
-                localStorage.removeItem("paymentConfirmation");
-                localStorage.removeItem("reservationDetails");
+            setIsCancelled(true);
+            console.log(`Payment status changed to: ${status}`);
 
-                cancelReservation(reservationData.pickupCode)
-                  .then(() => {
-                    console.log("Reservation cancelled due to expired payment session");
-                  })
-                  .catch((error) => {
-                    console.error("Failed to cancel reservation on expiry:", error);
-                  });
-              }
-            } else if (status === "FAILED") {              // Set a payment failed state
-              console.log("Payment failed with status:", status);
-              // Cancel the reservation immediately on payment failure
-              if (reservationData.pickupCode) {
-                // Remove data from localStorage
-                localStorage.removeItem("paymentConfirmation");
-                localStorage.removeItem("reservationDetails");
-                
-                cancelReservation(reservationData.pickupCode)
-                  .then(() => {
-                    console.log("Reservation cancelled due to failed payment");
-                  })
-                  .catch((error) => {
-                    console.error("Failed to cancel reservation after payment failure:", error);
-                  });
-              }
+            // COMMENTED OUT - Reservation cancellation logic for expired/failed payments
+            /*
+            if (reservationData?.pickupCode) {
+              // Remove data from localStorage
+              localStorage.removeItem("paymentConfirmation");
+              localStorage.removeItem("reservationDetails");
+              // Prevent duplicate cancellations
+              localStorage.setItem(`cancelled_${reservationData.pickupCode}`, "in_progress");
+
+              cancelReservation(reservationData.pickupCode).then((result) => {
+                console.log("Reservation cancelled due to expired payment session:", result);
+              });
+            }
+            */
+            console.log("Payment failed/expired/cancelled, but reservation cancellation is temporarily disabled");
+
+            if (status === "EXPIRED") {
+              setSessionExpired(true);
+            } else if (status === "FAILED" || status === "CANCELLED") {
+              // Set a payment failed state
+              console.log(`Payment ${status.toLowerCase()} with status:`, status);
             }
           }
         } catch (error) {
@@ -133,7 +121,6 @@ export default function ReservationPayPage() {
       return () => clearInterval(interval);
     }
   }, [paymentId]);
-
   useEffect(() => {
     if (paid) {
       // Store more detailed payment confirmation
@@ -147,87 +134,134 @@ export default function ReservationPayPage() {
         })
       );
 
+      // Store a flag in localStorage to indicate payment success
+      // This will be checked in cleanup functions to prevent cancellation
+      if (reservationData?.pickupCode) {
+        localStorage.setItem(`payment_success_${reservationData.pickupCode}`, "true");
+        console.log("Payment success flag set in localStorage");
+      }
+
+      // Set navigating state immediately before timeout
+      setNavigatingToConfirmation(true);
+      console.log("Set navigatingToConfirmation to true");
+
       const t = setTimeout(() => {
+        console.log("Navigation timeout triggered, pushing to locker-open");
         // Pass the pickup code from the reservation data if available
         router.push(`/tablet/payment/locker-open`);
       }, 5000);
       return () => clearTimeout(t);
     }
-  }, [paid, id, router, reservationData]);
+  }, [paid, id, router, reservationData, amount]);
   useEffect(() => {
     if (isCancelled) {
+      // This effect handles explicit cancellation by the user or expired payments
+
+      // COMMENTED OUT - Reservation cancellation logic
+      /*
       // Cancel the reservation when payment is cancelled or failed
       if (reservationData?.pickupCode) {
-        // Remove payment confirmation from localStorage
+        // Clean up localStorage
         localStorage.removeItem("paymentConfirmation");
+        localStorage.removeItem("reservationDetails");
 
-        cancelReservation(reservationData.pickupCode)
-          .then(() => {
-            console.log("Reservation cancelled successfully");
-          })
-          .catch((error) => {
-            console.error("Failed to cancel reservation:", error);
+        // Check if already cancelled or in process of cancellation
+        const key = `cancelled_${reservationData.pickupCode}`;
+        const alreadyCancelled = localStorage.getItem(key);
+
+        if (alreadyCancelled !== "completed" && alreadyCancelled !== "in_progress") {
+          localStorage.setItem(key, "in_progress");
+          cancelReservation(reservationData.pickupCode).then((result) => {
+            if (result.success) {
+              console.log("Reservation cancelled successfully");
+            } else {
+              console.error("Failed to cancel reservation:", result?.error);
+            }
           });
+        } else {
+          console.log(`isCancelled effect: skipping cancelReservation - status is ${alreadyCancelled}`);
+        }
       }
+      */
 
+      console.log("Payment cancelled, but reservation cancellation is temporarily disabled");
+
+      // Still navigate back when cancelled
       const t = setTimeout(() => {
         router.back();
       }, 3000);
       return () => clearTimeout(t);
     }
   }, [isCancelled, router, reservationData]);
-  // This effect has been removed since its functionality is already handled in the useEffect below
-  // Navigation effect to handle browser navigation events and cleanup
   useEffect(() => {
-    // Define the cancelation function that will be called for any navigation event
-    const handleNavigation = () => {
-      if (!paid && reservationData?.pickupCode) {
-        console.log("Navigation detected, cancelling reservation");
+    // Early return if we don't have reservation data yet
+    if (!reservationData?.pickupCode) return;
 
-        // Check if we've already tried to cancel to prevent duplicate cancellations
-        const hasCancelledBefore = localStorage.getItem(`cancelled_${reservationData.pickupCode}`);
-
-        if (!hasCancelledBefore) {
-          // Mark this reservation as being cancelled
-          localStorage.setItem(`cancelled_${reservationData.pickupCode}`, "true");
-
-          // Remove payment confirmation from localStorage
-          localStorage.removeItem("paymentConfirmation");
-
-          cancelReservation(reservationData.pickupCode)
-            .then(() => {
-              console.log("Reservation cancelled due to navigation");
-            })
-            .catch((error) => {
-              console.error("Failed to cancel reservation on navigation:", error);
-              // Remove the marker if cancellation failed so we can try again
-              localStorage.removeItem(`cancelled_${reservationData.pickupCode}`);
-            });
-        }
+    const isConfirmationPage = (path: string) => typeof path === "string" && path.includes("/tablet/payment/locker-open"); // Define the cancelation function that will be called for any navigation event
+    const handleNavigation = (url?: string) => {
+      // Skip cancellation if already paid or navigating to confirmation page
+      if (paid || navigatingToConfirmation || !reservationData?.pickupCode) {
+        return;
       }
-    };
 
-    // Listen for popstate event (browser back/forward buttons)
-    window.addEventListener("popstate", handleNavigation);
+      // Check if destination is the confirmation page
+      if (url && isConfirmationPage(url)) {
+        console.log("Navigating to confirmation page, skipping cancellation");
+        setNavigatingToConfirmation(true);
+        return;
+      }
+
+      console.log("Navigation detected - cancellation temporarily disabled");
+
+      /* COMMENTED OUT - Cancel reservation logic
+      console.log("Navigation detected, cancelling reservation");
+
+      // Remove local storage items to clean up
+      localStorage.removeItem("paymentConfirmation");
+      localStorage.removeItem("reservationDetails");
+      // Set the localStorage state to prevent duplicate cancellations
+      const key = `cancelled_${reservationData.pickupCode}`;
+      const alreadyCancelled = localStorage.getItem(key);
+
+      if (alreadyCancelled !== "completed" && alreadyCancelled !== "in_progress") {
+        localStorage.setItem(key, "in_progress");
+        // Call the API to cancel the reservation
+        cancelReservation(reservationData.pickupCode).then((result) => {
+          if (result.success) {
+            console.log("Reservation cancelled due to navigation");
+          } else {
+            console.error("Cancellation result:", result);
+          }
+        });
+      } else {
+        console.log(`Skipping cancelReservation - status is ${alreadyCancelled}`);
+      }
+      */
+    };
 
     // Override history methods to catch programmatic navigation
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
-    history.pushState = function (...args) {
-      handleNavigation();
-      return originalPushState.apply(this, args);
+    history.pushState = function (data: any, unused: string, url?: string | URL) {
+      // Pass the URL to check if it's the confirmation page
+      const urlString = url?.toString();
+      handleNavigation(urlString);
+      return originalPushState.apply(this, [data, unused, url]);
     };
 
-    history.replaceState = function (...args) {
-      handleNavigation();
-      return originalReplaceState.apply(this, args);
+    history.replaceState = function (data: any, unused: string, url?: string | URL) {
+      // Pass the URL to check if it's the confirmation page
+      const urlString = url?.toString();
+      handleNavigation(urlString);
+      return originalReplaceState.apply(this, [data, unused, url]);
     };
 
     // Also handle browser refresh/close with beforeunload
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      handleNavigation();
-      if (!paid && reservationData?.pickupCode) {
+      // Only show the confirm dialog, but don't trigger cancellation here
+      // The actual cancellation will happen when the page unloads
+      if (!paid && !navigatingToConfirmation && reservationData?.pickupCode) {
         e.preventDefault();
         e.returnValue = "Je bent een betaling aan het maken. Weet je zeker dat je wilt annuleren?";
         return e.returnValue;
@@ -236,23 +270,97 @@ export default function ReservationPayPage() {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
 
+    // Handle browser back button
+    const handlePopState = () => {
+      if (!navigatingToConfirmation && !paid) {
+        handleNavigation();
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
     return () => {
       // Clean up by restoring original methods
-      window.removeEventListener("popstate", handleNavigation);
       history.pushState = originalPushState;
       history.replaceState = originalReplaceState;
       window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+      console.log("Component unmounting, cleanup function running");
 
-      // Also handle the React component unmounting case
-      handleNavigation();
+      // Check various flags to determine if we should cancel
+      const currentUrl = window.location.href;
+      const isConfirmationUrl = currentUrl.includes("/tablet/payment/locker-open");
+      const isNavigatingToConfirmation = navigatingToConfirmation;
+      const isPaidState = paid;
+
+      // Also check the localStorage flag we set earlier
+      const paymentSuccessFlag = reservationData?.pickupCode ? localStorage.getItem(`payment_success_${reservationData.pickupCode}`) : null;
+
+      console.log("Status check:", {
+        currentUrl,
+        isConfirmationUrl,
+        isNavigatingToConfirmation,
+        isPaidState,
+        paymentSuccessFlag,
+      });
+
+      // CANCELLATION LOGIC COMMENTED OUT
+      /* 
+      // Skip cancellation if ANY of these conditions are true
+      const shouldSkipCancellation = 
+        isConfirmationUrl || 
+        isNavigatingToConfirmation || 
+        isPaidState || 
+        paymentSuccessFlag === "true";
+      
+      if (shouldSkipCancellation) {
+        console.log("Skipping cancellation due to successful payment or navigation to confirmation");
+        return; // Exit early without cancelling
+      }
+      
+      // Only proceed with cancellation if we have a pickup code
+      if (!reservationData?.pickupCode) {
+        console.log("No pickup code available, skipping cancellation");
+        return;
+      }
+      
+      // Check if already cancelled or in process of cancellation
+      const key = `cancelled_${reservationData.pickupCode}`;
+      const alreadyCancelled = localStorage.getItem(key);
+
+      if (alreadyCancelled !== "completed" && alreadyCancelled !== "in_progress") {
+        console.log("Component unmounting, cancelling reservation");
+        localStorage.setItem(key, "in_progress");
+        cancelReservation(reservationData.pickupCode)
+          .then(result => {
+            console.log("Cancellation result:", result);
+            if (result.success) {
+              localStorage.setItem(key, "completed");
+            }
+          })
+          .catch(err => console.error("Error cancelling reservation:", err));
+      } else {
+        console.log(`Component unmounting: skipping cancelReservation - status is ${alreadyCancelled}`);
+      }
+      */
+      console.log("Cancellation on unmount temporarily disabled");
     };
-  }, [paid, reservationData]);
+  }, [paid, reservationData, navigatingToConfirmation]);
 
   const handleCancel = () => {
     setShowCancelConfirm(true);
   };
-
   const confirmCancel = () => {
+    // COMMENTED OUT - Explicit cancellation cleanup logic
+    /*
+    // When user explicitly cancels, make sure we clean up localStorage immediately
+    if (reservationData?.pickupCode) {
+      localStorage.removeItem("paymentConfirmation");
+      localStorage.removeItem("reservationDetails");
+
+      // Mark as canceled in localStorage to prevent duplicate cancellations
+      localStorage.setItem(`cancelled_${reservationData.pickupCode}`, "in_progress");
+    }
+    */
+    console.log("User explicitly cancelled, but reservation cancellation is temporarily disabled");
     setIsCancelled(true);
   };
 
