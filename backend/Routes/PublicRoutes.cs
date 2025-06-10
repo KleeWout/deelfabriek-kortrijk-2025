@@ -201,9 +201,7 @@ public static class PublicRoutes
             {
                 return Results.NotFound(new { error = ex.Message });
             }
-        });
-
-        group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
+        }); group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
         {
             try
             {
@@ -213,6 +211,20 @@ public static class PublicRoutes
             catch (Exception ex)
             {
                 return Results.BadRequest(new { error = ex.Message });
+            }
+        });
+
+        // Return endpoint - handles marking a reservation as returned
+        group.MapGet("/code/{pickupCode}/returned", async (int pickupCode, IReservationService service) =>
+        {
+            try
+            {
+                var reservation = await service.HandleReservationReturnByCode(pickupCode);
+                return Results.Ok(reservation);
+            }
+            catch (Exception ex)
+            {
+                return Results.NotFound(new { error = ex.Message });
             }
         });
 

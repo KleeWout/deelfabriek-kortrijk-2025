@@ -19,19 +19,19 @@ export default function LockerOpenPage() {
       try {
         setIsLoading(true);
 
-        // Get the payment details from localStorage
-        const storedPaymentDetails = localStorage.getItem("paymentDetails");
-        if (!storedPaymentDetails) {
-          setError("No payment details found. Please try again.");
+        // Get the reservation details from localStorage
+        const storedReservationDetails = localStorage.getItem("reservationDetails");
+        if (!storedReservationDetails) {
+          setError("No reservation details found. Please try again.");
           return;
         }
 
         // Parse the stored payment details
-        const paymentDetails = JSON.parse(storedPaymentDetails);
-        console.log("Retrieved payment details from localStorage:", paymentDetails);
+        const reservationDetails = JSON.parse(storedReservationDetails);
+        console.log("Retrieved reservation details from localStorage:", reservationDetails);
 
         // Use the pickupCode from localStorage data
-        const pickupCode = paymentDetails.pickupCode;
+        const pickupCode = reservationDetails.pickupCode;
         if (!pickupCode) {
           setError("Invalid payment details. Missing pickup code.");
           return;
@@ -43,7 +43,8 @@ export default function LockerOpenPage() {
         console.log("Payment confirmation data from API:", data);
 
         // After successful API call, remove the item from localStorage
-        localStorage.removeItem("paymentDetails");
+        localStorage.removeItem("reservationDetails");
+        localStorage.removeItem("paymentConfirmation");
       } catch (error) {
         console.error("Error fetching reservation data:", error);
         setError("Failed to load locker information. Please try again.");

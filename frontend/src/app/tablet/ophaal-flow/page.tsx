@@ -144,10 +144,10 @@ export default function OphaalFlowPage() {
           <button
             className="w-full py-4 mt-1 bg-[var(--color-primarygreen-1)] text-white text-xl rounded-lg font-bold shadow hover:bg-[#00664f] transition"
             onClick={() => {
-              // Store the reservation data in localStorage before navigating
-              if (reservationData) {
-                localStorage.setItem("paymentDetails", JSON.stringify(reservationData));
-              }
+              // // Store the reservation data in localStorage before navigating
+              // if (reservationData) {
+              //   localStorage.setItem("paymentDetails", JSON.stringify(reservationData));
+              // }
               router.push(`/tablet/payment`);
               // router.push(`/tablet/payment/${reservationData?.pickupCode || 0}`);
             }}

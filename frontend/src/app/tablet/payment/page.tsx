@@ -28,7 +28,7 @@ export default function ReservationPayPage() {
   // Get reservation data from localStorage when component mounts
   useEffect(() => {
     try {
-      const storedData = localStorage.getItem("paymentDetails");
+      const storedData = localStorage.getItem("reservationDetails");
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         setReservationData(parsedData);

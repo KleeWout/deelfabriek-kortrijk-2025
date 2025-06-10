@@ -43,7 +43,7 @@ export default function TabletCodePage() {
       if (reservationData.status === "Not_Active") {
         router.push("/tablet/ophaal-flow");
       }
-      else if (reservationData.status === "Completed") {
+      else if (reservationData.status === "Active") {
         router.push(`/tablet/return-flow`);
       }
       else{

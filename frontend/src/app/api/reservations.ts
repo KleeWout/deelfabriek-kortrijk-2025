@@ -86,3 +86,21 @@ export async function markReservationAsPaid(code: string): Promise<ReservationRe
     throw error;
   }
 }
+
+export async function markReservationAsReturned(code: string): Promise<ReservationResponse> {
+  try {
+    const response = await fetch(`${url}/reservations/code/${code}/returned`);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Reservation not found");
+      }
+      throw new Error(`Failed to mark reservation as returned: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error marking reservation as returned:", error);
+    throw error;
+  }
+}

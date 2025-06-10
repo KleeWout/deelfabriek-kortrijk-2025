@@ -16,13 +16,14 @@ public interface IReservationService
 
     public Task<ReservationViewDto> MarkAsPaidAndStarLoan(int pickupCode);
 
+    public Task<ReservationViewKioskDto> CompleteReservationReturnAsync(Reservation reservation);
+
+    public Task<ReservationViewKioskDto> HandleReservationReturnByCode(int pickupCode);
+
     public Task ExpireOverdueReservations();
 
     // delete reservation
     public Task DeleteReservation(int id);
-
-
-
 }
 
 public class ReservationService : IReservationService
@@ -191,36 +192,13 @@ public class ReservationService : IReservationService
 
         if (reservation.Status == ReservationStatus.Not_Active)
         {
-            await _resRepo.UpdateAsync(reservation);
-            // ones you paid via payconiq with qr code (still has to be done) ->  MarkAsPaidAndStarLoan(pickupcode)
+            // await _resRepo.UpdateAsync(reservation);
             return _mapper.Map<ReservationViewKioskDto>(reservation);
         }
-        else if (reservation.Status == ReservationStatus.Active)
-        {
-            // Use a transaction for consistency when completing a reservation
-            using (var transaction = await _customreservationRepository.BeginTransactionAsync())
-            {
-                try
-                {
-                    reservation.ActualReturnDate = DateTime.Now;
-                    reservation.Status = ReservationStatus.Completed;
-
-                    // Update item status back to beschikbaar
-                    reservation.Item.Status = ItemStatus.Beschikbaar;
-                    await _itemRepo.UpdateAsync(reservation.Item);
-                    await _resRepo.UpdateAsync(reservation);
-
-                    await transaction.CommitAsync();
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    throw new Exception($"Failed to complete reservation: {ex.Message}", ex);
-                }
-            }
-
-            return _mapper.Map<ReservationViewKioskDto>(reservation);
-        }
+        // else if (reservation.Status == ReservationStatus.Active)
+        // {
+        //     return await CompleteReservationReturnAsync(reservation);
+        // }
 
         if (reservation.Status == ReservationStatus.Expired)
         {
@@ -297,6 +275,47 @@ public class ReservationService : IReservationService
     {
         var random = new Random();
         return random.Next(100000, 999999); // Generates a random 6-digit number
+    }    // Handles the return of an item by reservation code
+    public async Task<ReservationViewKioskDto> HandleReservationReturnByCode(int pickupCode)
+    {
+        var reservation = await GetReservationByCode(pickupCode);
+
+        if (reservation == null) throw new Exception("Reservation not found");
+
+        if (reservation.Status != ReservationStatus.Active)
+        {
+            throw new Exception("Reservation is not active and cannot be returned");
+        }
+
+        return await CompleteReservationReturnAsync(reservation);
+    }
+
+    // Completes a reservation return process
+    public async Task<ReservationViewKioskDto> CompleteReservationReturnAsync(Reservation reservation)
+    {
+        // Use a transaction for consistency when completing a reservation
+        using (var transaction = await _customreservationRepository.BeginTransactionAsync())
+        {
+            try
+            {
+                reservation.ActualReturnDate = DateTime.Now;
+                reservation.Status = ReservationStatus.Completed;
+
+                // Update item status back to beschikbaar
+                reservation.Item.Status = ItemStatus.Beschikbaar;
+                await _itemRepo.UpdateAsync(reservation.Item);
+                await _resRepo.UpdateAsync(reservation);
+
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Failed to complete reservation: {ex.Message}", ex);
+            }
+        }
+
+        return _mapper.Map<ReservationViewKioskDto>(reservation);
     }
 
     private async Task<int> GenerateUnique6DigitCode()
