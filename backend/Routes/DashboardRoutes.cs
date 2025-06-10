@@ -367,13 +367,72 @@ public static class AdminRoutes
         }).DisableAntiforgery();
 
         //edit item
-        group.MapPut("/{id}", async (int id, Item item, IItemService itemService, ItemValidator validator) =>
+        group.MapPut("/{id}", async (HttpRequest request, int id, IItemService itemService, ItemValidator validator) =>
         {
-            // Set the ID to ensure we're updating the correct item
-            item.Id = id;
+            // Get the existing item from the database
+            var existingItem = await itemService.GetItemById(id);
+            if (existingItem == null)
+                return Results.NotFound("Item not found.");
 
-            // Validate the item
-            var validationResult = await validator.ValidateAsync(item);
+            // Read the form data
+            var form = await request.ReadFormAsync();
+
+            // Update item properties from form
+            existingItem.Title = form["title"];
+            existingItem.Description = form["description"];
+            existingItem.PricePerWeek = decimal.TryParse(form["pricePerWeek"], out var price) ? price : null;
+            existingItem.HowToUse = form["howToUse"];
+            existingItem.Accesories = form["accesories"];
+            existingItem.Weight = decimal.TryParse(form["weight"], out var weight) ? weight : null;
+            existingItem.Dimensions = form["dimensions"];
+            existingItem.Tip = form["tip"];
+            existingItem.Status = Enum.TryParse<ItemStatus>(form["status"], out var status) ? status : ItemStatus.Beschikbaar;
+            existingItem.LockerId = int.TryParse(form["lockerId"], out var lockerId) ? lockerId : null;
+
+            // Handle image replacement
+            if (form.Files.Count > 0)
+            {
+                var file = form.Files[0];
+                if (file.Length == 0)
+                {
+                    return Results.BadRequest("File is empty.");
+                }
+                else
+                {
+                    Console.WriteLine($"Received file: {file.FileName}, Size: {file.Length} bytes");
+                }
+                // Validate file type
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
+                }
+
+                // Delete old image if it exists
+                if (!string.IsNullOrEmpty(existingItem.ImageSrc))
+                {
+                    var oldImagePath = Path.GetFullPath("./uploads/" + existingItem.ImageSrc);
+                    if (File.Exists(oldImagePath))
+                    {
+                        File.Delete(oldImagePath);
+                    }
+                }
+
+                // Save new image
+                var uploadsPath = Path.GetFullPath("./uploads/");
+                Directory.CreateDirectory(uploadsPath);
+                var fileName = file.FileName;
+                var filePath = Path.Combine(uploadsPath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                existingItem.ImageSrc = fileName;
+            }
+
+            // Validate the updated item
+            var validationResult = await validator.ValidateAsync(existingItem);
             if (!validationResult.IsValid)
             {
                 var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -382,10 +441,7 @@ public static class AdminRoutes
 
             try
             {
-                // Our modified repository method now handles retrieving the existing item
-                await itemService.UpdateItem(item);
-
-                // Get the updated item to return
+                await itemService.UpdateItem(existingItem);
                 var updatedItem = await itemService.GetItemById(id);
                 return Results.Ok(updatedItem);
             }
@@ -397,7 +453,7 @@ public static class AdminRoutes
             {
                 return Results.Problem($"An error occurred while updating the item: {ex.Message}");
             }
-        });
+        }).DisableAntiforgery();
 
         // delete item
         group.MapDelete("/{id}", async (int id, IItemService itemService) =>

@@ -7,21 +7,19 @@ export type OpeningHoursData = {
   open: boolean;
 };
 
-
-const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+const url = "http://localhost:3001";
 
 export const fetchOpeningsHours = async () => {
-        try {
-          const response = await fetch(`${url}/openingshours`);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch openingshours: ${response.status}`);
-          }
-          const data: OpeningHoursData[] = await response.json();
-          return data;
-        } catch (err) {
-            console.error("Failed to fetch opening hours:", err);
-          
-        }
-      };
+  try {
+    const response = await fetch(`${url}/openingshours`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch openingshours: ${response.status}`);
+    }
+    const data: OpeningHoursData[] = await response.json();
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch opening hours:", err);
+  }
+};
 
-      fetchOpeningsHours();
+fetchOpeningsHours();
