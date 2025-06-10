@@ -137,7 +137,7 @@ export default function ReservationPayPage() {
       // Store a flag in localStorage to indicate payment success
       // This will be checked in cleanup functions to prevent cancellation
       if (reservationData?.pickupCode) {
-        localStorage.setItem(`payment_success_${reservationData.pickupCode}`, "true");
+        localStorage.setItem(`payment_success`, "true");
         console.log("Payment success flag set in localStorage");
       }
 
@@ -162,7 +162,7 @@ export default function ReservationPayPage() {
         localStorage.removeItem("reservationDetails");
 
         // Check if already cancelled or in process of cancellation
-        const key = `cancelled_${reservationData.pickupCode}`;
+        const key = `cancelled`;
         const alreadyCancelled = localStorage.getItem(key);
 
         if (alreadyCancelled !== "completed" && alreadyCancelled !== "in_progress") {
@@ -288,7 +288,7 @@ export default function ReservationPayPage() {
       const isPaidState = paid;
 
       // Also check the localStorage flag we set earlier
-      const paymentSuccessFlag = reservationData?.pickupCode ? localStorage.getItem(`payment_success_${reservationData.pickupCode}`) : null;
+      const paymentSuccessFlag = reservationData?.pickupCode ? localStorage.getItem(`payment_success`) : null;
 
       console.log("Status check:", {
         currentUrl,
