@@ -58,6 +58,27 @@ app.UseCors("AllowAll");
 
 app.MapGet("/", () => "Welcome to the deelfabriek API!");
 
+app.MapGet("/photo", (IHostEnvironment env, string? src) =>
+{
+    if (string.IsNullOrWhiteSpace(src))
+        return Results.BadRequest("Missing 'src' query parameter.");
+
+    // Only allow file names, not paths
+    var fileName = Path.GetFileName(src);
+    var filePath = Path.Combine(env.ContentRootPath, "Uploads", fileName);
+
+    if (!System.IO.File.Exists(filePath))
+        return Results.NotFound("File not found.");
+
+    var contentType = "application/octet-stream";
+    if (fileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+        contentType = "image/png";
+    else if (fileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+        contentType = "image/jpeg";
+
+    return Results.File(filePath, contentType);
+});
+
 app.MapGroup("/items").GroupPublicItems();
 app.MapGroup("/users").GroupPublicUsers();
 app.MapGroup("/categories").GroupPublicCategories();
@@ -70,5 +91,7 @@ adminApi.MapGroup("/lockers").GroupAdminLockers();
 adminApi.MapGroup("/categories").GroupAdminCategories();
 adminApi.MapGroup("/users").GroupAdminUsers();
 adminApi.MapGroup("/reservations").GroupAdminReservations();
+
+
 
 app.Run();

@@ -82,7 +82,7 @@ public static class AdminRoutes
                 return Results.BadRequest(ex.Message);
             }
         });
-    
+
         // delete locker
         group.MapDelete("/{id}", async (int id, ILockerService lockerService, IItemService itemService) =>
         {
@@ -103,11 +103,11 @@ public static class AdminRoutes
                     await itemService.UpdateItem(item);
                 }
             }
-            
+
             return Results.NoContent();
         });
 
- 
+
         return group;
     }
 
@@ -202,50 +202,50 @@ public static class AdminRoutes
             await userService.DeleteUser(id);
             return Results.NoContent();
         });
-          group.MapPut("/{id}", async (int id, User user, IUserService userService, UserValidator userValidator) =>
-        {
-            // Validate the incoming user data
-            var validationResult = await userValidator.ValidateAsync(user);
-            if (!validationResult.IsValid)
-            {
-                // Extract only the validation error messages
-                var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return Results.BadRequest(warnings); // Return only the warnings
-            }
+        group.MapPut("/{id}", async (int id, User user, IUserService userService, UserValidator userValidator) =>
+      {
+          // Validate the incoming user data
+          var validationResult = await userValidator.ValidateAsync(user);
+          if (!validationResult.IsValid)
+          {
+              // Extract only the validation error messages
+              var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+              return Results.BadRequest(warnings); // Return only the warnings
+          }
 
-            // Get the existing user (this will be tracked by EF)
-            var existingUser = await userService.GetUserById(id);
-            if (existingUser == null)
-            {
-                return Results.NotFound($"User with ID {id} not found.");
-            }
+          // Get the existing user (this will be tracked by EF)
+          var existingUser = await userService.GetUserById(id);
+          if (existingUser == null)
+          {
+              return Results.NotFound($"User with ID {id} not found.");
+          }
 
-            // Check if email already exists for another user (if email is being changed)
-            if (existingUser.Email != user.Email && await userService.EmailExists(user.Email))
-            {
-                return Results.Conflict("A user with this email already exists.");
-            }
+          // Check if email already exists for another user (if email is being changed)
+          if (existingUser.Email != user.Email && await userService.EmailExists(user.Email))
+          {
+              return Results.Conflict("A user with this email already exists.");
+          }
 
-            // Update the properties of the existing tracked entity
-            existingUser.FirstName = user.FirstName;
-            existingUser.LastName = user.LastName;
-            existingUser.PhoneNumber = user.PhoneNumber;
-            existingUser.Email = user.Email;
-            existingUser.Street = user.Street;
-            existingUser.City = user.City;
-            existingUser.Bus = user.Bus;
-            existingUser.PostalCode = user.PostalCode;
+          // Update the properties of the existing tracked entity
+          existingUser.FirstName = user.FirstName;
+          existingUser.LastName = user.LastName;
+          existingUser.PhoneNumber = user.PhoneNumber;
+          existingUser.Email = user.Email;
+          existingUser.Street = user.Street;
+          existingUser.City = user.City;
+          existingUser.Bus = user.Bus;
+          existingUser.PostalCode = user.PostalCode;
 
-            try
-            {
-                await userService.UpdateUser(existingUser);
-                return Results.Ok(existingUser);
-            }
-            catch (Exception ex)
-            {
-                return Results.Problem($"An error occurred while updating the user: {ex.Message}");
-            }
-        });
+          try
+          {
+              await userService.UpdateUser(existingUser);
+              return Results.Ok(existingUser);
+          }
+          catch (Exception ex)
+          {
+              return Results.Problem($"An error occurred while updating the user: {ex.Message}");
+          }
+      });
 
         return group;
     }
@@ -263,7 +263,15 @@ public static class AdminRoutes
             }
             return Results.Ok(items);
         });
-
+        group.MapGet("/with-image", async (IItemService itemService) =>
+        {
+            var items = await itemService.GetAllItemsAdmin();
+            if (items == null || !items.Any())
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(items);
+        });
         // post items
         group.MapPost("/", async (Item item, IItemService itemService, ItemValidator validator) =>
        {
@@ -297,7 +305,7 @@ public static class AdminRoutes
              return Results.Ok(content);
 
          }).DisableAntiforgery();
-         
+
         // post item with image - works via postman 
         group.MapPost("/with-image", async (
               HttpRequest request,
@@ -425,7 +433,7 @@ public static class AdminRoutes
 
         return group;
     }
-    
+
     public static RouteGroupBuilder GroupAdminReservations(this RouteGroupBuilder group)
     {
         // get all reservations

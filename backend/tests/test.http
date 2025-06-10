@@ -85,3 +85,11 @@ Content-Type: application/json
 ###
 // nog output maken 
 GET {{url}}/reservations/3
+
+###
+
+GET {{url}}/photo
+
+###
+
+
