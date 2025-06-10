@@ -24,18 +24,22 @@ export default function ReservationPayPage() {
   const [isCancelled, setIsCancelled] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [navigatingToConfirmation, setNavigatingToConfirmation] = useState(false);
-
+  const [excistingReservation, setExcistingReservation] = useState(false);
   // Get reservation data from localStorage when component mounts
   useEffect(() => {
     try {
       const storedData = localStorage.getItem("reservationDetails");
       if (storedData) {
         const parsedData = JSON.parse(storedData);
+        if (parsedData.existingReservation === "true") {
+          setExcistingReservation(true);
+        }
+
         setReservationData(parsedData);
 
         // payconiq amount
-        if (parsedData.price) {
-          setAmount(parsedData.price);
+        if (parsedData.totalPrice) {
+          setAmount(parsedData.totalPrice);
         }
       } else {
         console.error("No payment details found in localStorage");
@@ -137,7 +141,7 @@ export default function ReservationPayPage() {
       // Store a flag in localStorage to indicate payment success
       // This will be checked in cleanup functions to prevent cancellation
       if (reservationData?.pickupCode) {
-        localStorage.setItem(`payment_success`, "true");
+        localStorage.setItem(`payment_success_${reservationData.pickupCode}`, "true");
         console.log("Payment success flag set in localStorage");
       }
 
@@ -156,29 +160,30 @@ export default function ReservationPayPage() {
   useEffect(() => {
     if (isCancelled) {
       // Cancel the reservation when payment is cancelled or failed
-      if (reservationData?.pickupCode) {
-        // Clean up localStorage
-        localStorage.removeItem("paymentConfirmation");
-        localStorage.removeItem("reservationDetails");
+      if (!excistingReservation) {
+        if (reservationData?.pickupCode) {
+          // Clean up localStorage
+          localStorage.removeItem("paymentConfirmation");
+          localStorage.removeItem("reservationDetails");
 
-        // Check if already cancelled or in process of cancellation
-        const key = `cancelled`;
-        const alreadyCancelled = localStorage.getItem(key);
+          // Check if already cancelled or in process of cancellation
+          const key = `cancelled_${reservationData.pickupCode}`;
+          const alreadyCancelled = localStorage.getItem(key);
 
-        if (alreadyCancelled !== "completed" && alreadyCancelled !== "in_progress") {
-          localStorage.setItem(key, "in_progress");
-          cancelReservation(reservationData.pickupCode).then((result) => {
-            if (result.success) {
-              console.log("Reservation cancelled successfully");
-            } else {
-              console.error("Failed to cancel reservation:", result?.error);
-            }
-          });
-        } else {
-          console.log(`isCancelled effect: skipping cancelReservation - status is ${alreadyCancelled}`);
+          if (alreadyCancelled !== "completed" && alreadyCancelled !== "in_progress") {
+            localStorage.setItem(key, "in_progress");
+            cancelReservation(reservationData.pickupCode).then((result) => {
+              if (result.success) {
+                console.log("Reservation cancelled successfully");
+              } else {
+                console.error("Failed to cancel reservation:", result?.error);
+              }
+            });
+          } else {
+            console.log(`isCancelled effect: skipping cancelReservation - status is ${alreadyCancelled}`);
+          }
         }
       }
-      
 
       console.log("Payment cancelled, but reservation cancellation is temporarily disabled");
 
@@ -288,7 +293,7 @@ export default function ReservationPayPage() {
       const isPaidState = paid;
 
       // Also check the localStorage flag we set earlier
-      const paymentSuccessFlag = reservationData?.pickupCode ? localStorage.getItem(`payment_success`) : null;
+      const paymentSuccessFlag = reservationData?.pickupCode ? localStorage.getItem(`payment_success_${reservationData.pickupCode}`) : null;
 
       console.log("Status check:", {
         currentUrl,

@@ -192,7 +192,7 @@ public class ReservationService : IReservationService
             PickupCode = reservation.PickupCode,
             ItemName = reservation.Item.Title,
             PersonName = $"{reservation.User.FirstName} {reservation.User.LastName}",
-            Price = reservation.TotalPrice,
+            TotalPrice = reservation.TotalPrice,
             PickupDeadline = reservation.PickupDeadline
         };
 

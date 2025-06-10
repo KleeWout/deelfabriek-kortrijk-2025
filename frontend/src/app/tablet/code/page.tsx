@@ -32,21 +32,26 @@ export default function TabletCodePage() {
       setTimeout(() => setShowToast(false), 2000);
       return;
     }
-
     try {
       // Use the API function from our centralized API folder
       const reservationData = await getReservationByCode(code);
       console.log("Reservation data:", reservationData);
 
-      // Store data in localStorage for the next page
-      localStorage.setItem("reservationDetails", JSON.stringify(reservationData));
-      if (reservationData.status === "Not_Active") {
+      // Add your custom property here
+      const enhancedReservationData = {
+        ...reservationData,
+        existingReservation: "true",
+      };
+
+      console.log("Enhanced reservation data:", enhancedReservationData);
+
+      // Store enhanced data in localStorage for the next page
+      localStorage.setItem("reservationDetails", JSON.stringify(enhancedReservationData));
+      if (enhancedReservationData.status === "Not_Active") {
         router.push("/tablet/ophaal-flow");
-      }
-      else if (reservationData.status === "Active") {
+      } else if (enhancedReservationData.status === "Active") {
         router.push(`/tablet/return-flow`);
-      }
-      else{
+      } else {
         setError("Ongeldige code");
         setShowToast(true);
         setTimeout(() => setShowToast(false), 2000);
@@ -54,7 +59,6 @@ export default function TabletCodePage() {
       }
     } catch (error) {
       console.error("Error fetching reservation data:", error);
-      
 
       // Handle specific error for invalid codes
       if (error instanceof Error && error.message === "Reservation not found") {

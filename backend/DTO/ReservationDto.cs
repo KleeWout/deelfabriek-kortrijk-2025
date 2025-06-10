@@ -48,6 +48,6 @@ public class ReservationCreatedDto
     public string PersonName { get; set; }
     public string ItemName { get; set; }
     public DateTime PickupDeadline { get; set; }
-    public decimal? Price { get; set; }
+    public decimal? TotalPrice { get; set; }
 }
 //
