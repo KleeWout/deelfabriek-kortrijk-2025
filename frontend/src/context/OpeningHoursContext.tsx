@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { OpeningHoursData, fetchOpeningsHours } from "../app/api/getOpeningshours";
 
-
 type OpeningHoursContextType = {
   openingHours: OpeningHoursData[] | null;
   loading: boolean;
@@ -24,24 +23,44 @@ export const OpeningsHoursProvider = ({ children }: { children: React.ReactNode 
   const [error, setError] = useState<string | null>(null);
   const [fetched, setFetched] = useState(false);
 
+  // Session storage key for caching opening hours
+  const SESSION_STORAGE_KEY = "deelfabriek_opening_hours";
+
   useEffect(() => {
-    if (!fetched) {
-      const getOpeningHours = async () => {
-        try {
-          const data = await fetchOpeningsHours();
-          if (data) {
-            setOpeningHours(data);
-          } else {
-            throw new Error("No data returned");
-          }
+    const getOpeningHours = async () => {
+      try {
+        // First, try to get data from sessionStorage
+        const cachedData = sessionStorage.getItem(SESSION_STORAGE_KEY);
+
+        if (cachedData) {
+          console.log("Using cached opening hours from session storage");
+          setOpeningHours(JSON.parse(cachedData));
           setLoading(false);
           setFetched(true);
-        } catch (err) {
-          setError(err instanceof Error ? err.message : "Unknown error occurred");
-          setLoading(false);
+          return;
         }
-      };
 
+        // If no cached data, make the API call
+        console.log("Fetching opening hours from API");
+        const data = await fetchOpeningsHours();
+
+        if (data) {
+          // Store in session storage for future use
+          sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data));
+          setOpeningHours(data);
+        } else {
+          throw new Error("No data returned");
+        }
+
+        setLoading(false);
+        setFetched(true);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error occurred");
+        setLoading(false);
+      }
+    };
+
+    if (!fetched) {
       getOpeningHours();
     }
   }, [fetched]);

@@ -155,10 +155,6 @@ export default function ReservationPayPage() {
   }, [paid, id, router, reservationData, amount]);
   useEffect(() => {
     if (isCancelled) {
-      // This effect handles explicit cancellation by the user or expired payments
-
-      // COMMENTED OUT - Reservation cancellation logic
-      /*
       // Cancel the reservation when payment is cancelled or failed
       if (reservationData?.pickupCode) {
         // Clean up localStorage
@@ -182,7 +178,7 @@ export default function ReservationPayPage() {
           console.log(`isCancelled effect: skipping cancelReservation - status is ${alreadyCancelled}`);
         }
       }
-      */
+      
 
       console.log("Payment cancelled, but reservation cancellation is temporarily disabled");
 
