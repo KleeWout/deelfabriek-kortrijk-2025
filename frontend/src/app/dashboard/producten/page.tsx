@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ItemProps from "@/models/ItemProps";
 import { PencilSimpleLine, Trash } from "phosphor-react";
 import { ItemCard } from "@/components/common/ItemCard";
+import { CategorySelector } from "@/components/common/CategorySelector";
 import { createItem, deleteItem, getItemsDashboard, updateItem } from "@/app/api/items";
 
 // interface Item {
@@ -329,9 +330,10 @@ export default function ItemsPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
+                {" "}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Categorie</label>
-                  <input type="text" value={formData.category} onChange={(e) => handleInputChange("category", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="Spelletjes" />
+                  <CategorySelector value={formData.category} onChange={(category) => handleInputChange("category", category)} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Prijs</label>

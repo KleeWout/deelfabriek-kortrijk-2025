@@ -19,7 +19,7 @@ public interface IItemService
     Task<IEnumerable<CategoryDto>> GetAllCategories();
     // Task<Category> GetCategoryById(int id);
     Task AddCategory(Category category);
-    Task DeleteCategory(int id);
+    Task DeleteCategory(string category);
 
     Task<List<ItemsPageDto>> GetItemsWithLocker();
 
@@ -35,6 +35,7 @@ public class ItemService : IItemService
     private readonly ILockerRepository _lockerRepository;
 
     private readonly IItemRepository _customItemRepository;
+    
     private readonly IMapper _mapper;
 
     public ItemService(
@@ -144,9 +145,9 @@ public class ItemService : IItemService
         await _categoryRepository.AddAsync(category);
     }
 
-    public async Task DeleteCategory(int id)
+    public async Task DeleteCategory(string category)
     {
-        await _categoryRepository.DeleteAsync(id);
+        await _customItemRepository.DeleteCategory(category);
     }
 
 

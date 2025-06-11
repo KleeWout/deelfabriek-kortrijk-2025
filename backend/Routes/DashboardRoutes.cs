@@ -145,24 +145,19 @@ public static class AdminRoutes
         });
 
         // delete category
-        // group.MapDelete("/{id}", async (int id, IItemService itemService) =>
-        // {
-        //     var existingCategory = await itemService.GetCategoryById(id);
-        //     if (existingCategory == null)
-        //     {
-        //         return Results.NotFound();
-        //     }
+        group.MapDelete("/{category}", async (string category, IItemService itemService) =>
+        {
 
-        //     try
-        //     {
-        //         await itemService.DeleteCategory(id);
-        //         return Results.NoContent();
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return Results.Problem($"An error occurred while deleting the category: {ex.Message}");
-        //     }
-        // });
+            try
+            {
+                await itemService.DeleteCategory(category);
+                return Results.Ok();
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred while deleting the category: {ex.Message}");
+            }
+        });
 
         return group;
     }

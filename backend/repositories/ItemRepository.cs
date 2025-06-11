@@ -14,6 +14,8 @@ public interface IItemRepository
 
     Task<List<Item>> GetItemsWithLocker();
 
+    Task DeleteCategory(string category);
+
     // Task<List<Item>> GetItemsByCategoryAsync(int categoryId);
     // Task UpdateItemWithCategories(Item item);
     // Task<Item> GetItemByIdWithCategories(int id);
@@ -164,5 +166,16 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
         return await _context.Items
             .Where(i => i.LockerId != null)
         .ToListAsync();
+    }
+    public async Task DeleteCategory(string category)
+    {
+        var categoryToDelete = await _context.Categories
+            .FirstOrDefaultAsync(c => c.Name == category);
+
+        if (categoryToDelete != null)
+        {
+            _context.Categories.Remove(categoryToDelete);
+            await _context.SaveChangesAsync();
+        }
     }
 }
