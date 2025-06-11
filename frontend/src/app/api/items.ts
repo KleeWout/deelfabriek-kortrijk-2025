@@ -31,8 +31,8 @@ export interface ItemResponse {
 
 // Using relative URL for client-side requests
 // This ensures requests are made to the same origin as the frontend
-const url = "http://localhost:3001";
-// const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+// const url = "http://localhost:3001";
+const url = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export const getItems = async (): Promise<ItemProps[]> => {
   try {
