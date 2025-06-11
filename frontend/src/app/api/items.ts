@@ -23,20 +23,11 @@ export interface ItemResponse {
   category: string;
 }
 
-// Local development URL
-//public URL
-// const url = "https://api-deelfabriek.woutjuuh02.be";
-//docker URL
-// const url = 'http://backend:3001'
-
-// Using relative URL for client-side requests
-// This ensures requests are made to the same origin as the frontend
-const url = "http://localhost:3001";
-// const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+import { getApiUrl } from "./config";
 
 export const getItems = async (): Promise<ItemProps[]> => {
   try {
-    const response = await fetch(`${url}/items/lockers`);
+    const response = await fetch(getApiUrl("items/lockers"));
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -52,7 +43,7 @@ export const getItems = async (): Promise<ItemProps[]> => {
 
 export const getItemById = async (id: number): Promise<ItemResponse> => {
   try {
-    const response = await fetch(`${url}/items/${id}`);
+    const response = await fetch(getApiUrl(`items/${id}`));
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
@@ -85,7 +76,7 @@ export const getItemById = async (id: number): Promise<ItemResponse> => {
 
 export const getItemsDashboard = async (): Promise<ItemProps[]> => {
   try {
-    const response = await fetch(`${url}/dashboard/items`);
+    const response = await fetch(getApiUrl("dashboard/items"));
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -113,8 +104,7 @@ export async function createItem(item: any): Promise<any> {
       }
     }
   });
-
-  const response = await fetch(`${url}/dashboard/items/with-image`, {
+  const response = await fetch(getApiUrl("dashboard/items/with-image"), {
     method: "POST",
     body: formData,
   });
@@ -140,8 +130,7 @@ export async function updateItem(id: number, itemData: any) {
   form.append("status", itemData.status ?? "Beschikbaar");
   if (itemData.lockerId) form.append("lockerId", itemData.lockerId);
   if (itemData.file) form.append("file", itemData.file);
-
-  const res = await fetch(`${url}/dashboard/items/${id}`, {
+  const res = await fetch(getApiUrl(`dashboard/items/${id}`), {
     method: "PUT",
     body: form,
     // Do NOT set Content-Type header! The browser will set it for FormData.
@@ -152,7 +141,7 @@ export async function updateItem(id: number, itemData: any) {
 
 // Delete an item
 export async function deleteItem(id: number): Promise<void> {
-  const response = await fetch(`${url}/dashboard/items/${id}`, {
+  const response = await fetch(getApiUrl(`dashboard/items/${id}`), {
     method: "DELETE",
   });
 

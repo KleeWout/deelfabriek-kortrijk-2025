@@ -1,14 +1,10 @@
 import { ReservationData } from "../../models/ReservationData";
 
-// const url = "https://api-deelfabriek.woutjuuh02.be";
-//docker URL
-// const url = 'http://backend:3001'
-const url = "http://localhost:3001";
-// const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+import { getApiUrl } from "./config";
 
 export async function createReservation(data: ReservationData): Promise<any> {
   try {
-    const response = await fetch(`${url}/reservations`, {
+    const response = await fetch(getApiUrl("reservations"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +25,7 @@ export async function createReservation(data: ReservationData): Promise<any> {
 
 export async function getReservationByCode(code: string): Promise<any> {
   try {
-    const response = await fetch(`${url}/reservations/code/${code}`);
+    const response = await fetch(getApiUrl(`reservations/code/${code}`));
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -65,7 +61,7 @@ export interface ReservationResponse {
 
 export async function markReservationAsPaid(code: string): Promise<ReservationResponse> {
   try {
-    const response = await fetch(`${url}/reservations/code/${code}/ispayed`, {
+    const response = await fetch(getApiUrl(`reservations/code/${code}/ispayed`), {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -88,7 +84,7 @@ export async function markReservationAsPaid(code: string): Promise<ReservationRe
 
 export async function markReservationAsReturned(code: string): Promise<ReservationResponse> {
   try {
-    const response = await fetch(`${url}/reservations/code/${code}/returned`);
+    const response = await fetch(getApiUrl(`reservations/code/${code}/returned`));
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -106,7 +102,7 @@ export async function markReservationAsReturned(code: string): Promise<Reservati
 
 export async function cancelReservation(reservationId: string): Promise<any> {
   try {
-     console.log(`Attempting to cancel reservation with ID: ${reservationId}`);
+    console.log(`Attempting to cancel reservation with ID: ${reservationId}`);
     // Check if the reservation was already cancelled to prevent duplicate requests
     const key = `cancelled_${reservationId}`;
     const alreadyCancelled = localStorage.getItem(key);
@@ -117,8 +113,7 @@ export async function cancelReservation(reservationId: string): Promise<any> {
     }
 
     localStorage.setItem(key, "in_progress");
-
-    const response = await fetch(`${url}/reservations/code/${reservationId}`, {
+    const response = await fetch(getApiUrl(`reservations/code/${reservationId}`), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

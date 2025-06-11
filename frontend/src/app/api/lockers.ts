@@ -1,6 +1,7 @@
 import LockerProps from "@/models/LockerProps";
+import { getApiUrl } from "./config";
 
-const API_URL = "http://localhost:3001/dashboard/lockers";
+const API_URL = getApiUrl("dashboard/lockers");
 
 // Get all lockers for dashboard
 export async function getLockersDashboard(): Promise<LockerProps[]> {

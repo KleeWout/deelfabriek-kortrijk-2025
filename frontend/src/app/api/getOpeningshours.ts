@@ -6,12 +6,11 @@ export type OpeningHoursData = {
   closeTimeAfternoon: string | null;
   open: boolean;
 };
-const url = "https://api-deelfabriek.woutjuuh02.be";
-// const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+import { getApiUrl } from "./config";
 
 export const fetchOpeningsHours = async () => {
   try {
-    const response = await fetch(`${url}/openingshours`);
+    const response = await fetch(getApiUrl("openingshours"));
     if (!response.ok) {
       throw new Error(`Failed to fetch openingshours: ${response.status}`);
     }
