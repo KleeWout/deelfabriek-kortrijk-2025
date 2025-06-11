@@ -1,3 +1,4 @@
+import CreateItemProps from "@/models/CreateItemProps";
 import ItemProps from "./../../models/ItemProps";
 
 export interface ItemResponse {
@@ -99,13 +100,23 @@ export const getItemsDashboard = async (): Promise<ItemProps[]> => {
 };
 
 // Create a new item
-export async function createItem(item: Omit<ItemProps, "id">): Promise<ItemProps> {
-  const response = await fetch(`${url}/dashboard/items`, {
+export async function createItem(item: any): Promise<any> {
+  const formData = new FormData();
+  // Append all fields
+  Object.entries(item).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      // For file, append as is
+      if (key === "file" && value instanceof File) {
+        formData.append("file", value);
+      } else {
+        formData.append(key, value as string);
+      }
+    }
+  });
+
+  const response = await fetch(`${url}/dashboard/items/with-image`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(item),
+    body: formData,
   });
 
   if (!response.ok) {
@@ -116,20 +127,27 @@ export async function createItem(item: Omit<ItemProps, "id">): Promise<ItemProps
 }
 
 // Update an existing item
-export async function updateItem(id: number, item: Partial<ItemProps>): Promise<ItemProps> {
-  const response = await fetch(`${url}/dashboard/items/${id}`, {
+export async function updateItem(id: number, itemData: any) {
+  const form = new FormData();
+  form.append("title", itemData.title);
+  form.append("description", itemData.description);
+  form.append("pricePerWeek", itemData.pricePerWeek);
+  form.append("howToUse", itemData.howToUse);
+  form.append("accesories", itemData.accessories);
+  form.append("weight", itemData.weight);
+  form.append("dimensions", itemData.dimensions);
+  form.append("tip", itemData.tip);
+  form.append("status", itemData.status ?? "Beschikbaar");
+  if (itemData.lockerId) form.append("lockerId", itemData.lockerId);
+  if (itemData.file) form.append("file", itemData.file);
+
+  const res = await fetch(`${url}/dashboard/items/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(item),
+    body: form,
+    // Do NOT set Content-Type header! The browser will set it for FormData.
   });
-
-  if (!response.ok) {
-    throw new Error(`Failed to update item: ${response.status}`);
-  }
-
-  return await response.json();
+  if (!res.ok) throw new Error("Failed to update item");
+  return await res.json();
 }
 
 // Delete an item

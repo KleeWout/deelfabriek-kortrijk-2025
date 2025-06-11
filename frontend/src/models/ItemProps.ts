@@ -6,7 +6,7 @@ export default interface ItemProps {
   status: string;
   description?: string;
   howToUse?: string;
-  accessories?: string[];
+  accessories?: string;
   dimensions?: string;
   weight?: number;
   tip?: string;
