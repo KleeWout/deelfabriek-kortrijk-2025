@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import TabletHeader from "@/components/tabletHeader";
 import { OpeningsHoursProvider } from "@/context/OpeningHoursContext";
+import LocalStorageCleanup from "@/components/global/LocalStorageCleanup";
 
 const exo2 = Exo_2({
   variable: "--font-exo2",
@@ -18,7 +19,6 @@ const openSans = Open_Sans({
 export const metadata: Metadata = {
   title: "Deelkast - Deelfabriek",
   description: "Deelkast van de Deelfabriek is een interactieve kast waaruit je spullen kunt lenen.",
-  
 };
 
 export default function RootLayout({
@@ -29,7 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${exo2.variable} ${openSans.variable} antialiased bg-primarybackground`}>
-        <OpeningsHoursProvider>{children}</OpeningsHoursProvider>
+        <OpeningsHoursProvider>
+          <LocalStorageCleanup />
+          {children}
+        </OpeningsHoursProvider>
         <Toaster position="top-center" />
       </body>
     </html>

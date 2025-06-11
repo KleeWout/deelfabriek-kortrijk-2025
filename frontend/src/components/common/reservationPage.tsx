@@ -7,6 +7,8 @@ import Navigation from "@/components/mobile/nav";
 import { addWeeks, format } from "date-fns";
 import { Fragment } from "react";
 import { createReservation } from "@/app/api/reservations";
+import { getItemById } from "@/app/api/items";
+import { clearReservationData } from "@/utils/storage";
 
 export default function ReservationPage() {
   const params = useParams();
@@ -48,27 +50,77 @@ export default function ReservationPage() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(addWeeks(new Date(), 1));
   const [item, setItem] = useState<any>(null);
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  // Get item details
+  const [showConfirm, setShowConfirm] = useState(false); // Get item details
   useEffect(() => {
-    // Log item details only once when component mounts
-    const loadedItem = JSON.parse(localStorage.getItem("item") || "{}");
-    console.log("Item from localStorage:", loadedItem);
-    setItem(loadedItem);
-  }, []);
+    // Clear any existing reservation data except for the item data
+    // This ensures we don't have stale reservation or payment data
+    Object.keys(localStorage).forEach((key) => {
+      if (key !== "item" && (key.startsWith("cancelled_") || key.startsWith("payment_success_") || key === "cancelled" || key === "completed")) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    const fetchItem = async () => {
+      try {
+        // First try to get the item from localStorage
+        const storedItem = localStorage.getItem("item");
+        let loadedItem;
+
+        if (storedItem) {
+          // Parse the stored item
+          loadedItem = JSON.parse(storedItem);
+          console.log("Item loaded from localStorage:", loadedItem);
+
+          // Check if it's valid and has the necessary properties
+          if (loadedItem && loadedItem.id && loadedItem.id === id && loadedItem.pricePerWeek !== undefined) {
+            setItem(loadedItem);
+            return;
+          }
+        }
+
+        // If we don't have a valid item in localStorage, fetch from API
+        console.log("Fetching item from API with ID:", id);
+        const apiItem = await getItemById(id);
+        console.log("Item fetched from API:", apiItem);
+
+        // Save to localStorage for future use
+        localStorage.setItem("item", JSON.stringify(apiItem));
+        setItem(apiItem);
+      } catch (error) {
+        console.error("Error loading item data:", error);
+        // Set a default item to prevent undefined errors
+        setItem({
+          id: id,
+          title: "Item niet gevonden",
+          pricePerWeek: 0,
+          status: "Onbekend",
+        });
+      }
+    };
+
+    fetchItem();
+
+    // Clean up when component unmounts
+    return () => {
+      // Don't clear item here as it might be needed for navigation
+    };
+  }, [id]);
 
   useEffect(() => {
     // Update end date when duration changes
     setEndDate(addWeeks(startDate, formData.duration));
   }, [formData.duration, startDate]);
-
-  if (!item) {
+  // Show loading state or error if item data isn't fully loaded
+  if (!item || !item.id) {
     return (
       <div className="container mx-auto p-4">
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
           <ReturnButton href="/mobile/items" />
           <h1 className="text-2xl font-bold text-red-500">Item niet gevonden</h1>
+          <p className="mt-2 text-gray-600">Er is een probleem opgetreden bij het laden van de itemgegevens.</p>
+          <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-primarygreen-1 text-white rounded-lg">
+            Probeer opnieuw
+          </button>
         </div>
       </div>
     );
@@ -159,12 +211,13 @@ export default function ReservationPage() {
       setIsSubmitting(false);
     }
   };
-
   const handleCancel = () => {
     setShowConfirm(false);
   };
 
-  const totalPrice = (item.pricePerWeek * formData.duration).toFixed(2).replace(".", ",");
+  // Add defensive code to handle missing item or pricePerWeek property
+  const itemPrice = item && item.pricePerWeek ? item.pricePerWeek : 0;
+  const totalPrice = (itemPrice * formData.duration).toFixed(2).replace(".", ",");
 
   return (
     <div className="min-h-screen  pb-16  ">
@@ -180,7 +233,7 @@ export default function ReservationPage() {
               <button onClick={() => setFormData({ ...formData, duration: 2 })} className={`px-6 py-3 rounded-lg text-lg font-semibold transition-colors ${formData.duration === 2 ? "bg-primarygreen-1 text-white" : "bg-white border border-primarygreen-1 text-primarygreen-1"}`}>
                 2 weken
               </button>
-            </div>
+            </div>{" "}
             <div className="flex justify-between m-2 p-2 text-base text-primarytext-1">
               <div className="flex flex-col">
                 Startdatum: <p className="font-bold">{format(startDate, "dd/MM/yyyy")}</p>
@@ -189,7 +242,7 @@ export default function ReservationPage() {
                 Einddatum: <p className="font-bold">{format(endDate, "dd/MM/yyyy")}</p>
               </div>
             </div>
-            <div className="text-center text-sm text-primarytext-1 m-4">Prijs: € {item.pricePerWeek.toFixed(2).replace(".", ",")} per week</div>
+            <div className="text-center text-sm text-primarytext-1 m-4">Prijs: € {item && item.pricePerWeek ? item.pricePerWeek.toFixed(2).replace(".", ",") : "0,00"} per week</div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primarygreen-1 mb-4">€ {totalPrice}</div>
               {!isTabletRoute && (

@@ -7,6 +7,7 @@ import itemsDetails from "@/data/itemDetails.json";
 import { format, addDays } from "date-fns";
 import { Note, EnvelopeSimple, Key, User, Package, CalendarCheck, CalendarX, CurrencyEur, DeviceMobile } from "phosphor-react";
 import Footer from "@/components/mobile/footer";
+import { clearReservationData } from "@/utils/storage";
 
 // Move this component to use the search params
 function ReservationContent() {
@@ -37,6 +38,7 @@ function ReservationContent() {
         if (!reservationResponse || !reservationResponse.pickupCode) {
           console.error("Invalid reservation data structure");
           // Delay redirect to avoid abrupt navigation
+
           const timer = setTimeout(() => router.push("/mobile/items"), 500);
           return () => clearTimeout(timer);
         }
@@ -52,7 +54,7 @@ function ReservationContent() {
           item: reservationResponse.itemName,
           pickupDate: new Date(), // Today
           returnDate: pickupDeadline,
-          price: reservationResponse.price.toFixed(2),
+          price: reservationResponse.totalPrice.toFixed(2),
         });
 
         // Mark that we have valid data
@@ -61,7 +63,7 @@ function ReservationContent() {
         // Clear the data from localStorage after retrieving it
         // But with a delay to ensure the component has fully mounted
         const timer = setTimeout(() => {
-          localStorage.removeItem("reservationDetails");
+          clearReservationData();
           console.log("Reservation data cleared from localStorage");
         }, 2000);
 
@@ -69,12 +71,14 @@ function ReservationContent() {
       } catch (error) {
         console.error("Error parsing reservation details:", error);
         // Delay redirect to avoid abrupt navigation
+
         const timer = setTimeout(() => router.push("/mobile/items"), 500);
         return () => clearTimeout(timer);
       }
     } else {
       console.log("No reservation data found in localStorage");
       // Delay redirect to avoid abrupt navigation
+
       const timer = setTimeout(() => router.push("/mobile/items"), 500);
       return () => clearTimeout(timer);
     }

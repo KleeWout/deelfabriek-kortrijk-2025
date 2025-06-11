@@ -7,6 +7,7 @@ import animationData from "@/app/tablet/ophaal-flow/pay/Animation - 174870279581
 import { TabletHeader } from "@/components/tabletHeader";
 import { createPayconiqPayment, checkPaymentStatus } from "@/services/payconiq";
 import { cancelReservation } from "@/app/api/reservations";
+import { clearReservationData, clearPaymentData } from "@/utils/storage";
 
 const LottiePlayer = dynamic(() => import("react-lottie-player"), {
   ssr: false,
@@ -162,9 +163,9 @@ export default function ReservationPayPage() {
       // Cancel the reservation when payment is cancelled or failed
       if (!excistingReservation) {
         if (reservationData?.pickupCode) {
-          // Clean up localStorage
-          localStorage.removeItem("paymentConfirmation");
-          localStorage.removeItem("reservationDetails");
+          // Clean up localStorage with our utility functions
+          clearPaymentData();
+          clearReservationData(reservationData.pickupCode);
 
           // Check if already cancelled or in process of cancellation
           const key = `cancelled_${reservationData.pickupCode}`;
@@ -350,17 +351,14 @@ export default function ReservationPayPage() {
     setShowCancelConfirm(true);
   };
   const confirmCancel = () => {
-    // COMMENTED OUT - Explicit cancellation cleanup logic
-    /*
     // When user explicitly cancels, make sure we clean up localStorage immediately
     if (reservationData?.pickupCode) {
-      localStorage.removeItem("paymentConfirmation");
-      localStorage.removeItem("reservationDetails");
+      clearPaymentData();
+      clearReservationData(reservationData.pickupCode);
 
       // Mark as canceled in localStorage to prevent duplicate cancellations
       localStorage.setItem(`cancelled_${reservationData.pickupCode}`, "in_progress");
     }
-    */
     console.log("User explicitly cancelled, but reservation cancellation is temporarily disabled");
     setIsCancelled(true);
   };

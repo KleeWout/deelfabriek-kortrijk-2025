@@ -6,6 +6,7 @@ import Image from "next/image";
 import { getGradientClassForBackground } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 import { getItemById, ItemResponse } from "@/app/api/items";
+import { clearReservationData } from "@/utils/storage";
 
 export default function ItemDetailPage() {
   const params = useParams();
@@ -19,13 +20,12 @@ export default function ItemDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   const gradientClass = getGradientClassForBackground(id);
-
   useEffect(() => {
     const fetchItem = async () => {
       try {
         setLoading(true);
         const data = await getItemById(id);
-        localStorage.setItem(`item`, JSON.stringify(data)); 
+        localStorage.setItem(`item`, JSON.stringify(data));
         setItem(data);
       } catch (err) {
         setError("Er ging iets mis bij het ophalen van dit item.");
@@ -35,7 +35,16 @@ export default function ItemDetailPage() {
       }
     };
 
+    // Clear any existing reservation data before fetching a new item
+    // This helps ensure we don't have stale data from previous reservations
+    clearReservationData();
+
     fetchItem();
+
+    // Clean up localStorage when component unmounts
+    return () => {
+      clearReservationData();
+    };
   }, [id]);
   const handleReservation = () => {
     // Use the pathname from Next.js hooks instead of window.location
@@ -45,6 +54,13 @@ export default function ItemDetailPage() {
       router.push(`/mobile/reserveer/${id}`);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      // Clear reservation data when the component unmounts
+      clearReservationData();
+    };
+  }, []);
 
   if (loading) {
     return (
