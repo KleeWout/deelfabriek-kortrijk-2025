@@ -18,7 +18,7 @@ public class ItemDetailDto
     public string Tip { get; set; }
     public DateTime CreatedAt { get; set; }
     public int LockerId { get; set; }
-    public string Category { get; set; } 
+    public string Category { get; set; }
 }
 
 public class ItemsPageDto
@@ -29,10 +29,9 @@ public class ItemsPageDto
     public decimal PricePerWeek { get; set; }
     public ItemStatus Status { get; set; }
 
+    public string? ImageSrc { get; set; }
 
-    public string ImageSrc { get; set; }
-
-    public string Category { get; set; } 
+    public string Category { get; set; }
 
 }
 

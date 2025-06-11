@@ -8,7 +8,6 @@ interface ItemPageProps {
 }
 
 export function ItemPage({ baseRoute }: ItemPageProps) {
-
   const [items, setItems] = useState<ItemProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,6 +16,7 @@ export function ItemPage({ baseRoute }: ItemPageProps) {
     const fetchItems = async () => {
       try {
         const data = await getItems();
+        // console.log(data);
         setItems(data);
         setLoading(false);
       } catch (err) {
@@ -27,8 +27,6 @@ export function ItemPage({ baseRoute }: ItemPageProps) {
 
     fetchItems();
   }, []);
-
-
 
   return (
     <div className="min-h-screen flex flex-col">
