@@ -4,7 +4,7 @@ namespace Deelkast.API.Services;
 
 public interface ILockerService
 {
-    Task<IEnumerable<Locker>> GetAllLockers();
+    Task<IEnumerable<LockerDto>> GetAllLockers();
     Task<Locker> GetLockerById(int id);
     Task<LockerDto> AddLocker(Locker locker);
     Task<LockerDto> UpdateLocker(int id, Locker locker);
@@ -14,8 +14,9 @@ public interface ILockerService
 
     Task<bool> AnyOtherLockerWithNumber(int id, int lockerNumber);
 
-    
+    Task<List<Locker>> GetAllEmptyLockers();
 }
+
 
 public class LockerService : ILockerService
 {
@@ -32,19 +33,20 @@ public class LockerService : ILockerService
         _lockerRepository = lockerRepository;
         _lockerCustomRepository = lockerCustomRepository;
         _mapper = mapper;
-        _itemRepository = itemRepository;     
+        _itemRepository = itemRepository;
     }
 
-    public async Task<IEnumerable<Locker>> GetAllLockers()
+    public async Task<IEnumerable<LockerDto>> GetAllLockers()
     {
-        return await _lockerRepository.GetAllAsync();
+        // return await _lockerRepository.GetAllAsync();
+        return await _lockerCustomRepository.GetAllLockersAsync();
     }
 
     public async Task<Locker> GetLockerById(int id)
     {
         return await _lockerRepository.GetByIdAsync(id);
     }
-    
+
     public async Task<LockerDto> AddLocker(Locker locker)
     {
         if (locker.ItemId.HasValue)
@@ -52,7 +54,7 @@ public class LockerService : ILockerService
             var item = await _itemRepository.GetByIdAsync(locker.ItemId.Value);
             if (item == null)
                 throw new Exception("Item does not exist.");
-       
+
 
             var oldLocker = await _lockerCustomRepository.GetLockerByItemId(locker.ItemId.Value);
             if (oldLocker != null) // als de locker een oude item id geeft 
@@ -144,5 +146,10 @@ public class LockerService : ILockerService
     {
         return await _lockerCustomRepository.AnyOtherLockerWithNumber(id, lockerNumber);
     }
-    
+
+
+    public async Task<List<Locker>> GetAllEmptyLockers()
+    {
+        return await _lockerCustomRepository.GetAllEmptyLockersAsync();
+    }
 }

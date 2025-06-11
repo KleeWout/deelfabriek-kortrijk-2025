@@ -17,7 +17,7 @@ public class ItemDetailDto
     public string Dimensions { get; set; }
     public string Tip { get; set; }
     public DateTime CreatedAt { get; set; }
-    public int LockerId { get; set; }
+    public int? LockerId { get; set; }
     public string Category { get; set; }
 }
 

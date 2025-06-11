@@ -3,7 +3,7 @@ namespace Deelkast.API.Services;
 public interface IItemService
 {
     Task<List<ItemDetailDto>> GetAllItemsAdmin();
-    Task<List<ItemsPageDto>> GetAllItemsPage();
+    Task<List<ItemsPageDto>> GetAllItems();
     // Task<ItemDetailDto> GetItemByIdDto(int id);
     Task<Item> GetItemById(int id);
     Task AddItem(Item item);
@@ -58,16 +58,16 @@ public class ItemService : IItemService
         return _mapper.Map<List<ItemDetailDto>>(items);
     }
 
-    public async Task<List<ItemsPageDto>> GetAllItemsPage()
+    public async Task<List<ItemsPageDto>> GetAllItems()
     {
         // Haal alle items op
         var items = await _customItemRepository.GetItems();
 
-        // Filter enkel items die een LockerId hebben (dus fysiek beschikbaar zijn)
-        var itemsWithLockers = items.Where(i => i.LockerId != null).ToList();
+        // // Filter enkel items die een LockerId hebben (dus fysiek beschikbaar zijn)
+        // var itemsWithLockers = items.Where(i => i.LockerId != null).ToList();
 
         // Map naar DTO en retourneer
-        return _mapper.Map<List<ItemsPageDto>>(itemsWithLockers);
+        return _mapper.Map<List<ItemsPageDto>>(items);
     }
 
 

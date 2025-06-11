@@ -7,7 +7,7 @@ public static class AdminRoutes
         group.MapGet("/", async (ILockerService lockerService) =>
         {
             var lockers = await lockerService.GetAllLockers();
-            if (lockers == null || !lockers.Any())
+            if (lockers == null)
             {
                 return Results.NotFound();
             }
@@ -24,13 +24,8 @@ public static class AdminRoutes
             }
             return Results.Ok(locker);
         });
-
-        group.MapPost("/", async (
-            Locker locker,
-            ILockerService lockerService,
-            IValidator<Locker> validator,
-            IItemService itemService
-        ) =>
+        //create a new locker
+        group.MapPost("/", async (Locker locker, ILockerService lockerService, IValidator<Locker> validator, IItemService itemService) =>
         {
             var validationResult = await validator.ValidateAsync(locker);
             if (!validationResult.IsValid)
@@ -102,7 +97,20 @@ public static class AdminRoutes
             return Results.NoContent();
         });
 
+        // get all empty lockers
+        group.MapGet("/empty", async (ILockerService lockerService) =>
+        {
+            var emptyLockers = await lockerService.GetAllEmptyLockers();
+            if (emptyLockers == null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(emptyLockers);
+        });
+
         return group;
+
+        
     }
 
     public static RouteGroupBuilder GroupAdminCategories(this RouteGroupBuilder group)

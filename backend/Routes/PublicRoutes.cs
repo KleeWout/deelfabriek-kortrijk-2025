@@ -120,7 +120,7 @@ public static class PublicRoutes
             //     return items.Any() ? Results.Ok(items) : Results.NotFound($"No items found for category {categoryId.Value}");
             // }
 
-            var allItems = await itemService.GetAllItemsPage();
+            var allItems = await itemService.GetAllItems();
             if (allItems == null || !allItems.Any())
             {
                 return Results.NotFound("No items found");
