@@ -100,25 +100,4 @@ export async function deleteLocker(id: number): Promise<void> {
   }
 }
 
-// Update locker status to maintenance
-export async function setLockerToMaintenance(id: number): Promise<LockerProps> {
-  try {
-    const response = await fetch(`${API_URL}/${id}/maintenance`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status: "Onderhoud" }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to set locker to maintenance: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error setting locker ${id} to maintenance:`, error);
-    throw error;
-  }
-}
+// This function has been removed as part of the maintenance feature removal

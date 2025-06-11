@@ -33,6 +33,8 @@ public class ItemsPageDto
 
     public string Category { get; set; }
 
+    public int? LockerId { get; set; }
+
 }
 
 public class ItemNameDto

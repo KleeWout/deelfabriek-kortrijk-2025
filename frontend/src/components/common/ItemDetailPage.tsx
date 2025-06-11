@@ -20,7 +20,7 @@ export default function ItemDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [fetchedImg, setFetchedImg] = useState<string | null>(null);
 
-  const gradientClass = getGradientClassForBackground(id);
+  const gradientClass = getGradientClassForBackground(item?.lockerId || 1);
   useEffect(() => {
     const fetchItem = async () => {
       try {

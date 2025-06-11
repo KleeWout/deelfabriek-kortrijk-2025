@@ -12,7 +12,7 @@ export default interface ItemProps {
   tip?: string;
   whatsIncluded?: string;
   category?: string;
-  lockerId?: number | null;
+  lockerId?: number;
   availability?: {
     start: string;
     end: string;

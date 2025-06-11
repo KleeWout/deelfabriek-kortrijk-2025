@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 //   onClick?: () => void;
 // }
 
-export function ItemCard({ id, title, pricePerWeek, imageSrc = "/assets/items/naaimachine.png", status = "Beschikbaar", index = 0, onClick, baseRoute }: ItemCardProps & { onClick?: () => void }) {
+export function ItemCard({ id, title, pricePerWeek, imageSrc = "/assets/items/naaimachine.png", status = "Beschikbaar", index = 0, onClick, baseRoute, lockerId = 0 }: ItemCardProps & { onClick?: () => void }) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -42,7 +42,7 @@ export function ItemCard({ id, title, pricePerWeek, imageSrc = "/assets/items/na
   const resolvedBaseRoute = baseRoute || (pathname.startsWith("/mobile") ? "/mobile/items" : pathname.startsWith("/tablet") ? "/tablet/items" : "/items");
 
   //verschillende achtergrond gradients:
-  const gradientClass = getGradientClassForBackground(id);
+  const gradientClass = getGradientClassForBackground(lockerId);
 
   //klik en navigeer nr detail pagina van item
   const handleItemClick = (itemId: number) => {

@@ -55,6 +55,9 @@ public class LockerService : ILockerService
             if (item == null)
                 throw new Exception("Item does not exist.");
 
+            // Update item status to Beschikbaar when assigned to a locker
+            item.Status = ItemStatus.Beschikbaar;
+            await _itemRepository.UpdateAsync(item);
 
             var oldLocker = await _lockerCustomRepository.GetLockerByItemId(locker.ItemId.Value);
             if (oldLocker != null) // als de locker een oude item id geeft 
@@ -97,12 +100,14 @@ public class LockerService : ILockerService
                 if (oldItem != null)
                 {
                     oldItem.LockerId = null;
+                    oldItem.Status = ItemStatus.Ongebruikt; // Set status to Ongebruikt when removed from a locker
                     await _itemRepository.UpdateAsync(oldItem);
                 }
             }
 
             // update lockerid item 
             newItem.LockerId = id;
+            newItem.Status = ItemStatus.Beschikbaar; // Set status to Beschikbaar when added to a locker
             await _itemRepository.UpdateAsync(newItem);
         }
         else if (existing.ItemId.HasValue && !locker.ItemId.HasValue)
@@ -112,6 +117,7 @@ public class LockerService : ILockerService
             if (item != null)
             {
                 item.LockerId = null;
+                item.Status = ItemStatus.Ongebruikt; // Set status to Ongebruikt when removed from a locker
                 await _itemRepository.UpdateAsync(item);
             }
         }
@@ -127,6 +133,20 @@ public class LockerService : ILockerService
 
     public async Task DeleteLocker(int id)
     {
+        // Check if the locker has an item
+        var locker = await _lockerRepository.GetByIdAsync(id);
+        if (locker != null && locker.ItemId.HasValue)
+        {
+            // Update the item status to Ongebruikt when the locker is deleted
+            var item = await _itemRepository.GetByIdAsync(locker.ItemId.Value);
+            if (item != null)
+            {
+                item.LockerId = null;
+                item.Status = ItemStatus.Ongebruikt;
+                await _itemRepository.UpdateAsync(item);
+            }
+        }
+
         await _lockerRepository.DeleteAsync(id);
     }
 

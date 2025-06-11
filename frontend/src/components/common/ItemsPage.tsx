@@ -39,7 +39,7 @@ export function ItemPage({ baseRoute }: ItemPageProps) {
         ) : items.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8">
             {items.map((item, index) => (
-              <ItemCard key={item.id} id={item.id} title={item.title} pricePerWeek={item.pricePerWeek} status={item.status} imageSrc={item.imageSrc} index={index} />
+              <ItemCard key={item.id} id={item.id} title={item.title} pricePerWeek={item.pricePerWeek} status={item.status} imageSrc={item.imageSrc} lockerId={item.lockerId} index={index} />
             ))}
           </div>
         ) : (

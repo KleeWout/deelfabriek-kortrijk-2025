@@ -278,7 +278,7 @@ export default function ItemsPage() {
                         <div className="text-sm text-gray-900">€{item.pricePerWeek?.toFixed(2)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.status === "Beschikbaar" ? "bg-green-100 text-green-800" : item.status === "Gereserveerd" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>{item.status}</span>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.status === "Beschikbaar" ? "bg-green-100 text-green-800" : item.status === "Geleend" ? "bg-primarypink-1 text-white" : "bg-gray-200 text-gray-800"}`}>{item.status}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button className="text-[#004431] hover:text-[#003422] mr-4" onClick={() => handleEditItem(item)}>

@@ -6,7 +6,7 @@ interface LockerProps {
   item: any | null;
   itemTitle: string | null;
   // Add derived fields for backwards compatibility
-  status?: "Beschikbaar" | "Bezet" | "Onderhoud";
+  status?: "Beschikbaar" | "Bezet";
   itemName?: string;
 }
 
