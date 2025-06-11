@@ -120,10 +120,12 @@ export default function OphaalFlowPage() {
             <div className="flex justify-between">
               <span>Locker</span>
               <span className="font-bold">{reservationData?.lockerNumber || "--"}</span>
-            </div>
+            </div>{" "}
             <div className="flex justify-between">
               <span>Reserveringsduur</span>
-              <span className="font-bold">1 week</span>
+              <span className="font-bold">
+                {reservationData?.weeks || 0} {(reservationData?.weeks || 0) > 1 ? "weken" : "week"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Code</span>
