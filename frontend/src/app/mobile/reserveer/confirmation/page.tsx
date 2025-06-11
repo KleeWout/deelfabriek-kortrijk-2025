@@ -105,7 +105,7 @@ function ReservationContent() {
       </div>
       <div className="flex items-center justify-center text-primarygreen-1 bg-primarygreen-2/20 p-3 rounded-lg mb-6">
         <EnvelopeSimple size={20} className="mr-2" />
-        <p className="font-medium">Er is een bevestigingsmail verstuurd</p>
+        <p className="font-medium">Er is een bevestigingsmail verstuurd met jouw ophaalcode</p>
       </div>
       <div className="flex items-center justify-center text-red-800 bg-red-100 p-3 rounded-lg mb-6 border border-red-300">
         <CalendarX size={20} className="mr-2" />
