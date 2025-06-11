@@ -27,10 +27,12 @@ export default function OphaalFlowPage() {
       router.push("/tablet/code");
     }
   }, []); // Empty dependency array ensures this runs only once on mount
+  // Use the locker ID for gradient background
+  const lockerId = reservationData?.lockerId || 1;
+  const gradientClass = getGradientClassForBackground(lockerId);
 
-  // Use the locker ID as the item ID for gradient
-  const itemId = reservationData?.lockerId || 1;
-  const gradientClass = getGradientClassForBackground(itemId);
+  // Get image source from item data or use placeholder
+  const imageSrc = reservationData?.item?.imageSrc || "/assets/items/naaimachine.png";
 
   const accesories = Array.isArray(reservationData?.item?.accesories) ? reservationData.item.accesories.join(", ") : reservationData?.item?.accesories || "Geen accessoires";
 
@@ -52,9 +54,9 @@ export default function OphaalFlowPage() {
       <div className="flex flex-row justify-center gap-10 w-full items-start" style={{ alignItems: "flex-start" }}>
         {/* Item card */}
         <div className="relative flex-1 bg-white/90 border-2 border-[var(--color-secondarygreen-1)] rounded-2xl shadow-lg flex min-h-[280px] max-h-[440px] max-w-[1000px] p-0 overflow-hidden items-center">
-          {/* Foto links */}
+          {/* Foto links */}{" "}
           <div className={`flex items-center justify-center bg-white h-full p-8 m-8 min-w-[320px] max-h-[240px] ${gradientClass} rounded-lg`}>
-            <Image src="/assets/items/naaimachine.png" alt="Naaimachine" width={260} height={180} className=" object-contain" />
+            <Image src={imageSrc} alt={reservationData?.item?.title || "Item"} width={260} height={180} className=" object-contain" />
           </div>{" "}
           {/* Info rechts */}
           <div className="flex flex-col flex-1 gap-2 min-w-0 p-8 pr-12 justify-center h-full">
