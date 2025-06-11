@@ -109,9 +109,23 @@ export default function ReservationPage() {
   useEffect(() => {
     // Update end date when duration changes
     setEndDate(addWeeks(startDate, formData.duration));
-  }, [formData.duration, startDate]);
-  // Show loading state or error if item data isn't fully loaded
-  if (!item || !item.id) {
+  }, [formData.duration, startDate]); // Show loading state while item data is being fetched
+  if (!item) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <ReturnButton href="/mobile/items" />
+          <h1 className="text-2xl font-bold text-primarygreen-1">Item laden...</h1>
+          <div className="mt-4 flex justify-center items-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primarygreen-1"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if item data was loaded but is invalid
+  if (!item.id) {
     return (
       <div className="container mx-auto p-4">
         <div className="bg-white rounded-lg shadow-md p-6 text-center">

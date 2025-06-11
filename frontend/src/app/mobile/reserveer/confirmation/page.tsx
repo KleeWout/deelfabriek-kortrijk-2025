@@ -181,6 +181,11 @@ function ReservationContent() {
         <DeviceMobile size={48} />
         <p>Vergeet niet uw telefoon mee te nemen voor de betaling ter plaatse</p>
       </div>
+      <div className="mt-8 flex justify-center">
+        <button onClick={() => router.push("/mobile")} className="bg-primarygreen-1 text-white py-3 px-8 rounded-lg text-lg font-medium hover:bg-green-800 transition-colors flex items-center gap-2">
+          Terug naar Home
+        </button>
+      </div>
     </div>
   );
 }

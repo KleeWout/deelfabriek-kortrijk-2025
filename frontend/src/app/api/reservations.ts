@@ -1,13 +1,10 @@
 import { ReservationData } from "../../models/ReservationData";
 
-// Local development URL - matching the pattern used in items.ts
-// const url = "http://localhost:3001";
-//public URL
 // const url = "https://api-deelfabriek.woutjuuh02.be";
 //docker URL
 // const url = 'http://backend:3001'
-
-const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+const url = "http://localhost:3001";
+// const url = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export async function createReservation(data: ReservationData): Promise<any> {
   try {
