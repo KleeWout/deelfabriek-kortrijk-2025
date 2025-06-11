@@ -6,8 +6,8 @@ export type OpeningHoursData = {
   closeTimeAfternoon: string | null;
   open: boolean;
 };
-
-const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+const url = "https://api-deelfabriek.woutjuuh02.be";
+// const url = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export const fetchOpeningsHours = async () => {
   try {
