@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace deelfabriek_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250610094759_database")]
-    partial class database
+    [Migration("20250612181607_Database")]
+    partial class Database
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

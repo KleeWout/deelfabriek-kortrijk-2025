@@ -110,7 +110,7 @@ public static class AdminRoutes
 
         return group;
 
-        
+
     }
 
     public static RouteGroupBuilder GroupAdminCategories(this RouteGroupBuilder group)
@@ -543,32 +543,42 @@ public static class AdminRoutes
                     return Results.NotFound($"Opening hour with ID {idDay} not found.");
                 }
 
-                var times = new[] { input.OpenTimeMorning, input.CloseTimeMorning, input.OpenTimeAfternoon, input.CloseTimeAfternoon };
-                int filled = times.Count(t => t.HasValue);
+                // Validation: if any hour is filled, morning hours must be filled
+                bool anyHourFilled =
+                    (input.OpenTimeMorning != null) ||
+                    (input.CloseTimeMorning != null) ||
+                    (input.OpenTimeAfternoon != null) ||
+                    (input.CloseTimeAfternoon != null);
 
-                if (filled == 0)
+                bool morningHoursFilled =
+                    (input.OpenTimeMorning != null) &&
+                    (input.CloseTimeMorning != null);
+
+                if (anyHourFilled && !morningHoursFilled)
                 {
-                    existing.OpenTimeMorning = null;
-                    existing.CloseTimeMorning = null;
-                    existing.OpenTimeAfternoon = null;
-                    existing.CloseTimeAfternoon = null;
-                    existing.Open = false;
+                    return Results.BadRequest("Als je uren invult, moeten de ochtenduren (open en sluit) ingevuld zijn.");
                 }
-                else if (filled == 2 || filled == 4)
+
+                // Always update the times
+                existing.OpenTimeMorning = input.OpenTimeMorning;
+                existing.CloseTimeMorning = input.CloseTimeMorning;
+                existing.OpenTimeAfternoon = input.OpenTimeAfternoon;
+                existing.CloseTimeAfternoon = input.CloseTimeAfternoon;
+
+                // If all hours are empty/null, force closed
+                bool allEmpty =
+                    input.OpenTimeMorning == null &&
+                    input.CloseTimeMorning == null &&
+                    input.OpenTimeAfternoon == null &&
+                    input.CloseTimeAfternoon == null;
+
+                if (allEmpty)
                 {
-                    if (filled == 2 && (!input.OpenTimeMorning.HasValue || !input.CloseTimeMorning.HasValue))
-                    {
-                        return Results.BadRequest("If you provide 2 times, they must be opening times for the store.");
-                    }
-                    existing.OpenTimeMorning = input.OpenTimeMorning;
-                    existing.CloseTimeMorning = input.CloseTimeMorning;
-                    existing.OpenTimeAfternoon = input.OpenTimeAfternoon;
-                    existing.CloseTimeAfternoon = input.CloseTimeAfternoon;
-                    existing.Open = true;
+                    existing.Open = false;
                 }
                 else
                 {
-                    return Results.BadRequest("You must provide 0, 2 or 4 time values (never 1 or 3).");
+                    existing.Open = input.Open; // Use frontend value (can be false with hours)
                 }
 
                 var updated = await openingHourService.UpdateOpeningHourAsync(existing);
