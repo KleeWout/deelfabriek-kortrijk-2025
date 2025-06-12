@@ -42,7 +42,7 @@ DELETE {{url}}/dashboard/items/8
 
 
 
-### items
+### items - also gets those with only lockers
 GET {{url}}/items
 
 ### All items from inside the lockers

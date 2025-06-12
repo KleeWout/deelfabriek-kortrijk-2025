@@ -8,7 +8,7 @@ namespace Deelkast.API.Services;
 public class ReservationExpirationService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly TimeSpan _interval = TimeSpan.FromMinutes(30); 
+    private readonly TimeSpan _interval = TimeSpan.FromHours(1); 
 
     public ReservationExpirationService(IServiceProvider serviceProvider)
     {
@@ -25,12 +25,18 @@ public class ReservationExpirationService : BackgroundService
             try
             {
                 await reservationService.ExpireOverdueReservations();
+                // Process fines and auto-block users - also send late notifications 
+                await reservationService.ProcessOverdueLoansAndFines();
+                // reminder 48 hours before return
+                await reservationService.SendReturnReminders48Hours();
+                // reminder when item is back available 
+                // -----
+              Console.WriteLine($"[INFO] Processed reservations and fines at {DateTime.Now}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Background reservation expiration failed: {ex.Message}");
+                Console.WriteLine($"[ERROR] Background reservation/fine processing failed: {ex.Message}");
             }
-
             await Task.Delay(_interval, stoppingToken);
         }
     }

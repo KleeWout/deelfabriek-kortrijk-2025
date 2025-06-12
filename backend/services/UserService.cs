@@ -10,6 +10,8 @@ public interface IUserService
     Task DeleteUser(int id);
     Task<bool> EmailExists(string email);
 
+    Task ToggleUserBlockStatus(int userId);
+
 }
 
 public class UserService : IUserService
@@ -52,5 +54,11 @@ public class UserService : IUserService
     {
         return await _customUserRepository.EmailExists(email);
     }
-    
+
+    public async Task ToggleUserBlockStatus(int userId)
+    {
+        await _customUserRepository.ToggleUserBlockStatus(userId);
+    }
+
+
 }

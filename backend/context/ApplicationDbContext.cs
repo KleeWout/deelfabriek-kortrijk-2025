@@ -12,6 +12,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<OpeningsHours> OpeningsHours { get; set; }
+    public DbSet<ItemAvailabilityNotification> ItemAvailabilityNotifications { get; set; } // Assuming you have a notification model
 
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -90,13 +91,40 @@ public class ApplicationDbContext : IdentityDbContext
                 Email = "john@example.com",
                 IsAdmin = false,
                 IsBlocked = false,
-                TotalFine = 0,
                 CreatedAt = new DateTime(2023, 6, 5),
                 Street = "Hoofdstraat 1",
                 City = "Amsterdam",
                 Bus = "A",
-                PostalCode = "1012AB",
+                PostalCode = "1012AB"
+            },
+            new User
+            {
+                Id = 2,
+                FirstName = "Jane",
+                LastName = "Smith",
+                PhoneNumber = "987654321",
+                Email = "zeefezfezf@zezfef",
+                IsBlocked = false,
+                CreatedAt = new DateTime(2023, 6, 5),
+                Street = "Hoofdstraat 1",
+                City = "Amsterdam",
+                Bus = "A",
+                PostalCode = "1012AB"
+            },
+            new User
+            {
+                Id = 3,
+                FirstName = "Admin",
+                LastName = "User",
+                PhoneNumber = "555555555",
+                Email = "zfhzfhezf@ekjhfzeef",
+                CreatedAt = new DateTime(2023, 6, 5),
+                Street = "Hoofdstraat 1",
+                City = "Amsterdam",
+                Bus = "A",
+                PostalCode = "1012AB"
             }
+
         );
         // Seed Items
         modelBuilder.Entity<Item>().HasData(
@@ -105,7 +133,7 @@ public class ApplicationDbContext : IdentityDbContext
             Id = 1,
             Title = "Naaimachine",
             PricePerWeek = 5.00m,
-            Status = ItemStatus.Geleend,
+            Status = ItemStatus.Beschikbaar,
             TimesLoaned = 0,
             Accesories = "4 spoeltjes",
             Weight = null,
@@ -119,7 +147,7 @@ public class ApplicationDbContext : IdentityDbContext
             Title = "Schroef- en Klopboormachine",
             Description = "Uiterst geschikt voor allround (klop)boor- en schroefwerkzaamheden. 3 functies: schroeven, boren en klopboren. Hoog werkcomfort door uitstekende machinebalans en compact formaat.",
             PricePerWeek = 5.00m,
-            Status = ItemStatus.Geleend,
+            Status = ItemStatus.Beschikbaar,
             ImageSrc = "https://shop.lecot.be/nl-be/makita-accu-schroef-en-klopboormachine-dhp485rfj-18v-2-x-3-ah-li-ion",
             TimesLoaned = 0,
             HowToUse = "Zie handleiding: https://www.icmsmakita.eu/cms/custom/nl/attachments/user_manual/DHP485_20240320_885653D991_DU884.pdf",
@@ -140,7 +168,8 @@ public class ApplicationDbContext : IdentityDbContext
             Accesories = "1 x kraanstuk, 1 x adapter, 1 x slangstuk, 1 x waterstop, 1 x tuinspuit",
             Weight = null,
             Dimensions = null,
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            LockerId = 3
         },
         new Item
         {
@@ -154,7 +183,8 @@ public class ApplicationDbContext : IdentityDbContext
             Accesories = "/",
             Weight = 7.9m,
             Dimensions = "44 x 29.7 cm",
-            CreatedAt = new DateTime(2023, 6, 5)
+            CreatedAt = new DateTime(2023, 6, 5),
+            LockerId = 4
         },
         new Item
         {
@@ -191,12 +221,26 @@ public class ApplicationDbContext : IdentityDbContext
                 LockerNumber = 102,
                 IsOpen = true,
                 ItemId = 2
+            },
+            new Locker
+            {
+                Id = 3,
+                LockerNumber = 103,
+                IsOpen = true,
+                ItemId = 3
+            },
+            new Locker
+            {
+                Id = 4,
+                LockerNumber = 104,
+                IsOpen = true,
+                ItemId = 4 // Geen item toegewezen
             }
         );
 
         // Seed Reservations
         modelBuilder.Entity<Reservation>().HasData(
-            new Reservation
+            new Reservation // normaal expired moeten zijn 
             {
                 Id = 1,
                 PickupCode = 123456,
@@ -211,25 +255,10 @@ public class ApplicationDbContext : IdentityDbContext
                 ItemId = 1,
                 LockerId = 1,
                 Status = ReservationStatus.Not_Active
-            },
-            new Reservation
-            {
-                Id = 2,
-                PickupCode = 654321,
-                ReservationDate = new DateTime(2023, 6, 5),
-                LoanStart = new DateTime(2023, 6, 6),
-                LoanEnd = new DateTime(2023, 6, 20),
-                ActualReturnDate = null,
-                Weeks = 2,
-                PickupDeadline = new DateTime(2023, 6, 9),
-                TotalPrice = 10.00m,
-                UserId = 1,
-                ItemId = 2,
-                LockerId = 2,
-                Status = ReservationStatus.Active
             }
-
+            
         );
+
 
         // Seed Opening Hours
         modelBuilder.Entity<OpeningsHours>().HasData(

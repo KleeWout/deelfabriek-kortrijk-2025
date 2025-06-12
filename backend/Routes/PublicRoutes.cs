@@ -199,11 +199,16 @@ public static class PublicRoutes
             }
             catch (Exception ex)
             {
-                return Results.NotFound(new { error = ex.Message });
+                if (ex.Message == "BLOCKED_USER")
+                {
+                    return Results.BadRequest(new { error = "Gebruiker is geblokkeerd." });
+                }
+                return Results.BadRequest(new { error = ex.Message });
             }
-        }); group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
-        {
+        });
+        group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
             try
+        {
             {
                 var reservation = await service.MarkAsPaidAndStarLoan(pickupCode);
                 return Results.Ok(reservation);
@@ -238,6 +243,19 @@ public static class PublicRoutes
 
             await reservationService.DeleteReservationByCode(pickupCode);
             return Results.Ok();
+        });
+
+        group.MapPost("/code/{pickupCode}/pay-fine", async (int pickupCode, IReservationService service) =>
+        {
+            try
+            {
+                var reservation = await service.ProcessFinePaymentAndCompleteReturn(pickupCode);
+                return Results.Ok(reservation);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
         });
 
         return group;
@@ -291,4 +309,26 @@ public static class PublicRoutes
 
         return group;
     }
+    
+ public static RouteGroupBuilder GroupPublicNotifications(this RouteGroupBuilder group)
+{
+        // POST: Create a new notification request
+   group.MapPost("/", async (ItemAvailabilityNotification notification, IItemService service) =>
+    {
+        try
+        {
+            await service.AddNotificationRequest(notification.ItemId, notification.UserId);
+            return Results.Ok(new { message = "Notification request sent successfully." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception occurred:");
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            return Results.Problem($"An error occurred: {ex.Message}");
+        }
+    });
+
+    return group;
+}
 }

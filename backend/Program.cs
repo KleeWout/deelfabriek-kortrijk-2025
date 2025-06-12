@@ -14,6 +14,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+
 // read settings from json
 var databaseSettings = builder.Configuration.GetSection("DatabaseSettings");
 builder.Services.Configure<DatabaseSettings>(databaseSettings);
@@ -39,6 +41,9 @@ builder.Services.AddScoped<IGenericRepository<Report>, GenericRepository<Report>
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IOpeningHoursRepository, OpeningHoursRepository>();
 builder.Services.AddScoped<IOpeningHoursService, OpeningHoursService>();
+builder.Services.AddSingleton<MailService>();
+builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
 builder.Services.AddValidatorsFromAssemblyContaining<ItemValidator>();
@@ -94,6 +99,7 @@ app.MapGroup("/categories").GroupPublicCategories();
 app.MapGroup("/reservations").GroupReservations();
 app.MapGroup("/openingshours").GroupPublicOpeningHours();
 app.MapGroup("/reports").GroupPublicReports();
+app.MapGroup("/notifications").GroupPublicNotifications();
 
 // add authorization later 
 var adminApi = app.MapGroup("/dashboard");
