@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { CategoryManagement } from "./components/CategoryManagement";
 
-
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<"categories" | "hours" | "users">("categories");
 
@@ -25,24 +24,6 @@ export default function SettingsPage() {
             >
               Categorieën
             </button>
-            <button
-              onClick={() => setActiveTab("hours")}
-              className={`
-                py-4 px-6 border-b-2 font-medium text-sm
-                ${activeTab === "hours" ? "border-primarygreen-1 text-primarygreen-1" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}
-              `}
-            >
-              Openingsuren
-            </button>
-            <button
-              onClick={() => setActiveTab("users")}
-              className={`
-                py-4 px-6 border-b-2 font-medium text-sm
-                ${activeTab === "users" ? "border-primarygreen-1 text-primarygreen-1" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}
-              `}
-            >
-              Gebruikers
-            </button>
           </nav>
         </div>
       </div>{" "}
@@ -54,8 +35,6 @@ export default function SettingsPage() {
             <CategoryManagement />
           </section>
         )}
-
-        
       </div>
     </div>
   );

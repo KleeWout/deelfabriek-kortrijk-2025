@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Navigation from "@/components/mobile/nav";
-import itemsDetails from "@/data/itemDetails.json";
 import { format, addDays } from "date-fns";
 import { Note, EnvelopeSimple, Key, User, Package, CalendarCheck, CalendarX, CurrencyEur, DeviceMobile } from "phosphor-react";
 import Footer from "@/components/mobile/footer";
