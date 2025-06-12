@@ -481,16 +481,16 @@ export default function ReservationPage() {
             </p>
             <div className="flex gap-6 w-full justify-center">
               <button
-                onClick={handleConfirm}
-                className="bg-primarygreen-1 text-white font-bold px-6 py-3 rounded-lg shadow hover:bg-green-900 transition-colors"
-              >
-                Ja, reserveren
-              </button>
-              <button
                 onClick={handleCancel}
                 className="bg-gray-200 text-primarygreen-1 font-bold px-6 py-3 rounded-lg shadow hover:bg-gray-300 transition-colors"
               >
                 Nee, terug
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="bg-primarygreen-1 text-white font-bold px-6 py-3 rounded-lg shadow hover:bg-green-900 transition-colors"
+              >
+                Ja, reserveren
               </button>
             </div>
           </div>
