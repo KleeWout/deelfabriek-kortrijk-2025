@@ -12,18 +12,20 @@ const formatTime = (time: string | null): string => {
 const getDisplayHours = (day: any): string => {
   if (!day.open) return "Gesloten";
 
-  // Morning hours
-  let displayHours = "";
-  if (day.openTimeMorning && day.closeTimeMorning) {
-    displayHours += `${formatTime(day.openTimeMorning)}–${formatTime(day.closeTimeMorning)}`;
-  }
+  const ochtend =
+    day.openTimeMorning && day.closeTimeMorning
+      ? `${formatTime(day.openTimeMorning)}–${formatTime(day.closeTimeMorning)}`
+      : "";
 
-  // Afternoon hours
-  if (day.openTimeAfternoon && day.closeTimeAfternoon) {
-    displayHours += `, ${formatTime(day.openTimeAfternoon)}–${formatTime(day.closeTimeAfternoon)}`;
-  }
+  const middag =
+    day.openTimeAfternoon && day.closeTimeAfternoon
+      ? `${formatTime(day.openTimeAfternoon)}–${formatTime(day.closeTimeAfternoon)}`
+      : "";
 
-  return displayHours || "Gesloten";
+  if (ochtend && middag) return `${ochtend}, ${middag}`;
+  if (ochtend) return ochtend;
+  if (middag) return middag;
+  return "Gesloten";
 };
 
 // Map API day names to abbreviated display names

@@ -117,10 +117,13 @@ export default function OpeningsurenPage() {
     // Validation: check for half-filled periods
     const invalidPeriodDay = openingHours.find((h) => {
       if (h.gesloten) return false;
+
       // Ochtend: only one filled
       const ochtendOneFilled = !!h.openTimeVm !== !!h.closeTimeVm;
       // Middag: only one filled
       const middagOneFilled = !!h.openTimeNm !== !!h.closeTimeNm;
+
+      // It's invalid if either period is half-filled
       return ochtendOneFilled || middagOneFilled;
     });
     if (invalidPeriodDay) {
@@ -186,6 +189,25 @@ export default function OpeningsurenPage() {
                   Middag
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <input
+                    type="checkbox"
+                    className="mr-2 h-4 w-4 align-middle accent-primarygreen-1"
+                    checked={
+                      openingHours.length > 0 &&
+                      openingHours.every((h) => h.gesloten)
+                    }
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setOpeningHours((hours) =>
+                        hours.map((h) => ({
+                          ...h,
+                          gesloten: checked,
+                          // times stay unchanged!
+                        }))
+                      );
+                    }}
+                    title="Selecteer alles als gesloten"
+                  />
                   Gesloten
                 </th>
               </tr>
@@ -197,11 +219,11 @@ export default function OpeningsurenPage() {
                     {h.idDay}
                   </td>
                   {/* Ochtend */}
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 align-middle border-r border-gray-100">
                     <div className="flex items-center gap-2">
                       <input
                         type="time"
-                        className={`w-28 rounded-lg border border-gray-200 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${
+                        className={`w-24 rounded-lg border border-gray-200 px-2 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${
                           h.gesloten
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-gray-50"
@@ -215,7 +237,7 @@ export default function OpeningsurenPage() {
                       <span className="text-gray-400">tot</span>
                       <input
                         type="time"
-                        className={`w-28 rounded-lg border border-gray-200 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${
+                        className={`w-24 rounded-lg border border-gray-200 px-2 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${
                           h.gesloten
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-gray-50"
@@ -226,14 +248,26 @@ export default function OpeningsurenPage() {
                         }
                         disabled={h.gesloten}
                       />
+                      <button
+                        type="button"
+                        className="ml-2 flex items-center gap-1 text-xs text-red-500 hover:text-red-700 hover:underline transition"
+                        onClick={() => {
+                          handleChange(idx, "openTimeVm", "");
+                          handleChange(idx, "closeTimeVm", "");
+                        }}
+                        disabled={h.gesloten}
+                        title="Maak ochtend leeg"
+                      >
+                        <span>Leeg</span>
+                      </button>
                     </div>
                   </td>
                   {/* Middag */}
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 align-middle">
                     <div className="flex items-center gap-2">
                       <input
                         type="time"
-                        className={`w-28 rounded-lg border border-gray-200 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${
+                        className={`w-24 rounded-lg border border-gray-200 px-2 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${
                           h.gesloten
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-gray-50"
@@ -247,7 +281,7 @@ export default function OpeningsurenPage() {
                       <span className="text-gray-400">tot</span>
                       <input
                         type="time"
-                        className={`w-28 rounded-lg border border-gray-200 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${
+                        className={`w-24 rounded-lg border border-gray-200 px-2 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primarygreen-1 transition ${
                           h.gesloten
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-gray-50"
@@ -258,6 +292,18 @@ export default function OpeningsurenPage() {
                         }
                         disabled={h.gesloten}
                       />
+                      <button
+                        type="button"
+                        className="ml-2 flex items-center gap-1 text-xs text-red-500 hover:text-red-700 hover:underline transition"
+                        onClick={() => {
+                          handleChange(idx, "openTimeNm", "");
+                          handleChange(idx, "closeTimeNm", "");
+                        }}
+                        disabled={h.gesloten}
+                        title="Maak middag leeg"
+                      >
+                        <span>Leeg</span>
+                      </button>
                     </div>
                   </td>
                   {/* Gesloten */}

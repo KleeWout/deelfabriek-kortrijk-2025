@@ -544,19 +544,12 @@ public static class AdminRoutes
                 }
 
                 // Validation: if any hour is filled, morning hours must be filled
-                bool anyHourFilled =
-                    (input.OpenTimeMorning != null) ||
-                    (input.CloseTimeMorning != null) ||
-                    (input.OpenTimeAfternoon != null) ||
-                    (input.CloseTimeAfternoon != null);
+                bool ochtendHalfFilled = (input.OpenTimeMorning != null) != (input.CloseTimeMorning != null);
+                bool middagHalfFilled = (input.OpenTimeAfternoon != null) != (input.CloseTimeAfternoon != null);
 
-                bool morningHoursFilled =
-                    (input.OpenTimeMorning != null) &&
-                    (input.CloseTimeMorning != null);
-
-                if (anyHourFilled && !morningHoursFilled)
+                if (ochtendHalfFilled || middagHalfFilled)
                 {
-                    return Results.BadRequest("Als je uren invult, moeten de ochtenduren (open en sluit) ingevuld zijn.");
+                    return Results.BadRequest("Vul zowel begin- als einduur in voor ochtend of middag, of laat beide leeg.");
                 }
 
                 // Always update the times
