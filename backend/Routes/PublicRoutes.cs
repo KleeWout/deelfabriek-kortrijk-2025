@@ -206,9 +206,9 @@ public static class PublicRoutes
                 return Results.BadRequest(new { error = ex.Message });
             }
         });
-        group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
-            try
+       group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
         {
+            try
             {
                 var reservation = await service.MarkAsPaidAndStarLoan(pickupCode);
                 return Results.Ok(reservation);

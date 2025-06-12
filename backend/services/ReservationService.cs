@@ -22,6 +22,8 @@ public interface IReservationService
     Task<decimal> CalculateFineForReservation(int reservationId);
 
     public Task DeleteReservationByCode(int pickupCode);
+
+    public Task DeleteReservation(int id);
     Task<ReservationViewKioskDto> ProcessFinePaymentAndCompleteReturn(int pickupCode);
 
     Task SendReturnReminders48Hours();
@@ -58,7 +60,7 @@ public class ReservationService : IReservationService
         _customUserRepository = customUserRepository;
         _emailService = emailService;
         _itemAvailabilityNotificationRepo = itemAvailabilityNotificationRepo;
-        
+
     }
 
     public async Task<IEnumerable<ReservationViewDto>> GetAllReservations()
@@ -153,7 +155,7 @@ public class ReservationService : IReservationService
         if (item.LockerId == null) throw new NoLockerAssignedException(dto.ItemId);
 
         var now = DateTime.Now;
-        var pickupDeadline = now.AddHours(72);
+        var pickupDeadline = now.AddHours(48);
         var totalPrice = item.PricePerWeek * dto.Weeks;
 
         // Create the reservation object
@@ -171,17 +173,6 @@ public class ReservationService : IReservationService
             TotalPrice = totalPrice
         };
 
-        await _resRepo.AddAsync(reservation);
-        try
-        {
-            await _emailService.SendReservationConfirmation(user, item, reservation);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error sending reservation confirmation email: {ex.Message}");
-            throw;
-        }
-        return reservation;
         // Use a transaction to ensure consistency
         using (var transaction = await _customreservationRepository.BeginTransactionAsync())
         {
@@ -197,6 +188,16 @@ public class ReservationService : IReservationService
 
                 // Commit the transaction
                 await transaction.CommitAsync();
+                try
+                {
+                    await _emailService.SendReservationConfirmation(user, item, reservation);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error sending reservation confirmation email: {ex.Message}");
+                    throw;
+                }
+
             }
             catch (Exception ex)
             {
@@ -238,7 +239,7 @@ public class ReservationService : IReservationService
         var now = DateTime.Now;
 
         if (reservation == null) throw new Exception("Reservation not found");
-        
+
         var user = await _userRepo.GetByIdAsync(reservation.UserId);
         if (user != null && user.IsBlocked)
         {
@@ -279,14 +280,14 @@ public class ReservationService : IReservationService
     {
         var reservation = await GetReservationByCode(pickupCode);
         if (reservation == null) throw new Exception("Reservation not found");
-        
+
         var user = await _userRepo.GetByIdAsync(reservation.UserId);
         if (user == null) throw new Exception("User not found");
 
         // Reset fine to 0 after payment
         reservation.FineApplied = 0;
-        reservation.FineDaysApplied = 0; 
-        
+        reservation.FineDaysApplied = 0;
+
         await _userRepo.UpdateAsync(user);
 
         // Complete the return
@@ -298,27 +299,27 @@ public class ReservationService : IReservationService
     {
         reservation.ActualReturnDate = DateTime.Now;
         reservation.Status = ReservationStatus.Completed;
-        
+
         // Update item status back to beschikbaar
         reservation.Item.Status = ItemStatus.Beschikbaar;
         await _itemRepo.UpdateAsync(reservation.Item);
         await _resRepo.UpdateAsync(reservation);
-         // Send return confirmation email
+        // Send return confirmation email
         try
         {
             var user = await _userRepo.GetByIdAsync(reservation.UserId);
             var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
-            
+
             if (user != null && item != null)
             {
-            // Check if it was returned late
-            await _emailService.SendReturnConfirmation(user, item, reservation);
+                // Check if it was returned late
+                await _emailService.SendReturnConfirmation(user, item, reservation);
             }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to send return confirmation email: {ex.Message}");
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to send return confirmation email: {ex.Message}");
+        }
 
         await NotifyUsersItemAvailable(reservation.Item);
         var dto = _mapper.Map<ReservationViewKioskDto>(reservation);
@@ -360,11 +361,11 @@ public class ReservationService : IReservationService
         // open locker where the item is in that reservation
         // locker.IsOpen = true; 
         // call to an python script to open the locker
-         try
+        try
         {
             var user = await _userRepo.GetByIdAsync(reservation.UserId);
             var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
-            
+
             if (user != null && item != null)
             {
                 await _emailService.SendPickupConfirmation(user, item, reservation);
@@ -384,23 +385,6 @@ public class ReservationService : IReservationService
 
         foreach (var reservation in expiredReservations)
         {
-            // Process each expired reservation in its own transaction
-            using (var transaction = await _customreservationRepository.BeginTransactionAsync())
-            {
-                try
-                {
-                    reservation.Status = ReservationStatus.Expired;
-                    reservation.Item.Status = ItemStatus.Beschikbaar;
-                    await _itemRepo.UpdateAsync(reservation.Item);
-                    await _resRepo.UpdateAsync(reservation);
-
-   public async Task ExpireOverdueReservations()
-    {
-        var now = DateTime.Now;
-        var expiredReservations = await _customreservationRepository.GetOverdueReservations(now);
-
-        foreach (var reservation in expiredReservations)
-        {
             reservation.Status = ReservationStatus.Expired;
             if (reservation.Item != null)
             {
@@ -411,109 +395,99 @@ public class ReservationService : IReservationService
             await _resRepo.UpdateAsync(reservation);
         }
     }
-public async Task ProcessOverdueLoansAndFines()
-{
-    var now = DateTime.Now;
-    var activeReservations = await _resRepo.GetAllAsync();
-
-    var overdueReservations = activeReservations
-        .Where(r => r.Status == ReservationStatus.Active &&
-                    r.LoanEnd.HasValue &&
-                    r.LoanEnd.Value.Date < now.Date)
-        .ToList();
-
-    foreach (var reservation in overdueReservations)
-{
-    var user = await _userRepo.GetByIdAsync(reservation.UserId);
-    if (user == null) continue;
-
-    var daysOverdue = (now.Date - reservation.LoanEnd.Value.Date).Days;
-    var newDaysToFine = daysOverdue - reservation.FineDaysApplied;
-
-   
-    if (newDaysToFine > 0)
+    public async Task ProcessOverdueLoansAndFines()
     {
-              // Calculate new fine amount (0.50 per day)
-        var newFineAmount = newDaysToFine * 0.50m;
-        
-        // Calculate what the total fine would be
-        var potentialTotalFine = reservation.FineApplied + newFineAmount;
-        
-        // Cap the total fine at 7 euros
-        var actualTotalFine = Math.Min(potentialTotalFine, 7.00m);
-        var actualNewFine = actualTotalFine - reservation.FineApplied;
-        
+        var now = DateTime.Now;
+        var activeReservations = await _resRepo.GetAllAsync();
 
-        if (actualNewFine > 0)
+        var overdueReservations = activeReservations
+            .Where(r => r.Status == ReservationStatus.Active &&
+                        r.LoanEnd.HasValue &&
+                        r.LoanEnd.Value.Date < now.Date)
+            .ToList();
+
+        foreach (var reservation in overdueReservations)
         {
-            reservation.FineApplied = actualTotalFine;
-            reservation.FineDaysApplied = daysOverdue; // Track all days we've processed
-            
-            await _resRepo.UpdateAsync(reservation);
-        }
-                    await transaction.CommitAsync();
-                }
-                catch (Exception ex)
+            var user = await _userRepo.GetByIdAsync(reservation.UserId);
+            if (user == null) continue;
+
+            var daysOverdue = (now.Date - reservation.LoanEnd.Value.Date).Days;
+            var newDaysToFine = daysOverdue - reservation.FineDaysApplied;
+
+
+            if (newDaysToFine > 0)
+            {
+                // Calculate new fine amount (0.50 per day)
+                var newFineAmount = newDaysToFine * 0.50m;
+
+                // Calculate what the total fine would be
+                var potentialTotalFine = reservation.FineApplied + newFineAmount;
+
+                // Cap the total fine at 7 euros
+                var actualTotalFine = Math.Min(potentialTotalFine, 7.00m);
+                var actualNewFine = actualTotalFine - reservation.FineApplied;
+
+
+                if (actualNewFine > 0)
                 {
-                    await transaction.RollbackAsync();
-                    // Log the error but continue with other reservations
-                    Console.WriteLine($"Failed to expire reservation {reservation.Id}: {ex.Message}");
+                    reservation.FineApplied = actualTotalFine;
+                    reservation.FineDaysApplied = daysOverdue; // Track all days we've processed
+
+                    await _resRepo.UpdateAsync(reservation);
                 }
             }
-        }
-    }
 
-    // Block user if fine >= 7
-    if (reservation.FineApplied >= 7.00m && !user.IsBlocked)
-    {
-        reservation.FineApplied = 7; // Cap
-        user.IsBlocked = true;
-        await _userRepo.UpdateAsync(user);
+            // Block user if fine >= 7
+            if (reservation.FineApplied >= 7.00m && !user.IsBlocked)
+            {
+                reservation.FineApplied = 7; // Cap
+                user.IsBlocked = true;
+                await _userRepo.UpdateAsync(user);
 
-        var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
-        if (item != null)
-        {
-            item.Status = ItemStatus.Beschikbaar;
-            reservation.Status = ReservationStatus.Cancelled;
-            await NotifyUsersItemAvailable(reservation.Item);
-            await _itemRepo.UpdateAsync(item);
-        }
+                var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
+                if (item != null)
+                {
+                    item.Status = ItemStatus.Beschikbaar;
+                    reservation.Status = ReservationStatus.Cancelled;
+                    await NotifyUsersItemAvailable(reservation.Item);
+                    await _itemRepo.UpdateAsync(item);
+                }
 
-        if (!reservation.BlockedEmailSent)
-        {
+                if (!reservation.BlockedEmailSent)
+                {
                     try
                     {
                         reservation.BlockedEmailSent = true;
                         await _resRepo.UpdateAsync(reservation);
                         await _emailService.SendUserBlockedNotification(user, item, reservation);
-            }
+                    }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Failed to send blocked user notification email: {ex.Message}");
                     }
-        }
-    }
+                }
+            }
 
-    // Late return notification
-    if (!reservation.LateEmailSent)
-    {
-        try
-        {
-            var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
-            if (item != null)
+            // Late return notification
+            if (!reservation.LateEmailSent)
             {
-                await _emailService.SendReturnLate(user, item, reservation);
-                reservation.LateEmailSent = true;
-                await _resRepo.UpdateAsync(reservation);
+                try
+                {
+                    var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
+                    if (item != null)
+                    {
+                        await _emailService.SendReturnLate(user, item, reservation);
+                        reservation.LateEmailSent = true;
+                        await _resRepo.UpdateAsync(reservation);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send late return notification email: {ex.Message}");
+                }
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to send late return notification email: {ex.Message}");
-        }
     }
-}
-}
 
 
 
@@ -529,7 +503,7 @@ public async Task ProcessOverdueLoansAndFines()
             return 0; // Nog niet over tijd
 
         var daysOverdue = (now.Date - reservation.LoanEnd.Value.Date).Days;
-        return daysOverdue *0.50m; // €0.50 per dag
+        return daysOverdue * 0.50m; // €0.50 per dag
     }
 
     // sendreturnreminder48hours 
@@ -557,31 +531,31 @@ public async Task ProcessOverdueLoansAndFines()
             }
         }
     }
-public async Task NotifyUsersItemAvailable(Item item)
-{
-    if (item == null) return;
-
-    var notifications = await _itemAvailabilityNotificationRepo.GetPendingNotificationsForItem(item.Id);
-    if (notifications == null) return;
-
-    foreach (var notif in notifications)
+    public async Task NotifyUsersItemAvailable(Item item)
     {
-        if (notif == null) continue;
-        var user = await _userRepo.GetByIdAsync(notif.UserId);
-        if (user != null)
+        if (item == null) return;
+
+        var notifications = await _itemAvailabilityNotificationRepo.GetPendingNotificationsForItem(item.Id);
+        if (notifications == null) return;
+
+        foreach (var notif in notifications)
         {
-            try
+            if (notif == null) continue;
+            var user = await _userRepo.GetByIdAsync(notif.UserId);
+            if (user != null)
             {
-                await _emailService.SendItemBackOnlineNotification(user, item);
-                await _itemAvailabilityNotificationRepo.DeleteNotification(notif.Id);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to notify user {user?.Id} about item availability: {ex.Message}");
+                try
+                {
+                    await _emailService.SendItemBackOnlineNotification(user, item);
+                    await _itemAvailabilityNotificationRepo.DeleteNotification(notif.Id);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to notify user {user?.Id} about item availability: {ex.Message}");
+                }
             }
         }
     }
-}
 
     private int Generate6DigitCode()
     {

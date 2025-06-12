@@ -494,7 +494,7 @@ public static class AdminRoutes
         return group;
     }
 
-    public static RouteGroupBuilder GroupAdminReservations(this RouteGroupBuilder group)
+ public static RouteGroupBuilder GroupAdminReservations(this RouteGroupBuilder group)
     {
         // get all reservations
         group.MapGet("/", async (IReservationService reservationService) =>
@@ -518,11 +518,6 @@ public static class AdminRoutes
             await reservationService.DeleteReservation(id);
             return Results.NoContent();
         });
-
-
-
-
-
 
         return group;
     }
