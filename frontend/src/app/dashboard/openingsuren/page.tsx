@@ -77,6 +77,13 @@ export default function OpeningsurenPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const handleChange = (
     idx: number,
     field: string,
@@ -90,6 +97,39 @@ export default function OpeningsurenPage() {
   const handleSave = async () => {
     setError(null);
     setSuccess(false);
+
+    // Validation: check for open days with all empty times
+    const invalidDay = openingHours.find(
+      (h) =>
+        !h.gesloten &&
+        !h.openTimeVm &&
+        !h.closeTimeVm &&
+        !h.openTimeNm &&
+        !h.closeTimeNm
+    );
+    if (invalidDay) {
+      setError(
+        `Vul minstens één openingsuur in voor ${invalidDay.idDay} of markeer als gesloten.`
+      );
+      return;
+    }
+
+    // Validation: check for half-filled periods
+    const invalidPeriodDay = openingHours.find((h) => {
+      if (h.gesloten) return false;
+      // Ochtend: only one filled
+      const ochtendOneFilled = !!h.openTimeVm !== !!h.closeTimeVm;
+      // Middag: only one filled
+      const middagOneFilled = !!h.openTimeNm !== !!h.closeTimeNm;
+      return ochtendOneFilled || middagOneFilled;
+    });
+    if (invalidPeriodDay) {
+      setError(
+        `Vul zowel begin- als einduur in voor ochtend of middag op ${invalidPeriodDay.idDay}, of laat beide leeg.`
+      );
+      return;
+    }
+
     try {
       await Promise.all(
         openingHours.map(async (h) => {
@@ -119,7 +159,6 @@ export default function OpeningsurenPage() {
   };
 
   if (loading) return <div className="p-8">Laden...</div>;
-  if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -245,6 +284,11 @@ export default function OpeningsurenPage() {
         {success && (
           <div className="absolute right-10 bottom-24 bg-green-100 border border-green-400 text-green-800 px-6 py-3 rounded-xl font-semibold shadow-lg">
             Openingsuren succesvol opgeslagen!
+          </div>
+        )}
+        {error && (
+          <div className="absolute right-10 bottom-10 bg-red-100 border border-red-400 text-red-800 px-6 py-3 rounded-xl font-semibold shadow-lg z-50">
+            {error}
           </div>
         )}
       </div>
