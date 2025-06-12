@@ -24,6 +24,12 @@ public interface IItemService
     Task<List<ItemsPageDto>> GetItemsWithLocker();
 
     // Task UpdateItemWithCategories(Item item);
+
+    // ------------------- notifications 
+    Task AddNotificationRequest(int itemId, int userId);
+    Task UpdateNotification(ItemAvailabilityNotification notification);
+    Task DeleteNotification(int id);
+
 }
 
 
@@ -35,6 +41,8 @@ public class ItemService : IItemService
     private readonly ILockerRepository _lockerRepository;
 
     private readonly IItemRepository _customItemRepository;
+
+    private readonly INotificationRepository _notificationRepository;
     private readonly IMapper _mapper;
 
     public ItemService(
@@ -42,13 +50,14 @@ public class ItemService : IItemService
     IItemRepository customItemRepository,
     IGenericRepository<Category> categoryRepository,
     ILockerRepository lockerRepository,
-    IMapper mapper)
+    IMapper mapper, INotificationRepository notificationRepository)
     {
         _itemRepository = itemRepository;
         _customItemRepository = customItemRepository;
         _categoryRepository = categoryRepository;
         _lockerRepository = lockerRepository;
         _mapper = mapper;
+        _notificationRepository = notificationRepository;
     }
 
 
@@ -154,5 +163,18 @@ public class ItemService : IItemService
     {
         var items = await _customItemRepository.GetItemsWithLocker();
         return _mapper.Map<List<ItemsPageDto>>(items);
+    }
+
+    public async Task AddNotificationRequest(int itemId, int userId)
+    {
+        await _notificationRepository.AddNotificationRequest(itemId, userId);
+    }
+    public async Task UpdateNotification(ItemAvailabilityNotification notification)
+    {
+        await _notificationRepository.UpdateNotification(notification);
+    }
+    public async Task DeleteNotification(int id)
+    {
+        await _notificationRepository.DeleteNotification(id);
     }
 }

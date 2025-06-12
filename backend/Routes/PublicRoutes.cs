@@ -142,16 +142,16 @@ public static class PublicRoutes
         });
 
         // Parameterized route last
-        // group.MapGet("/{id:int}", async (int id, IItemService itemService) =>
-        // {
-        //     var item = await itemService.GetItemByIdDto(id);
-        //     if (item == null)
-        //     {
-        //         return Results.NotFound();
-        //     }
-        //     return Results.Ok(item);
-        // });
-         //get all items that are in lockers
+        group.MapGet("/{id:int}", async (int id, IItemService itemService) =>
+        {
+            var item = await itemService.GetItemById(id);
+            if (item == null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(item);
+        });
+        //get all items that are in lockers
         group.MapGet("/lockers", async (IItemService itemService) =>
         {
             var items = await itemService.GetItemsWithLocker();
@@ -194,10 +194,14 @@ public static class PublicRoutes
             try
             {
                 var reservation = await service.HandleReservationByCode(pickupCode);
-                return Results.Ok(reservation); 
+                return Results.Ok(reservation);
             }
             catch (Exception ex)
             {
+                if (ex.Message == "BLOCKED_USER")
+                {
+                    return Results.BadRequest(new { error = "Gebruiker is geblokkeerd." });
+                }
                 return Results.BadRequest(new { error = ex.Message });
             }
         });
@@ -207,6 +211,19 @@ public static class PublicRoutes
             try
             {
                 var reservation = await service.MarkAsPaidAndStarLoan(pickupCode);
+                return Results.Ok(reservation);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
+        });
+
+        group.MapPost("/code/{pickupCode}/pay-fine", async (int pickupCode, IReservationService service) =>
+        {
+            try
+            {
+                var reservation = await service.ProcessFinePaymentAndCompleteReturn(pickupCode);
                 return Results.Ok(reservation);
             }
             catch (Exception ex)
@@ -266,4 +283,26 @@ public static class PublicRoutes
 
         return group;
     }
+    
+ public static RouteGroupBuilder GroupPublicNotifications(this RouteGroupBuilder group)
+{
+        // POST: Create a new notification request
+   group.MapPost("/", async (ItemAvailabilityNotification notification, IItemService service) =>
+    {
+        try
+        {
+            await service.AddNotificationRequest(notification.ItemId, notification.UserId);
+            return Results.Ok(new { message = "Notification request sent successfully." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception occurred:");
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            return Results.Problem($"An error occurred: {ex.Message}");
+        }
+    });
+
+    return group;
+}
 }

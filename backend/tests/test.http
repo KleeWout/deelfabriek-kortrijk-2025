@@ -51,7 +51,7 @@ Content-Type: application/json
 GET {{url}}/items
 ###
 // detail product page  -werkt
-GET {{url}}/items/2
+GET {{url}}/items/3
 ###
 // get item with status available 
 // Werkt
@@ -75,38 +75,32 @@ POST {{url}}/reservations
 Content-Type: application/json
 
 {
-  "itemId": 4,
-  "userId": 1,
-  "weeks": 2
+  "itemId": 1,
+  "userId": 3,
+  "weeks": 1
 }
 
 // get reservations for user
 ###
-// nog output maken 
-GET {{url}}/reservations/1
-
+GET {{url}}/reservations/2
 ###
-// get opening hours
-GET {{url}}/openingshours
-
+GET {{url}}/reservations/3
 ###
-// POST Report
-POST {{url}}/reports
+GET {{url}}/reservations/code/863883
+###
+PUT {{url}}/reservations/code/863883/ispayed
+### 
+POST {{url}}/reservations/code/789012/pay-fine
+
+
+
+// notifications
+// -------------------------------
+###
+POST {{url}}/notifications
 Content-Type: application/json
 
 {
-  "reservationid": 1,
-  "rating": 1,
-  "remark": "Damaged"
+  "userId": 1,
+  "itemId": 1
 }
-
-
-
-
-GET {{url}}/reservations/9
-###
-GET {{url}}/reservations/code/611838
-###
-PUT {{url}}/reservations/code/611838/ispayed
-
-

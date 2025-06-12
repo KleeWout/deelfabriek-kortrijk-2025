@@ -240,6 +240,26 @@ public static class AdminRoutes
             }
         });
 
+        // block-unblock toggle
+        group.MapPost("/{id}/toggle-block", async (int id, IUserService userService) =>
+        {
+            var existingUser = await userService.GetUserById(id);
+            if (existingUser == null)
+            {
+                return Results.NotFound($"User with ID {id} not found.");
+            }
+
+            try
+            {
+                await userService.ToggleUserBlockStatus(id);
+                return Results.Ok(existingUser);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred while toggling the block status: {ex.Message}");
+            }
+        });
+
         return group;
     }
 

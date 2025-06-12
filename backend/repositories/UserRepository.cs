@@ -6,10 +6,7 @@ public interface IUserRepository
 {
 
     Task<bool> EmailExists(string email);
-    // block user
-    Task BlockUser(int userId);
-    // unblock user
-    Task UnblockUser(int userId);
+    Task ToggleUserBlockStatus(int userId);
 
 }
 
@@ -33,26 +30,15 @@ public class UserRepository : IUserRepository
         return users.Any(u => u.Email == email);
     }
 
-    public async Task BlockUser(int userId)
+     public async Task ToggleUserBlockStatus(int userId)
     {
         var user = await _genericRepository.GetByIdAsync(userId);
         if (user != null)
         {
-            user.IsBlocked = true;
+            user.IsBlocked = !user.IsBlocked; // Toggle tussen true/false
             await _genericRepository.UpdateAsync(user);
         }
     }
-
-    public async Task UnblockUser(int userId)
-    {
-        var user = await _genericRepository.GetByIdAsync(userId);
-        if (user != null)
-        {
-            user.IsBlocked = false;
-            await _genericRepository.UpdateAsync(user);
-        }
-    }
-    
   
 
 }

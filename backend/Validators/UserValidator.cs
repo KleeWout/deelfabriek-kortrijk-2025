@@ -48,7 +48,5 @@ public class UserValidator : AbstractValidator<User>
             .NotEmpty().WithMessage("Postal code is required.")
             .MaximumLength(10).WithMessage("Postal code cannot exceed 10 characters.");
 
-        RuleFor(user => user.TotalFine)
-            .GreaterThanOrEqualTo(0).WithMessage("Total fine cannot be negative.");
     }
 }

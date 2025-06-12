@@ -26,6 +26,12 @@ public class ReservationViewKioskDto
 
     public int ItemId { get; set; }
     public ItemDetailDto? Item { get; set; }
+
+      // Fine properties
+    public bool HasFine { get; set; }
+    public decimal FineAmount { get; set; }
+    public bool RequiresPayment { get; set; }
+    
 }
 
 
