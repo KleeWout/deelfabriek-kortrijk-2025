@@ -11,47 +11,80 @@ const formatTime = (time: string | null): string => {
 // Helper to get a friendly display of opening hours
 const getDisplayHours = (day: any): string => {
   if (!day.open) return "Gesloten";
-  
-  // Morning hours
-  let displayHours = "";
-  if (day.openTimeMorning && day.closeTimeMorning) {
-    displayHours += `${formatTime(day.openTimeMorning)}–${formatTime(day.closeTimeMorning)}`;
-  }
-  
-  // Afternoon hours
-  if (day.openTimeAfternoon && day.closeTimeAfternoon) {
-    displayHours += `, ${formatTime(day.openTimeAfternoon)}–${formatTime(day.closeTimeAfternoon)}`;
-  }
-  
-  return displayHours || "Gesloten";
+
+  const ochtend =
+    day.openTimeMorning && day.closeTimeMorning
+      ? `${formatTime(day.openTimeMorning)}–${formatTime(day.closeTimeMorning)}`
+      : "";
+
+  const middag =
+    day.openTimeAfternoon && day.closeTimeAfternoon
+      ? `${formatTime(day.openTimeAfternoon)}–${formatTime(day.closeTimeAfternoon)}`
+      : "";
+
+  if (ochtend && middag) return `${ochtend}, ${middag}`;
+  if (ochtend) return ochtend;
+  if (middag) return middag;
+  return "Gesloten";
 };
 
 // Map API day names to abbreviated display names
 const dayNameMap: { [key: string]: string } = {
-  "Maandag": "ma",
-  "Dinsdag": "di",
-  "Woensdag": "woe",
-  "Donderdag": "do",
-  "Vrijdag": "vr",
-  "Zaterdag": "za", 
-  "Zondag": "zo"
+  Maandag: "ma",
+  Dinsdag: "di",
+  Woensdag: "woe",
+  Donderdag: "do",
+  Vrijdag: "vr",
+  Zaterdag: "za",
+  Zondag: "zo",
 };
 
 // Correct day order
-const dayOrder = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"];
+const dayOrder = [
+  "Maandag",
+  "Dinsdag",
+  "Woensdag",
+  "Donderdag",
+  "Vrijdag",
+  "Zaterdag",
+  "Zondag",
+];
+
+// Map English to Dutch if needed
+const englishToDutch: { [key: string]: string } = {
+  Monday: "Maandag",
+  Tuesday: "Dinsdag",
+  Wednesday: "Woensdag",
+  Thursday: "Donderdag",
+  Friday: "Vrijdag",
+  Saturday: "Zaterdag",
+  Sunday: "Zondag",
+};
 
 export default function Footer() {
   const { openingHours, loading, error } = useOpeningsHours();
-  
-  // Sort days in correct order
-  const sortedHours = openingHours 
-    ? [...openingHours].sort((a, b) => 
-        dayOrder.indexOf(a.idDay) - dayOrder.indexOf(b.idDay))
+
+  // Map English days to Dutch if needed
+  const mappedHours = openingHours
+    ? openingHours.map((day) => ({
+        ...day,
+        idDay: englishToDutch[day.idDay] || day.idDay,
+      }))
     : [];
+
+  // Sort days in correct Dutch order
+  const sortedHours = mappedHours.sort(
+    (a, b) => dayOrder.indexOf(a.idDay) - dayOrder.indexOf(b.idDay)
+  );
 
   return (
     <footer className="w-full bg-primarygreen-1 p-4 text-white flex flex-col gap-4">
-      <Image src="/logo-stadkortrijk.png" alt="Kortrijk Logo" width="300" height="200" />
+      <Image
+        src="/logo-stadkortrijk.png"
+        alt="Kortrijk Logo"
+        width="300"
+        height="200"
+      />
       <div className="flex items-start gap-2 flex-col">
         <div className="flex items-center gap-2">
           <House size={24} />
@@ -80,9 +113,9 @@ export default function Footer() {
           {error && <p>Kon openingsuren niet laden</p>}
           {!loading && !error && (
             <ul className="space-y-1">
-              {sortedHours.map(day => (
+              {sortedHours.map((day) => (
                 <li key={day.idDay}>
-                  {dayNameMap[day.idDay] || day.idDay}: {getDisplayHours(day)}
+                  {day.idDay}: {getDisplayHours(day)}
                 </li>
               ))}
             </ul>

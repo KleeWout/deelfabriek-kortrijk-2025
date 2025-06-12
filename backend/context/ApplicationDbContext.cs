@@ -326,5 +326,36 @@ public class ApplicationDbContext : IdentityDbContext
                 Open = false
             }
         );
+
+        // Seed Reports (Rapporten)
+        modelBuilder.Entity<Report>().HasData(
+            new Report
+            {
+                Id = 1,
+                ReservationId = 1,
+                Rating = 5,
+                Remark = null, // 5 sterren zonder review
+                Status = true,
+                CreatedAt = new DateTime(2023, 6, 8)
+            },
+            new Report
+            {
+                Id = 2,
+                ReservationId = 1,
+                Rating = 1,
+                Remark = "Item defect, Niet proper", // opties van return reasons
+                Status = true,
+                CreatedAt = new DateTime(2023, 6, 9)
+            },
+            new Report
+            {
+                Id = 3,
+                ReservationId = 1,
+                Rating = 5,
+                Remark = "Item niet zoals verwacht, Handleiding ontbrak",
+                Status = true,
+                CreatedAt = new DateTime(2023, 6, 10)
+            }
+        );
     }
 }
