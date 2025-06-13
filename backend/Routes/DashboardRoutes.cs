@@ -7,7 +7,7 @@ public static class AdminRoutes
         group.MapGet("/", async (ILockerService lockerService) =>
         {
             var lockers = await lockerService.GetAllLockers();
-            if (lockers == null || !lockers.Any())
+            if (lockers == null)
             {
                 return Results.NotFound();
             }
@@ -24,13 +24,8 @@ public static class AdminRoutes
             }
             return Results.Ok(locker);
         });
-
-        group.MapPost("/", async (
-            Locker locker,
-            ILockerService lockerService,
-            IValidator<Locker> validator,
-            IItemService itemService
-        ) =>
+        //create a new locker
+        group.MapPost("/", async (Locker locker, ILockerService lockerService, IValidator<Locker> validator, IItemService itemService) =>
         {
             var validationResult = await validator.ValidateAsync(locker);
             if (!validationResult.IsValid)
@@ -102,7 +97,20 @@ public static class AdminRoutes
             return Results.NoContent();
         });
 
+        // get all empty lockers
+        group.MapGet("/empty", async (ILockerService lockerService) =>
+        {
+            var emptyLockers = await lockerService.GetAllEmptyLockers();
+            if (emptyLockers == null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(emptyLockers);
+        });
+
         return group;
+
+
     }
 
     public static RouteGroupBuilder GroupAdminCategories(this RouteGroupBuilder group)
@@ -137,24 +145,19 @@ public static class AdminRoutes
         });
 
         // delete category
-        // group.MapDelete("/{id}", async (int id, IItemService itemService) =>
-        // {
-        //     var existingCategory = await itemService.GetCategoryById(id);
-        //     if (existingCategory == null)
-        //     {
-        //         return Results.NotFound();
-        //     }
+        group.MapDelete("/{category}", async (string category, IItemService itemService) =>
+        {
 
-        //     try
-        //     {
-        //         await itemService.DeleteCategory(id);
-        //         return Results.NoContent();
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return Results.Problem($"An error occurred while deleting the category: {ex.Message}");
-        //     }
-        // });
+            try
+            {
+                await itemService.DeleteCategory(category);
+                return Results.Ok();
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred while deleting the category: {ex.Message}");
+            }
+        });
 
         return group;
     }
@@ -237,6 +240,26 @@ public static class AdminRoutes
             catch (Exception ex)
             {
                 return Results.Problem($"An error occurred while updating the user: {ex.Message}");
+            }
+        });
+
+        // block-unblock toggle
+        group.MapPost("/{id}/toggle-block", async (int id, IUserService userService) =>
+        {
+            var existingUser = await userService.GetUserById(id);
+            if (existingUser == null)
+            {
+                return Results.NotFound($"User with ID {id} not found.");
+            }
+
+            try
+            {
+                await userService.ToggleUserBlockStatus(id);
+                return Results.Ok(existingUser);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred while toggling the block status: {ex.Message}");
             }
         });
 
@@ -367,13 +390,74 @@ public static class AdminRoutes
         }).DisableAntiforgery();
 
         //edit item
-        group.MapPut("/{id}", async (int id, Item item, IItemService itemService, ItemValidator validator) =>
+        group.MapPut("/{id}", async (HttpRequest request, int id, IItemService itemService, ItemValidator validator) =>
         {
-            // Set the ID to ensure we're updating the correct item
-            item.Id = id;
+            // Get the existing item from the database
+            var existingItem = await itemService.GetItemById(id);
+            if (existingItem == null)
+                return Results.NotFound("Item not found.");
 
-            // Validate the item
-            var validationResult = await validator.ValidateAsync(item);
+            // Read the form data
+            var form = await request.ReadFormAsync();
+            Console.WriteLine(form["accesories"]);
+            // Update item properties from form
+            existingItem.Title = form["title"];
+            existingItem.Description = form["description"];
+            existingItem.PricePerWeek = decimal.TryParse(form["pricePerWeek"], out var price) ? price : null;
+            existingItem.HowToUse = form["howToUse"];
+            existingItem.Accesories = form["accesories"];
+            existingItem.Weight = decimal.TryParse(form["weight"], out var weight) ? weight : null;
+            existingItem.Dimensions = form["dimensions"];
+            existingItem.Tip = form["tip"];
+            existingItem.Status = Enum.TryParse<ItemStatus>(form["status"], out var status) ? status : ItemStatus.Beschikbaar;
+            existingItem.LockerId = int.TryParse(form["lockerId"], out var lockerId) ? lockerId : null;
+            existingItem.Category = form["category"];
+            existingItem.TimesLoaned = int.TryParse(form["timesLoaned"], out var timesLoaned) ? timesLoaned : 0;
+
+            // Handle image replacement
+            if (form.Files.Count > 0)
+            {
+                var file = form.Files[0];
+                if (file.Length == 0)
+                {
+                    return Results.BadRequest("File is empty.");
+                }
+                else
+                {
+                    Console.WriteLine($"Received file: {file.FileName}, Size: {file.Length} bytes");
+                }
+                // Validate file type
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
+                }
+
+                // Delete old image if it exists
+                if (!string.IsNullOrEmpty(existingItem.ImageSrc))
+                {
+                    var oldImagePath = Path.GetFullPath("./uploads/" + existingItem.ImageSrc);
+                    if (File.Exists(oldImagePath))
+                    {
+                        File.Delete(oldImagePath);
+                    }
+                }
+
+                // Save new image
+                var uploadsPath = Path.GetFullPath("./uploads/");
+                Directory.CreateDirectory(uploadsPath);
+                var fileName = file.FileName;
+                var filePath = Path.Combine(uploadsPath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                existingItem.ImageSrc = fileName;
+            }
+
+            // Validate the updated item
+            var validationResult = await validator.ValidateAsync(existingItem);
             if (!validationResult.IsValid)
             {
                 var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
@@ -382,10 +466,7 @@ public static class AdminRoutes
 
             try
             {
-                // Our modified repository method now handles retrieving the existing item
-                await itemService.UpdateItem(item);
-
-                // Get the updated item to return
+                await itemService.UpdateItem(existingItem);
                 var updatedItem = await itemService.GetItemById(id);
                 return Results.Ok(updatedItem);
             }
@@ -397,7 +478,7 @@ public static class AdminRoutes
             {
                 return Results.Problem($"An error occurred while updating the item: {ex.Message}");
             }
-        });
+        }).DisableAntiforgery();
 
         // delete item
         group.MapDelete("/{id}", async (int id, IItemService itemService) =>
@@ -415,7 +496,7 @@ public static class AdminRoutes
         return group;
     }
 
-    public static RouteGroupBuilder GroupAdminReservations(this RouteGroupBuilder group)
+ public static RouteGroupBuilder GroupAdminReservations(this RouteGroupBuilder group)
     {
         // get all reservations
         group.MapGet("/", async (IReservationService reservationService) =>
@@ -439,11 +520,6 @@ public static class AdminRoutes
             await reservationService.DeleteReservation(id);
             return Results.NoContent();
         });
-
-
-
-
-
 
         return group;
     }
@@ -484,32 +560,35 @@ public static class AdminRoutes
                     return Results.NotFound($"Opening hour with ID {idDay} not found.");
                 }
 
-                var times = new[] { input.OpenTimeMorning, input.CloseTimeMorning, input.OpenTimeAfternoon, input.CloseTimeAfternoon };
-                int filled = times.Count(t => t.HasValue);
+                // Validation: if any hour is filled, morning hours must be filled
+                bool ochtendHalfFilled = (input.OpenTimeMorning != null) != (input.CloseTimeMorning != null);
+                bool middagHalfFilled = (input.OpenTimeAfternoon != null) != (input.CloseTimeAfternoon != null);
 
-                if (filled == 0)
+                if (ochtendHalfFilled || middagHalfFilled)
                 {
-                    existing.OpenTimeMorning = null;
-                    existing.CloseTimeMorning = null;
-                    existing.OpenTimeAfternoon = null;
-                    existing.CloseTimeAfternoon = null;
-                    existing.Open = false;
+                    return Results.BadRequest("Vul zowel begin- als einduur in voor ochtend of middag, of laat beide leeg.");
                 }
-                else if (filled == 2 || filled == 4)
+
+                // Always update the times
+                existing.OpenTimeMorning = input.OpenTimeMorning;
+                existing.CloseTimeMorning = input.CloseTimeMorning;
+                existing.OpenTimeAfternoon = input.OpenTimeAfternoon;
+                existing.CloseTimeAfternoon = input.CloseTimeAfternoon;
+
+                // If all hours are empty/null, force closed
+                bool allEmpty =
+                    input.OpenTimeMorning == null &&
+                    input.CloseTimeMorning == null &&
+                    input.OpenTimeAfternoon == null &&
+                    input.CloseTimeAfternoon == null;
+
+                if (allEmpty)
                 {
-                    if (filled == 2 && (!input.OpenTimeMorning.HasValue || !input.CloseTimeMorning.HasValue))
-                    {
-                        return Results.BadRequest("If you provide 2 times, they must be opening times for the store.");
-                    }
-                    existing.OpenTimeMorning = input.OpenTimeMorning;
-                    existing.CloseTimeMorning = input.CloseTimeMorning;
-                    existing.OpenTimeAfternoon = input.OpenTimeAfternoon;
-                    existing.CloseTimeAfternoon = input.CloseTimeAfternoon;
-                    existing.Open = true;
+                    existing.Open = false;
                 }
                 else
                 {
-                    return Results.BadRequest("You must provide 0, 2 or 4 time values (never 1 or 3).");
+                    existing.Open = input.Open; // Use frontend value (can be false with hours)
                 }
 
                 var updated = await openingHourService.UpdateOpeningHourAsync(existing);

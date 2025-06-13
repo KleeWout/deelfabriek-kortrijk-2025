@@ -6,12 +6,12 @@ export default interface ItemProps {
   status: string;
   description?: string;
   howToUse?: string;
-  accessories?: string[];
+  accesories?: string;
   dimensions?: string;
   weight?: number;
   tip?: string;
-  whatsIncluded?: string;
   category?: string;
+  lockerId?: number;
   availability?: {
     start: string;
     end: string;

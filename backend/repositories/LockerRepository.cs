@@ -13,7 +13,9 @@ public interface ILockerRepository
     Task<Locker?> GetLockerByItemId(int itemId);
 
 
-    Task<List<Locker>> GetAllLockersAsync();
+    Task<List<LockerDto>> GetAllLockersAsync();
+
+    Task<List<Locker>> GetAllEmptyLockersAsync();
 
 }
 
@@ -48,10 +50,24 @@ public class LockerRepository : ILockerRepository
             .FirstOrDefaultAsync(l => l.ItemId == itemId);
     }
 
-    public async Task<List<Locker>> GetAllLockersAsync()
+    public async Task<List<LockerDto>> GetAllLockersAsync()
     {
-        return await _context.Lockers.ToListAsync();
+        return await _context.Lockers
+        .Select(l => new LockerDto
+        {
+            Id = l.Id,
+            LockerNumber = l.LockerNumber,
+            ItemId = l.ItemId,
+            ItemTitle = l.Item != null ? l.Item.Title : null
+        })
+        .ToListAsync();
     }
-    
+
+    public async Task<List<Locker>> GetAllEmptyLockersAsync()
+    {
+        return await _context.Lockers
+            .Where(i => i.ItemId == null)
+            .ToListAsync();
+    }
 
 }

@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { getIconByName } from '@/utils/iconUtils';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { getIconByName } from "@/utils/iconUtils";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: 'SquaresFour' },
-  { name: 'Producten', href: '/dashboard/producten', icon: 'Package' },
-  { name: 'Reservaties', href: '/dashboard/reservaties', icon: 'CalendarDots' },
-  { name: 'Lockers', href: '/dashboard/lockers', icon: 'Lockers' },
-  { name: 'Rapporten', href: '/dashboard/rapporten', icon: 'FileText' },
-  { name: 'Openingsuren', href: '/dashboard/openingsuren', icon: 'Calendar' },
-  { name: 'Instellingen', href: '/dashboard/instellingen', icon: 'Gear' },
+  { name: "Dashboard", href: "/dashboard", icon: "SquaresFour" },
+  { name: "Producten", href: "/dashboard/producten", icon: "Package" },
+  { name: "Reservaties", href: "/dashboard/reservaties", icon: "CalendarDots" },
+  { name: "Lockers", href: "/dashboard/lockers", icon: "Lockers" },
+  { name: "Rapporten", href: "/dashboard/rapporten", icon: "FileText" },
+  { name: "Openingsuren", href: "/dashboard/openingsuren", icon: "Calendar" },
+  { name: "Instellingen", href: "/dashboard/instellingen", icon: "Gear" },
 ];
 
 interface SidebarItem {
@@ -31,12 +31,27 @@ function getSidebarItem(
   return (
     <Link
       href={href}
-      className={`flex items-center px-4 py-3 text-base font-medium rounded-md ${currentPath === href ? 'bg-green-950 text-white' : 'text-gray-300 hover:bg-green-800'}`}
+      className={`flex items-center h-12 px-4 py-3 text-base rounded-md ${
+        currentPath === href
+          ? "bg-green-950 text-white"
+          : "text-gray-300 hover:bg-green-800"
+      }`}
     >
       <div
-        className={`flex ${collapsed ? 'justify-center' : 'gap-3 justify-center items-center'}`}
+        className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}
+        style={{ width: "100%" }}
       >
-        <IconComponent size={32} weight="regular" color="#ffffff" />
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconComponent size={32} weight="regular" color="#ffffff" />
+        </div>
         {!collapsed && name}
       </div>
     </Link>
@@ -46,24 +61,24 @@ function getSidebarItem(
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
-  const CaretIcon = getIconByName(collapsed ? 'CaretRight' : 'CaretLeft');
+  const CaretIcon = getIconByName(collapsed ? "CaretRight" : "CaretLeft");
 
   return (
     <div
-      className={`bg-primarygreen-1 text-white ${collapsed ? 'w-16' : 'w-64'} flex flex-col h-screen transition-width duration-300`}
+      className={`bg-primarygreen-1 text-white ${collapsed ? "w-16" : "w-64"} flex flex-col h-screen transition-width duration-300`}
     >
       <div className="p-4 border-b border-white flex items-center justify-between">
         {!collapsed && <span className="font-bold text-xl">Dashboard</span>}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="p-1 rounded-md hover:bg-green-800 transition-colors"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <CaretIcon size={24} weight="regular" color="#ffffff" />
         </button>
       </div>
       <nav className="flex-1 overflow-y-auto pt-5 pb-4">
-        <ul className={`space-y-1 ${collapsed ? 'px-1' : 'px-2'}`}>
+        <ul className={`space-y-1 ${collapsed ? "px-1" : "px-2"}`}>
           {navigation.map((item) => (
             <li key={item.href}>
               {getSidebarItem(

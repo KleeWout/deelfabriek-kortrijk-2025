@@ -28,6 +28,9 @@ Content-Type: application/json
 ###
 DELETE {{url}}/dashboard/users/2
 ###
+POST {{url}}/dashboard/users/1/toggle-block
+
+###
 //ITEMS
 // -------------------------------
 // werkt 
@@ -158,13 +161,13 @@ GET {{url}}/dashboard/openingsuren
 
 ###
 // get opening hours id
-GET {{url}}/dashboard/openingsuren/Maandag
+GET {{url}}/dashboard/openingsuren/Monday
 
 
 ###
 // PUT opening hours
 
-PUT {{url}}/dashboard/openingsuren/Maandag
+PUT {{url}}/dashboard/openingsuren/Monday
 Content-Type: application/json
 
 {
@@ -186,8 +189,18 @@ POST {{url}}/dashboard/rapports
 Content-Type: application/json
 
 {
+  "reservationid": 1,
+  "rating": 1,
+  "remark": "Damaged"
 
 }
 ###
 // delete reservation 
 DELETE {{url}}/dashboard/reservations/5
+
+### GET Repports
+GET {{url}}/dashboard/reports
+
+###
+
+GET {{url}}/items/2

@@ -11,7 +11,7 @@ public class Reservation : IEntity
     public DateTime? LoanEnd { get; set; }
     public DateTime? ActualReturnDate { get; set; }
     public int Weeks { get; set; } // <-- Needed for pickup logic
-    public DateTime PickupDeadline { get; set; } // 48h deadline
+    public DateTime PickupDeadline { get; set; } // 72h deadline
 
     [Precision(10, 2)]
     public decimal? TotalPrice { get; set; }
@@ -24,6 +24,19 @@ public class Reservation : IEntity
     public Item Item { get; set; }
     public Locker Locker { get; set; }
     public ReservationStatus Status { get; set; } = ReservationStatus.Not_Active;
+
+    public bool LateEmailSent { get; set; }
+    public bool ReminderSent { get; set; }
+    public bool BlockedEmailSent { get; set; }
+
+    [Precision(10, 2)]
+    public decimal FineApplied { get; set; } = 0.00m;
+
+    public int FineDaysApplied { get; set; } = 0;
+
+
+
+  
 }
 
 
@@ -34,7 +47,8 @@ public enum ReservationStatus
     Not_Active,
     Active,
     Expired,
-    Completed
+    Completed,
+    Cancelled
 }
 
 public class ReservationProfile : Profile

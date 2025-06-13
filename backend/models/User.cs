@@ -18,9 +18,6 @@ public class User : IEntity
 
     public bool IsBlocked { get; set; } = false;
 
-    [Precision(10, 2)]
-    public decimal TotalFine { get; set; } = 0.00m;
-
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public string Street { get; set; }
@@ -31,18 +28,15 @@ public class User : IEntity
   
     public string PostalCode { get; set; }
 
-
-
-    // public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
-
-
-
 }
 
-public class IuserProfile : Profile
-{
-    // public IuserProfile()
-    // {
-    //      CreateMap<User, UserDto>();
-    // }
-}
+  public class UserProfile : Profile
+    {
+        public UserProfile()
+        {
+            // Add mapping for User
+            CreateMap<newUserDto, User>();
+            
+            // Add any other mappings your application needs
+        }
+    }

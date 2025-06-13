@@ -3,7 +3,7 @@ namespace Deelkast.API.Services;
 public interface IItemService
 {
     Task<List<ItemDetailDto>> GetAllItemsAdmin();
-    Task<List<ItemsPageDto>> GetAllItemsPage();
+    Task<List<ItemsPageDto>> GetAllItems();
     // Task<ItemDetailDto> GetItemByIdDto(int id);
     Task<Item> GetItemById(int id);
     Task AddItem(Item item);
@@ -19,11 +19,17 @@ public interface IItemService
     Task<IEnumerable<CategoryDto>> GetAllCategories();
     // Task<Category> GetCategoryById(int id);
     Task AddCategory(Category category);
-    Task DeleteCategory(int id);
+    Task DeleteCategory(string category);
 
     Task<List<ItemsPageDto>> GetItemsWithLocker();
 
     // Task UpdateItemWithCategories(Item item);
+
+    // ------------------- notifications 
+    Task AddNotificationRequest(int itemId, int userId);
+    Task UpdateNotification(ItemAvailabilityNotification notification);
+    Task DeleteNotification(int id);
+
 }
 
 
@@ -35,6 +41,8 @@ public class ItemService : IItemService
     private readonly ILockerRepository _lockerRepository;
 
     private readonly IItemRepository _customItemRepository;
+
+    private readonly INotificationRepository _notificationRepository;
     private readonly IMapper _mapper;
 
     public ItemService(
@@ -42,13 +50,14 @@ public class ItemService : IItemService
     IItemRepository customItemRepository,
     IGenericRepository<Category> categoryRepository,
     ILockerRepository lockerRepository,
-    IMapper mapper)
+    IMapper mapper, INotificationRepository notificationRepository)
     {
         _itemRepository = itemRepository;
         _customItemRepository = customItemRepository;
         _categoryRepository = categoryRepository;
         _lockerRepository = lockerRepository;
         _mapper = mapper;
+        _notificationRepository = notificationRepository;
     }
 
 
@@ -58,16 +67,16 @@ public class ItemService : IItemService
         return _mapper.Map<List<ItemDetailDto>>(items);
     }
 
-    public async Task<List<ItemsPageDto>> GetAllItemsPage()
+    public async Task<List<ItemsPageDto>> GetAllItems()
     {
         // Haal alle items op
         var items = await _customItemRepository.GetItems();
 
-        // Filter enkel items die een LockerId hebben (dus fysiek beschikbaar zijn)
-        var itemsWithLockers = items.Where(i => i.LockerId != null).ToList();
+        // // Filter enkel items die een LockerId hebben (dus fysiek beschikbaar zijn)
+        // var itemsWithLockers = items.Where(i => i.LockerId != null).ToList();
 
         // Map naar DTO en retourneer
-        return _mapper.Map<List<ItemsPageDto>>(itemsWithLockers);
+        return _mapper.Map<List<ItemsPageDto>>(items);
     }
 
 
@@ -144,9 +153,9 @@ public class ItemService : IItemService
         await _categoryRepository.AddAsync(category);
     }
 
-    public async Task DeleteCategory(int id)
+    public async Task DeleteCategory(string category)
     {
-        await _categoryRepository.DeleteAsync(id);
+        await _customItemRepository.DeleteCategory(category);
     }
 
 
@@ -154,5 +163,18 @@ public class ItemService : IItemService
     {
         var items = await _customItemRepository.GetItemsWithLocker();
         return _mapper.Map<List<ItemsPageDto>>(items);
+    }
+
+    public async Task AddNotificationRequest(int itemId, int userId)
+    {
+        await _notificationRepository.AddNotificationRequest(itemId, userId);
+    }
+    public async Task UpdateNotification(ItemAvailabilityNotification notification)
+    {
+        await _notificationRepository.UpdateNotification(notification);
+    }
+    public async Task DeleteNotification(int id)
+    {
+        await _notificationRepository.DeleteNotification(id);
     }
 }

@@ -1,48 +1,84 @@
-'use client';
-import { useState } from 'react';
-import { Question, Backspace } from 'phosphor-react';
-import { useRouter } from 'next/navigation';
+"use client";
+import { useState } from "react";
+import { Question, Backspace } from "phosphor-react";
+import { useRouter } from "next/navigation";
+import { getReservationByCode } from "@/app/api/reservations";
+import { el } from "date-fns/locale";
 
 const MAX_CODE_LENGTH = 6;
 
 export default function TabletCodePage() {
-  const [code, setCode] = useState('');
-  const [error, setError] = useState('');
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
   const [showToast, setShowToast] = useState(false);
   const router = useRouter();
 
   const handleKeypadClick = (val: string) => {
     if (code.length < MAX_CODE_LENGTH) {
       setCode(code + val);
-      setError('');
+      setError("");
     }
   };
 
   const handleDelete = () => {
     setCode(code.slice(0, -1));
-    setError('');
+    setError("");
   };
-
-  const handleEnter = () => {
-    if (code === '999999') {
-      router.push('/tablet/return-flow');
-      return;
-    }
+  const handleEnter = async () => {
+    // Validation
     if (code.length !== MAX_CODE_LENGTH) {
-      setError('De code moet 6 cijfers zijn.');
+      setError("De code moet 6 cijfers zijn.");
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
       return;
     }
-    if (code === '999998') {
-      router.push('/tablet/ophaal-flow');
-      return;
+    try {
+      // Use the API function from our centralized API folder
+      const reservationData = await getReservationByCode(code);
+      console.log("Reservation data:", reservationData);
+
+      // Add your custom property here
+      const enhancedReservationData = {
+        ...reservationData,
+        existingReservation: "true",
+      };
+
+      console.log("Enhanced reservation data:", enhancedReservationData);
+
+      // Store enhanced data in localStorage for the next page
+      await localStorage.setItem(
+        "reservationDetails",
+        JSON.stringify(enhancedReservationData)
+      );
+      if (enhancedReservationData.status === "Not_Active") {
+        router.push("/tablet/ophaal-flow");
+        console.log(localStorage.getItem("reservationDetails"));
+      } else if (enhancedReservationData.status === "Active") {
+        console.log(localStorage.getItem("reservationDetails"));
+        router.push(`/tablet/return-flow`);
+      } else {
+        setError("Ongeldige code");
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2000);
+        return;
+      }
+    } catch (error) {
+      console.error("Error fetching reservation data:", error);
+
+      // Handle specific error for invalid codes
+      if (error instanceof Error && error.message === "Reservation not found") {
+        setError("Ongeldige code. Probeer opnieuw.");
+      } else {
+        setError("Er is een fout opgetreden. Probeer opnieuw.");
+      }
+
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
     }
-    // TODO: Navigatie naar andere pagina
   };
 
   const handleHelp = () => {
-    setError('Vraag hulp aan een medewerker.');
+    setError("Vraag hulp aan een medewerker.");
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
   };
@@ -91,7 +127,7 @@ export default function TabletCodePage() {
           {/* 0 knop */}
           <button
             className="aspect-square w-full text-5xl font-semibold text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition flex items-center justify-center"
-            onClick={() => handleKeypadClick('0')}
+            onClick={() => handleKeypadClick("0")}
             disabled={code.length >= MAX_CODE_LENGTH}
           >
             0

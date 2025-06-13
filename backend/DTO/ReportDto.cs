@@ -2,6 +2,7 @@ namespace Deelkast.API.DTO;
 
 public class ReportDto
 {
+    public int Id { get; set; }
     public string Email { get; set; }
     public string ItemTitle { get; set; }
     public int Rating { get; set; }

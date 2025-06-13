@@ -1,3 +1,4 @@
+import CreateItemProps from "@/models/CreateItemProps";
 import ItemProps from "./../../models/ItemProps";
 
 export interface ItemResponse {
@@ -22,20 +23,11 @@ export interface ItemResponse {
   category: string;
 }
 
-// Local development URL
-// const url = "http://localhost:3001";
-//public URL
-// const url = "https://api-deelfabriek.woutjuuh02.be";
-//docker URL
-// const url = 'http://backend:3001'
-
-// Using relative URL for client-side requests
-// This ensures requests are made to the same origin as the frontend
-const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+import { getApiUrl } from "./config";
 
 export const getItems = async (): Promise<ItemProps[]> => {
   try {
-    const response = await fetch(`${url}/items/lockers`);
+    const response = await fetch(getApiUrl("items/lockers"));
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -51,7 +43,7 @@ export const getItems = async (): Promise<ItemProps[]> => {
 
 export const getItemById = async (id: number): Promise<ItemResponse> => {
   try {
-    const response = await fetch(`${url}/items/${id}`);
+    const response = await fetch(getApiUrl(`items/${id}`));
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
@@ -84,7 +76,7 @@ export const getItemById = async (id: number): Promise<ItemResponse> => {
 
 export const getItemsDashboard = async (): Promise<ItemProps[]> => {
   try {
-    const response = await fetch(`${url}/dashboard/items`);
+    const response = await fetch(getApiUrl("dashboard/items"));
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -99,13 +91,22 @@ export const getItemsDashboard = async (): Promise<ItemProps[]> => {
 };
 
 // Create a new item
-export async function createItem(item: Omit<ItemProps, "id">): Promise<ItemProps> {
-  const response = await fetch(`${url}/dashboard/items`, {
+export async function createItem(item: any): Promise<any> {
+  const formData = new FormData();
+  // Append all fields
+  Object.entries(item).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      // For file, append as is
+      if (key === "file" && value instanceof File) {
+        formData.append("file", value);
+      } else {
+        formData.append(key, value as string);
+      }
+    }
+  });
+  const response = await fetch(getApiUrl("dashboard/items/with-image"), {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(item),
+    body: formData,
   });
 
   if (!response.ok) {
@@ -116,25 +117,33 @@ export async function createItem(item: Omit<ItemProps, "id">): Promise<ItemProps
 }
 
 // Update an existing item
-export async function updateItem(id: number, item: Partial<ItemProps>): Promise<ItemProps> {
-  const response = await fetch(`${url}/dashboard/items/${id}`, {
+export async function updateItem(id: number, itemData: any) {
+  const form = new FormData();
+  form.append("title", itemData.title);
+  form.append("description", itemData.description);
+  form.append("pricePerWeek", itemData.pricePerWeek);
+  form.append("howToUse", itemData.howToUse);
+  form.append("accesories", itemData.accesories);
+  form.append("weight", itemData.weight);
+  form.append("dimensions", itemData.dimensions);
+  form.append("tip", itemData.tip);
+  form.append("status", itemData.status ?? "Beschikbaar");
+  form.append("timesLoaned", itemData.timesLoaned);
+  if (itemData.lockerId) form.append("lockerId", itemData.lockerId);
+  if (itemData.file) form.append("file", itemData.file);
+  if (itemData.category) form.append("category", itemData.category);
+  const res = await fetch(getApiUrl(`dashboard/items/${id}`), {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(item),
+    body: form,
+    // Do NOT set Content-Type header! The browser will set it for FormData.
   });
-
-  if (!response.ok) {
-    throw new Error(`Failed to update item: ${response.status}`);
-  }
-
-  return await response.json();
+  if (!res.ok) throw new Error("Failed to update item");
+  return await res.json();
 }
 
 // Delete an item
 export async function deleteItem(id: number): Promise<void> {
-  const response = await fetch(`${url}/dashboard/items/${id}`, {
+  const response = await fetch(getApiUrl(`dashboard/items/${id}`), {
     method: "DELETE",
   });
 

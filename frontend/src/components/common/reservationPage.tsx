@@ -1,12 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter, usePathname } from 'next/navigation';
-import { ReturnButton } from '@/components/common/ReturnButton';
-import Navigation from '@/components/mobile/nav';
-import itemsDetails from '@/data/itemDetails.json';
-import { addWeeks, format } from 'date-fns';
-import { Fragment } from 'react';
+import { useState, useEffect } from "react";
+import { useParams, useRouter, usePathname } from "next/navigation";
+import { ReturnButton } from "@/components/common/ReturnButton";
+import Navigation from "@/components/mobile/nav";
+import { addWeeks, format } from "date-fns";
+import { Fragment } from "react";
+import { createReservation } from "@/app/api/reservations";
+import { getItemById } from "@/app/api/items";
+import { clearReservationData } from "@/utils/storage";
 
 export default function ReservationPage() {
   const params = useParams();
@@ -15,57 +17,148 @@ export default function ReservationPage() {
   const pathname = usePathname();
 
   // Check if we're on the tablet route
-  const isTabletRoute = pathname.includes('/tablet/');
+  const isTabletRoute = pathname.includes("/tablet/");
 
   // Form state
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    street: '',
-    houseNumber: '',
-    city: '',
-    postalCode: '',
-    bus: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    street: "",
+    houseNumber: "",
+    city: "",
+    postalCode: "",
+    bus: "",
     duration: 1, // Default duration in weeks
   });
 
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [termsError, setTermsError] = useState('');
+  const [termsError, setTermsError] = useState("");
 
   const [errors, setErrors] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    street: '',
-    city: '',
-    postalCode: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    street: "",
+    city: "",
+    postalCode: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(addWeeks(new Date(), 1));
+  const [item, setItem] = useState<any>(null);
+  const [showConfirm, setShowConfirm] = useState(false); // Get item details
+  useEffect(() => {
+    // Clear any existing reservation data except for the item data
+    // This ensures we don't have stale reservation or payment data
+    Object.keys(localStorage).forEach((key) => {
+      if (
+        key !== "item" &&
+        (key.startsWith("cancelled_") ||
+          key.startsWith("payment_success_") ||
+          key === "cancelled" ||
+          key === "completed")
+      ) {
+        localStorage.removeItem(key);
+      }
+    });
 
-  const [showConfirm, setShowConfirm] = useState(false);
+    const fetchItem = async () => {
+      try {
+        // First try to get the item from localStorage
+        const storedItem = localStorage.getItem("item");
+        let loadedItem;
 
-  // Get item details
-  const item = itemsDetails.find((item) => item.id === id);
+        if (storedItem) {
+          // Parse the stored item
+          loadedItem = JSON.parse(storedItem);
+          console.log("Item loaded from localStorage:", loadedItem);
+
+          // Check if it's valid and has the necessary properties
+          if (
+            loadedItem &&
+            loadedItem.id &&
+            loadedItem.id === id &&
+            loadedItem.pricePerWeek !== undefined
+          ) {
+            setItem(loadedItem);
+            return;
+          }
+        }
+
+        // If we don't have a valid item in localStorage, fetch from API
+        console.log("Fetching item from API with ID:", id);
+        const apiItem = await getItemById(id);
+        console.log("Item fetched from API:", apiItem);
+
+        // Save to localStorage for future use
+        localStorage.setItem("item", JSON.stringify(apiItem));
+        setItem(apiItem);
+      } catch (error) {
+        console.error("Error loading item data:", error);
+        // Set a default item to prevent undefined errors
+        setItem({
+          id: id,
+          title: "Item niet gevonden",
+          pricePerWeek: 0,
+          status: "Onbekend",
+        });
+      }
+    };
+
+    fetchItem();
+
+    // Clean up when component unmounts
+    return () => {
+      // Don't clear item here as it might be needed for navigation
+    };
+  }, [id]);
 
   useEffect(() => {
     // Update end date when duration changes
     setEndDate(addWeeks(startDate, formData.duration));
-  }, [formData.duration, startDate]);
-
+  }, [formData.duration, startDate]); // Show loading state while item data is being fetched
   if (!item) {
     return (
       <div className="container mx-auto p-4">
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
-          <ReturnButton href="/mobile/items" />
+          <ReturnButton
+            href={isTabletRoute ? "/tablet/items" : "/mobile/items"}
+          />
+          <h1 className="text-2xl font-bold text-primarygreen-1">
+            Item laden...
+          </h1>
+          <div className="mt-4 flex justify-center items-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primarygreen-1"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if item data was loaded but is invalid
+  if (!item.id) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <ReturnButton
+            href={isTabletRoute ? "/tablet/items" : "/mobile/items"}
+          />
           <h1 className="text-2xl font-bold text-red-500">
             Item niet gevonden
           </h1>
+          <p className="mt-2 text-gray-600">
+            Er is een probleem opgetreden bij het laden van de itemgegevens.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-primarygreen-1 text-white rounded-lg"
+          >
+            Probeer opnieuw
+          </button>
         </div>
       </div>
     );
@@ -84,54 +177,45 @@ export default function ReservationPage() {
     if (errors[name as keyof typeof errors]) {
       setErrors({
         ...errors,
-        [name]: '',
+        [name]: "",
       });
     }
   };
 
-  const handleDurationChange = (change: number) => {
-    // Max 2 weken, min 1 week
-    const newDuration = Math.max(1, Math.min(2, formData.duration + change));
-    setFormData({
-      ...formData,
-      duration: newDuration,
-    });
-  };
-
   const validateForm = () => {
     const newErrors = {
-      firstName: formData.firstName ? '' : 'Voornaam is verplicht',
-      lastName: formData.lastName ? '' : 'Achternaam is verplicht',
+      firstName: formData.firstName ? "" : "Voornaam is verplicht",
+      lastName: formData.lastName ? "" : "Achternaam is verplicht",
       email: formData.email
         ? /\S+@\S+\.\S+/.test(formData.email)
-          ? ''
-          : 'Ongeldig e-mailadres'
-        : 'E-mail is verplicht',
+          ? ""
+          : "Ongeldig e-mailadres"
+        : "E-mail is verplicht",
       phone: formData.phone
         ? /^[0-9+\s()-]{10,15}$/.test(formData.phone)
-          ? ''
-          : 'Ongeldig telefoonnummer'
-        : 'Telefoonnummer is verplicht',
-      street: formData.street ? '' : 'Straat is verplicht',
-      city: formData.city ? '' : 'Stad is verplicht',
+          ? ""
+          : "Ongeldig telefoonnummer"
+        : "Telefoonnummer is verplicht",
+      street: formData.street ? "" : "Straat is verplicht",
+      city: formData.city ? "" : "Stad is verplicht",
       postalCode: formData.postalCode
         ? /^\d{4}$/.test(formData.postalCode)
-          ? ''
-          : 'Ongeldige postcode'
-        : 'Postcode is verplicht',
+          ? ""
+          : "Ongeldige postcode"
+        : "Postcode is verplicht",
     };
 
     setErrors(newErrors);
 
-    return !Object.values(newErrors).some((error) => error !== '');
+    return !Object.values(newErrors).some((error) => error !== "");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setTermsError('');
+    setTermsError("");
     if (!acceptedTerms) {
-      setTermsError('Je moet de gebruikersvoorwaarden accepteren.');
+      setTermsError("Je moet de gebruikersvoorwaarden accepteren.");
       return;
     }
 
@@ -141,40 +225,59 @@ export default function ReservationPage() {
 
     setShowConfirm(true);
   };
-
   const handleConfirm = async () => {
     setShowConfirm(false);
     setIsSubmitting(true);
     try {
-      // Api call voor het versturen van de reservering
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Create reservation data payload
+      const reservationData = {
+        user: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNumber: formData.phone,
+          street: formData.street,
+          bus: formData.bus || undefined, // Only include if not empty
+          houseNumber: formData.houseNumber || "", // Convert empty to empty string
+          postalCode: formData.postalCode,
+          city: formData.city,
+        },
+        itemId: id,
+        weeks: formData.duration,
+      };
+
+      const response = await createReservation(reservationData);
+      // Store the response in localStorage
+      localStorage.setItem("reservationDetails", JSON.stringify(response));
       // Navigate to the appropriate confirmation page based on route type
       if (isTabletRoute) {
-        router.push(`/tablet/payment/${id}`);
+        router.push(`/tablet/payment/`);
       } else {
-        router.push(`/mobile/reserveer/confirmation?id=${id}`);
+        // Call the API and get the response
+        router.push("/mobile/reserveer/confirmation");
       }
     } catch (error) {
-      console.error('Error submitting reservation:', error);
+      console.error("Error submitting reservation:", error);
       alert(
-        'Er is een fout opgetreden bij het versturen van je reservering. Probeer het later opnieuw.'
+        "Er is een fout opgetreden bij het versturen van je reservering. Probeer het later opnieuw."
       );
     } finally {
       setIsSubmitting(false);
     }
   };
-
   const handleCancel = () => {
     setShowConfirm(false);
   };
 
-  const totalPrice = (item.price * formData.duration)
+  // Add defensive code to handle missing item or pricePerWeek property
+  const itemPrice = item && item.pricePerWeek ? item.pricePerWeek : 0;
+  const totalPrice = (itemPrice * formData.duration)
     .toFixed(2)
-    .replace('.', ',');
+    .replace(".", ",");
 
   return (
-    <div className="min-h-screen  pb-16  ">
-      <div className="container mx-auto p-8 mt-4 flex flex-col lg:flex-row-reverse items-center gap-12 justify-center">
+    <div className="pb-16  ">
+      <div className="container mx-auto p-8 flex flex-col lg:flex-row-reverse items-center gap-12 justify-center">
         <div>
           <h1 className="text-2xl font-bold  text-primarygreen-1 mb-8">
             Reserveren
@@ -184,33 +287,37 @@ export default function ReservationPage() {
             <div className="flex justify-center items-center gap-4 mb-4">
               <button
                 onClick={() => setFormData({ ...formData, duration: 1 })}
-                className={`px-6 py-3 rounded-lg text-lg font-semibold transition-colors ${formData.duration === 1 ? 'bg-primarygreen-1 text-white' : 'bg-white border border-primarygreen-1 text-primarygreen-1'}`}
+                className={`px-6 py-3 rounded-lg text-lg font-semibold transition-colors ${formData.duration === 1 ? "bg-primarygreen-1 text-white" : "bg-white border border-primarygreen-1 text-primarygreen-1"}`}
               >
                 1 week
               </button>
               <button
                 onClick={() => setFormData({ ...formData, duration: 2 })}
-                className={`px-6 py-3 rounded-lg text-lg font-semibold transition-colors ${formData.duration === 2 ? 'bg-primarygreen-1 text-white' : 'bg-white border border-primarygreen-1 text-primarygreen-1'}`}
+                className={`px-6 py-3 rounded-lg text-lg font-semibold transition-colors ${formData.duration === 2 ? "bg-primarygreen-1 text-white" : "bg-white border border-primarygreen-1 text-primarygreen-1"}`}
               >
                 2 weken
               </button>
-            </div>
+            </div>{" "}
             <div className="flex justify-between m-2 p-2 text-base text-primarytext-1">
               <div className="flex flex-col">
-                Startdatum:{' '}
-                <p className="font-bold">{format(startDate, 'dd/MM/yyyy')}</p>
+                Startdatum:{" "}
+                <p className="font-bold">{format(startDate, "dd/MM/yyyy")}</p>
               </div>
               <div className="flex flex-col">
-                Einddatum:{' '}
-                <p className="font-bold">{format(endDate, 'dd/MM/yyyy')}</p>
+                Einddatum:{" "}
+                <p className="font-bold">{format(endDate, "dd/MM/yyyy")}</p>
               </div>
             </div>
             <div className="text-center text-sm text-primarytext-1 m-4">
-              Prijs: €{item.price.toFixed(2).replace('.', ',')} per week
+              Prijs: €{" "}
+              {item && item.pricePerWeek
+                ? item.pricePerWeek.toFixed(2).replace(".", ",")
+                : "0,00"}{" "}
+              per week
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primarygreen-1 mb-4">
-                €{totalPrice}
+                € {totalPrice}
               </div>
               {!isTabletRoute && (
                 <div className="bg-gray-50 rounded-lg  text-center px-3 py-2">
@@ -251,7 +358,7 @@ export default function ReservationPage() {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border rounded-lg ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full p-3 border rounded-lg ${errors.firstName ? "border-red-500" : "border-gray-300"}`}
                   placeholder="John"
                 />
                 {errors.firstName && (
@@ -274,7 +381,7 @@ export default function ReservationPage() {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border rounded-lg ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full p-3 border rounded-lg ${errors.lastName ? "border-red-500" : "border-gray-300"}`}
                   placeholder="Doe"
                 />
                 {errors.lastName && (
@@ -296,7 +403,7 @@ export default function ReservationPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full p-3 border rounded-lg ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                className={`w-full p-3 border rounded-lg ${errors.email ? "border-red-500" : "border-gray-300"}`}
                 placeholder="john@email.com"
               />
               {errors.email && (
@@ -317,7 +424,7 @@ export default function ReservationPage() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className={`w-full p-3 border rounded-lg ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                className={`w-full p-3 border rounded-lg ${errors.phone ? "border-red-500" : "border-gray-300"}`}
                 placeholder="+32 123 45 67 89"
               />
               {errors.phone && (
@@ -339,7 +446,7 @@ export default function ReservationPage() {
                   name="street"
                   value={formData.street}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border rounded-lg ${errors.street ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full p-3 border rounded-lg ${errors.street ? "border-red-500" : "border-gray-300"}`}
                   placeholder="Rijkswachtstraat 5"
                 />
                 {errors.street && (
@@ -380,7 +487,7 @@ export default function ReservationPage() {
                   name="city"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border rounded-lg ${errors.city ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full p-3 border rounded-lg ${errors.city ? "border-red-500" : "border-gray-300"}`}
                   placeholder="Kortrijk"
                 />
                 {errors.city && (
@@ -401,7 +508,7 @@ export default function ReservationPage() {
                   name="postalCode"
                   value={formData.postalCode}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border rounded-lg ${errors.postalCode ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full p-3 border rounded-lg ${errors.postalCode ? "border-red-500" : "border-gray-300"}`}
                   placeholder="8500"
                 />
                 {errors.postalCode && (
@@ -422,7 +529,7 @@ export default function ReservationPage() {
               required
             />
             <label htmlFor="terms" className="text-sm select-none">
-              Ik heb de{' '}
+              Ik heb de{" "}
               <a
                 href="/gebruiksvoorwaarden.pdf"
                 target="_blank"
@@ -430,7 +537,7 @@ export default function ReservationPage() {
                 className="underline text-primarygreen-1 hover:text-primarygreen-2 font-semibold"
               >
                 gebruikersvoorwaarden
-              </a>{' '}
+              </a>{" "}
               gelezen en goedgekeurd
               <span className="text-red-500"> *</span>
             </label>
@@ -438,21 +545,21 @@ export default function ReservationPage() {
           {termsError && (
             <p className="text-red-500 text-xs mt-1">{termsError}</p>
           )}
+          <div className="flex justify-center items-center w-full">
+            <button
+              form="reservationForm"
+              type="submit"
+              disabled={isSubmitting}
+              className="w-64 bg-primarygreen-1 text-white py-3 px-4 rounded-lg hover:bg-green-900 transition-colors disabled:bg-gray-400"
+            >
+              {isSubmitting
+                ? "Bezig met reserveren..."
+                : isTabletRoute
+                  ? "Huur nu"
+                  : "Reserveren"}
+            </button>
+          </div>
         </form>
-      </div>
-      <div className="flex justify-center items-center w-full">
-        <button
-          form="reservationForm"
-          type="submit"
-          disabled={isSubmitting}
-          className="w-64 bg-primarygreen-1 text-white py-3 px-4 rounded-lg hover:bg-green-900 transition-colors disabled:bg-gray-400"
-        >
-          {isSubmitting
-            ? 'Bezig met reserveren...'
-            : isTabletRoute
-              ? 'Huur nu'
-              : 'Reserveren'}
-        </button>
       </div>
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -461,7 +568,7 @@ export default function ReservationPage() {
               Bevestig je reservatie
             </h2>
             <p className="text-lg text-center mb-6">
-              Is alle info juist en ben je zeker dat je een{' '}
+              Is alle info juist en ben je zeker dat je een{" "}
               <span className="font-bold">{item.title}</span> wil reserveren?
             </p>
             <div className="flex gap-6 w-full justify-center">

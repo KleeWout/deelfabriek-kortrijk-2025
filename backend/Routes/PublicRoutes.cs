@@ -120,7 +120,7 @@ public static class PublicRoutes
             //     return items.Any() ? Results.Ok(items) : Results.NotFound($"No items found for category {categoryId.Value}");
             // }
 
-            var allItems = await itemService.GetAllItemsPage();
+            var allItems = await itemService.GetAllItems();
             if (allItems == null || !allItems.Any())
             {
                 return Results.NotFound("No items found");
@@ -151,7 +151,7 @@ public static class PublicRoutes
             }
             return Results.Ok(item);
         });
-         //get all items that are in lockers
+        //get all items that are in lockers
         group.MapGet("/lockers", async (IItemService itemService) =>
         {
             var items = await itemService.GetItemsWithLocker();
@@ -166,12 +166,13 @@ public static class PublicRoutes
 
     public static RouteGroupBuilder GroupReservations(this RouteGroupBuilder group)
     {
-        group.MapPost("/", async (CreateReservationDto dto, IReservationService reservationService) =>
+        group.MapPost("/", async (CreateReservationDto dto, IReservationService reservationService, UserRegistrationValidator validator) =>
         {
             try
             {
+                var validationResult = await validator.ValidateAsync(dto.User);
                 var reservation = await reservationService.CreateReservation(dto);
-                return Results.Ok(new { ReservationId = reservation.Id }); // Only return the ID
+                return Results.Ok(reservation);
             }
             catch (Exception ex)
             {
@@ -184,7 +185,7 @@ public static class PublicRoutes
             var reservation = await reservationService.GetReservationbyId(id);
             if (reservation == null)
             {
-                return Results.NotFound();
+                return Results.NotFound(new { error = "Reservation not found" });
             }
 
             return Results.Ok(reservation);
@@ -194,7 +195,23 @@ public static class PublicRoutes
             try
             {
                 var reservation = await service.HandleReservationByCode(pickupCode);
-                return Results.Ok(reservation); 
+                return Results.Ok(reservation);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "BLOCKED_USER")
+                {
+                    return Results.BadRequest(new { error = "Gebruiker is geblokkeerd." });
+                }
+                return Results.BadRequest(new { error = ex.Message });
+            }
+        });
+       group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
+        {
+            try
+            {
+                var reservation = await service.MarkAsPaidAndStarLoan(pickupCode);
+                return Results.Ok(reservation);
             }
             catch (Exception ex)
             {
@@ -202,11 +219,37 @@ public static class PublicRoutes
             }
         });
 
-        group.MapPut("/code/{pickupCode}/ispayed", async (int pickupCode, IReservationService service) =>
+        // Return endpoint - handles marking a reservation as returned
+        group.MapGet("/code/{pickupCode}/returned", async (int pickupCode, IReservationService service) =>
         {
             try
             {
-                var reservation = await service.MarkAsPaidAndStarLoan(pickupCode);
+                var reservation = await service.HandleReservationReturnByCode(pickupCode);
+                return Results.Ok(reservation);
+            }
+            catch (Exception ex)
+            {
+                return Results.NotFound(new { error = ex.Message });
+            }
+        });
+
+        group.MapDelete("/code/{pickupCode}", async (int pickupCode, IReservationService reservationService) =>
+        {
+            var existingReservation = await reservationService.GetReservationByCode(pickupCode);
+            if (existingReservation == null)
+            {
+                return Results.NotFound();
+            }
+
+            await reservationService.DeleteReservationByCode(pickupCode);
+            return Results.Ok();
+        });
+
+        group.MapPost("/code/{pickupCode}/pay-fine", async (int pickupCode, IReservationService service) =>
+        {
+            try
+            {
+                var reservation = await service.ProcessFinePaymentAndCompleteReturn(pickupCode);
                 return Results.Ok(reservation);
             }
             catch (Exception ex)
@@ -266,4 +309,26 @@ public static class PublicRoutes
 
         return group;
     }
+    
+ public static RouteGroupBuilder GroupPublicNotifications(this RouteGroupBuilder group)
+{
+        // POST: Create a new notification request
+   group.MapPost("/", async (ItemAvailabilityNotification notification, IItemService service) =>
+    {
+        try
+        {
+            await service.AddNotificationRequest(notification.ItemId, notification.UserId);
+            return Results.Ok(new { message = "Notification request sent successfully." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception occurred:");
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            return Results.Problem($"An error occurred: {ex.Message}");
+        }
+    });
+
+    return group;
+}
 }
