@@ -31,12 +31,27 @@ function getSidebarItem(
   return (
     <Link
       href={href}
-      className={`flex items-center px-4 py-3 text-base font-medium rounded-md ${currentPath === href ? "bg-green-950 text-white" : "text-gray-300 hover:bg-green-800"}`}
+      className={`flex items-center h-12 px-4 py-3 text-base rounded-md ${
+        currentPath === href
+          ? "bg-green-950 text-white"
+          : "text-gray-300 hover:bg-green-800"
+      }`}
     >
       <div
-        className={`flex ${collapsed ? "justify-center" : "gap-3 justify-center items-center"}`}
+        className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}
+        style={{ width: "100%" }}
       >
-        <IconComponent size={32} weight="regular" color="#ffffff" />
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconComponent size={32} weight="regular" color="#ffffff" />
+        </div>
         {!collapsed && name}
       </div>
     </Link>

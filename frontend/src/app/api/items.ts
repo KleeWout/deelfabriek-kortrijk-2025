@@ -123,13 +123,15 @@ export async function updateItem(id: number, itemData: any) {
   form.append("description", itemData.description);
   form.append("pricePerWeek", itemData.pricePerWeek);
   form.append("howToUse", itemData.howToUse);
-  form.append("accesories", itemData.accessories);
+  form.append("accesories", itemData.accesories);
   form.append("weight", itemData.weight);
   form.append("dimensions", itemData.dimensions);
   form.append("tip", itemData.tip);
   form.append("status", itemData.status ?? "Beschikbaar");
+  form.append("timesLoaned", itemData.timesLoaned);
   if (itemData.lockerId) form.append("lockerId", itemData.lockerId);
   if (itemData.file) form.append("file", itemData.file);
+  if (itemData.category) form.append("category", itemData.category);
   const res = await fetch(getApiUrl(`dashboard/items/${id}`), {
     method: "PUT",
     body: form,

@@ -3,6 +3,7 @@ import { ItemCard } from "@/components/common/ItemCard";
 import { getItems } from "@/app/api/items";
 import ItemProps from "@/models/ItemProps";
 import { CategoryResponse } from "@/app/api/categories";
+import { getApiUrl } from "@/app/api/config";
 
 interface ItemPageProps {
   baseRoute?: string; // Optional prop to specify the base route
@@ -10,7 +11,11 @@ interface ItemPageProps {
   categories?: CategoryResponse[]; // Categories for filtering
 }
 
-export function ItemPage({ baseRoute, selectedCategoryId, categories = [] }: ItemPageProps) {
+export function ItemPage({
+  baseRoute,
+  selectedCategoryId,
+  categories = [],
+}: ItemPageProps) {
   const [items, setItems] = useState<ItemProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,9 +47,13 @@ export function ItemPage({ baseRoute, selectedCategoryId, categories = [] }: Ite
     return items.filter((item) => {
       // Check if item has a category and if it might match our selected category ID
       const categoryStr = item.category?.toLowerCase() || "";
-      const selectedCategoryObj = categories.find((c) => c.id === selectedCategoryId);
+      const selectedCategoryObj = categories.find(
+        (c) => c.id === selectedCategoryId
+      );
 
-      return selectedCategoryObj ? categoryStr.includes(selectedCategoryObj.name.toLowerCase()) : false;
+      return selectedCategoryObj
+        ? categoryStr.includes(selectedCategoryObj.name.toLowerCase())
+        : false;
     });
   }, [items, selectedCategoryId, categories]);
 
@@ -60,7 +69,22 @@ export function ItemPage({ baseRoute, selectedCategoryId, categories = [] }: Ite
         ) : filteredItems.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8">
             {filteredItems.map((item, index) => (
-              <ItemCard key={item.id} id={item.id} title={item.title} pricePerWeek={item.pricePerWeek} status={item.status} imageSrc={item.imageSrc} lockerId={item.lockerId} index={index} />
+              <ItemCard
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                pricePerWeek={item.pricePerWeek}
+                status={item.status}
+                imageSrc={
+                  item.imageSrc
+                    ? getApiUrl(
+                        `/photo?src=${encodeURIComponent(item.imageSrc)}`
+                      )
+                    : ""
+                }
+                lockerId={item.lockerId}
+                index={index}
+              />
             ))}
           </div>
         ) : (
