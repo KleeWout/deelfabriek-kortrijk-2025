@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace deelfabriek_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250612181607_Database")]
+    [Migration("20250612211016_Database")]
     partial class Database
     {
         /// <inheritdoc />
@@ -272,6 +272,34 @@ namespace deelfabriek_backend.Migrations
                     b.HasIndex("ReservationId");
 
                     b.ToTable("Report");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2023, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Rating = 5,
+                            ReservationId = 1,
+                            Status = true
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2023, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Rating = 1,
+                            Remark = "Item defect, Niet proper",
+                            ReservationId = 1,
+                            Status = true
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2023, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Rating = 5,
+                            Remark = "Item niet zoals verwacht, Handleiding ontbrak",
+                            ReservationId = 1,
+                            Status = true
+                        });
                 });
 
             modelBuilder.Entity("Deelkast.API.Models.Reservation", b =>

@@ -46,10 +46,15 @@ export default function TabletCodePage() {
       console.log("Enhanced reservation data:", enhancedReservationData);
 
       // Store enhanced data in localStorage for the next page
-      localStorage.setItem("reservationDetails", JSON.stringify(enhancedReservationData));
+      await localStorage.setItem(
+        "reservationDetails",
+        JSON.stringify(enhancedReservationData)
+      );
       if (enhancedReservationData.status === "Not_Active") {
         router.push("/tablet/ophaal-flow");
+        console.log(localStorage.getItem("reservationDetails"));
       } else if (enhancedReservationData.status === "Active") {
+        console.log(localStorage.getItem("reservationDetails"));
         router.push(`/tablet/return-flow`);
       } else {
         setError("Ongeldige code");
@@ -81,37 +86,77 @@ export default function TabletCodePage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--color-primarybackground)]">
       <div className="flex flex-col w-full max-w-[380px] items-center">
-        <div className="text-3xl font-bold text-[var(--color-primarygreen-1)] mb-1 w-full text-center whitespace-nowrap leading-tight">Ophalen of Terugbrengen</div>
-        <div className="text-xl text-[var(--color-primarytext-1)] mb-4 w-full text-center">Geef uw code in</div>
+        <div className="text-3xl font-bold text-[var(--color-primarygreen-1)] mb-1 w-full text-center whitespace-nowrap leading-tight">
+          Ophalen of Terugbrengen
+        </div>
+        <div className="text-xl text-[var(--color-primarytext-1)] mb-4 w-full text-center">
+          Geef uw code in
+        </div>
         <div className="mb-8 w-full">
-          <input type="text" value={code} readOnly className="text-center text-5xl font-semibold text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] rounded-lg w-full h-24 py-4 bg-white mb-2 tracking-widest outline-none" maxLength={MAX_CODE_LENGTH} />
+          <input
+            type="text"
+            value={code}
+            readOnly
+            className="text-center text-5xl font-semibold text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] rounded-lg w-full h-24 py-4 bg-white mb-2 tracking-widest outline-none"
+            maxLength={MAX_CODE_LENGTH}
+          />
         </div>
         {/* Keypad */}
         <div className="grid grid-cols-3 gap-4 w-full mb-8">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-            <button key={n} className="aspect-square w-full text-5xl font-semibold text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition flex items-center justify-center" onClick={() => handleKeypadClick(n.toString())} disabled={code.length >= MAX_CODE_LENGTH}>
+            <button
+              key={n}
+              className="aspect-square w-full text-5xl font-semibold text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition flex items-center justify-center"
+              onClick={() => handleKeypadClick(n.toString())}
+              disabled={code.length >= MAX_CODE_LENGTH}
+            >
               {n}
             </button>
           ))}
           {/* Vraagteken knop (nu niet-primary) */}
-          <button className="aspect-square w-full flex items-center justify-center border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition" onClick={handleHelp}>
-            <Question size={40} className="text-[var(--color-primarygreen-1)]" weight="bold" />
+          <button
+            className="aspect-square w-full flex items-center justify-center border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition"
+            onClick={handleHelp}
+          >
+            <Question
+              size={40}
+              className="text-[var(--color-primarygreen-1)]"
+              weight="bold"
+            />
           </button>
           {/* 0 knop */}
-          <button className="aspect-square w-full text-5xl font-semibold text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition flex items-center justify-center" onClick={() => handleKeypadClick("0")} disabled={code.length >= MAX_CODE_LENGTH}>
+          <button
+            className="aspect-square w-full text-5xl font-semibold text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition flex items-center justify-center"
+            onClick={() => handleKeypadClick("0")}
+            disabled={code.length >= MAX_CODE_LENGTH}
+          >
             0
           </button>
           {/* Backspace knop (nu niet-primary) */}
-          <button className="aspect-square w-full flex items-center justify-center border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition" onClick={handleDelete}>
-            <Backspace size={40} className="text-[var(--color-primarygreen-1)]" weight="bold" />
+          <button
+            className="aspect-square w-full flex items-center justify-center border-2 border-[var(--color-primarygreen-1)] rounded-lg bg-white hover:bg-[var(--color-primarygreen-2)] transition"
+            onClick={handleDelete}
+          >
+            <Backspace
+              size={40}
+              className="text-[var(--color-primarygreen-1)]"
+              weight="bold"
+            />
           </button>
         </div>
-        <button className="w-full h-16 bg-[var(--color-primarygreen-1)] text-white text-2xl rounded-lg font-bold shadow hover:bg-[#00664f] transition" onClick={handleEnter}>
+        <button
+          className="w-full h-16 bg-[var(--color-primarygreen-1)] text-white text-2xl rounded-lg font-bold shadow hover:bg-[#00664f] transition"
+          onClick={handleEnter}
+        >
           Enter
         </button>
       </div>
       {/* Toast notification */}
-      {showToast && <div className="fixed bottom-8 right-8 bg-[var(--color-primarypink-1)] text-white px-6 py-3 rounded-lg shadow-lg text-lg animate-fade-in">{error}</div>}
+      {showToast && (
+        <div className="fixed bottom-8 right-8 bg-[var(--color-primarypink-1)] text-white px-6 py-3 rounded-lg shadow-lg text-lg animate-fade-in">
+          {error}
+        </div>
+      )}
     </div>
   );
 }

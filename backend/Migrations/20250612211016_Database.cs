@@ -452,6 +452,16 @@ namespace deelfabriek_backend.Migrations
                     { 2, null, 2, new DateTime(2023, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 654321, new DateTime(2023, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2023, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 10.00m, 1, 2 }
                 });
 
+            migrationBuilder.InsertData(
+                table: "Report",
+                columns: new[] { "Id", "CreatedAt", "Rating", "Remark", "ReservationId", "Status" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2023, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, null, 1, true },
+                    { 2, new DateTime(2023, 6, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "Item defect, Niet proper", 1, true },
+                    { 3, new DateTime(2023, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, "Item niet zoals verwacht, Handleiding ontbrak", 1, true }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",

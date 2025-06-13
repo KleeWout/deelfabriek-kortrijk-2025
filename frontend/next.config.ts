@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   output: "standalone",
   images: {
-    domains: ["portal.payconiq.com", "shop.lecot.be"],
+    domains: ["portal.payconiq.com", "localhost"],
   },
   eslint: {
     ignoreDuringBuilds: true, // Ignore ESLint errors during build

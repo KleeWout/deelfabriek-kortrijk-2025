@@ -399,7 +399,7 @@ public static class AdminRoutes
 
             // Read the form data
             var form = await request.ReadFormAsync();
-
+            Console.WriteLine(form["accesories"]);
             // Update item properties from form
             existingItem.Title = form["title"];
             existingItem.Description = form["description"];
@@ -411,6 +411,8 @@ public static class AdminRoutes
             existingItem.Tip = form["tip"];
             existingItem.Status = Enum.TryParse<ItemStatus>(form["status"], out var status) ? status : ItemStatus.Beschikbaar;
             existingItem.LockerId = int.TryParse(form["lockerId"], out var lockerId) ? lockerId : null;
+            existingItem.Category = form["category"];
+            existingItem.TimesLoaned = int.TryParse(form["timesLoaned"], out var timesLoaned) ? timesLoaned : 0;
 
             // Handle image replacement
             if (form.Files.Count > 0)

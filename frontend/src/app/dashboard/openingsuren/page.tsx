@@ -315,7 +315,7 @@ export default function OpeningsurenPage() {
                         onChange={(e) =>
                           handleChange(idx, "gesloten", e.target.checked)
                         }
-                        className="w-5 h-5 accent-primarygreen-1 rounded border-2 border-primarygreen-1 focus:ring-2 focus:ring-primarygreen-1"
+                        className="w-4 h-4 accent-primarygreen-1 rounded border-2 border-primarygreen-1 focus:ring-2 focus:ring-primarygreen-1"
                       />
                       <span className="ml-2 text-gray-700 font-semibold">
                         Gesloten

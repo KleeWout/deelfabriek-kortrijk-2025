@@ -197,3 +197,10 @@ Content-Type: application/json
 ###
 // delete reservation 
 DELETE {{url}}/dashboard/reservations/5
+
+### GET Repports
+GET {{url}}/dashboard/reports
+
+###
+
+GET {{url}}/items/2

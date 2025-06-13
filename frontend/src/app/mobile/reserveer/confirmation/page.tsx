@@ -4,7 +4,17 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Navigation from "@/components/mobile/nav";
 import { format, addDays } from "date-fns";
-import { Note, EnvelopeSimple, Key, User, Package, CalendarCheck, CalendarX, CurrencyEur, DeviceMobile } from "phosphor-react";
+import {
+  Note,
+  EnvelopeSimple,
+  Key,
+  User,
+  Package,
+  CalendarCheck,
+  CalendarX,
+  CurrencyEur,
+  DeviceMobile,
+} from "phosphor-react";
 import Footer from "@/components/mobile/footer";
 import { clearReservationData } from "@/utils/storage";
 
@@ -93,22 +103,32 @@ function ReservationContent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-primarybackground">
-      <h1 className="text-3xl font-bold text-center text-primarygreen-1 mb-2">Reservering Bevestigd!</h1>
-      <p className="text-center text-gray-600 mb-6">Uw locker is succesvol gereserveerd</p>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-center text-primarygreen-1 mb-2">
+        Reservering Bevestigd!
+      </h1>
+      <p className="text-center text-gray-600 mb-6">
+        Uw locker is succesvol gereserveerd
+      </p>
       <div className="bg-primarygreen-1 text-white p-6 rounded-lg mb-6">
         <div className="text-center">
           <h2 className="text-lg font-medium mb-2">Ophaal code</h2>
-          <div className="text-5xl font-bold tracking-[0.3em] mb-2">{reservationDetails.code}</div>
+          <div className="text-5xl font-bold tracking-[0.3em] mb-2">
+            {reservationDetails.code}
+          </div>
         </div>
       </div>
       <div className="flex items-center justify-center text-primarygreen-1 bg-primarygreen-2/20 p-3 rounded-lg mb-6">
         <EnvelopeSimple size={20} className="mr-2" />
-        <p className="font-medium">Er is een bevestigingsmail verstuurd met jouw ophaalcode</p>
+        <p className="font-medium">
+          Er is een bevestigingsmail verstuurd met jouw ophaalcode
+        </p>
       </div>
       <div className="flex items-center justify-center text-red-800 bg-red-100 p-3 rounded-lg mb-6 border border-red-300">
         <CalendarX size={20} className="mr-2" />
-        <p className="font-medium">Haal je item op voor de deadline, anders vervalt je reservatie!</p>
+        <p className="font-medium">
+          Haal je item op voor de deadline, anders vervalt je reservatie!
+        </p>
       </div>
       <div className="bg-white rounded-lg p-6 mb-6">
         <div className="space-y-4">
@@ -140,9 +160,13 @@ function ReservationContent() {
             <div className="flex flex-col">
               <div className="flex gap-2">
                 <span className="font-bold">Ophalen voor:</span>
-                <span className="text-red-600 font-medium">{formatDate(reservationDetails.returnDate)}</span>
+                <span className="text-red-600 font-medium">
+                  {formatDate(reservationDetails.returnDate)}
+                </span>
               </div>
-              <span className="text-xs text-gray-500">Haal je item op voor deze deadline!</span>
+              <span className="text-xs text-gray-500">
+                Haal je item op voor deze deadline!
+              </span>
             </div>
           </div>
           <div className="flex items-start">
@@ -151,7 +175,9 @@ function ReservationContent() {
             </div>
             <div className="flex flex-col">
               <span className="font-bold">Betaal bij ophalen</span>
-              <span className="text-xs text-gray-500">Na betaling krijg je de huurperiode te zien</span>
+              <span className="text-xs text-gray-500">
+                Na betaling krijg je de huurperiode te zien
+              </span>
             </div>
           </div>
           <div className="flex items-center">
@@ -159,7 +185,9 @@ function ReservationContent() {
               <CurrencyEur size={20} className="text-primarygreen-1" />
             </div>
             <span className="font-bold">Betaling:</span>
-            <span className="ml-2">€ {reservationDetails.price} - via Payconiq</span>
+            <span className="ml-2">
+              € {reservationDetails.price} - via Payconiq
+            </span>
           </div>
         </div>
       </div>
@@ -178,10 +206,15 @@ function ReservationContent() {
       </div>
       <div className="flex items-center justify-center text-red-700 font-medium gap-2 p-3 bg-red-100 rounded-lg">
         <DeviceMobile size={48} />
-        <p>Vergeet niet uw telefoon mee te nemen voor de betaling ter plaatse</p>
+        <p>
+          Vergeet niet uw telefoon mee te nemen voor de betaling ter plaatse
+        </p>
       </div>
       <div className="mt-8 flex justify-center">
-        <button onClick={() => router.push("/mobile")} className="bg-primarygreen-1 text-white py-3 px-8 rounded-lg text-lg font-medium hover:bg-green-800 transition-colors flex items-center gap-2">
+        <button
+          onClick={() => router.push("/mobile")}
+          className="bg-primarygreen-1 text-white py-3 px-8 rounded-lg text-lg font-medium hover:bg-green-800 transition-colors flex items-center gap-2"
+        >
           Terug naar Home
         </button>
       </div>
