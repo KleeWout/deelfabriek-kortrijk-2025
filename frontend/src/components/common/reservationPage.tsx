@@ -125,7 +125,9 @@ export default function ReservationPage() {
     return (
       <div className="container mx-auto p-4">
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
-          <ReturnButton href="/mobile/items" />
+          <ReturnButton
+            href={isTabletRoute ? "/tablet/items" : "/mobile/items"}
+          />
           <h1 className="text-2xl font-bold text-primarygreen-1">
             Item laden...
           </h1>
@@ -142,7 +144,9 @@ export default function ReservationPage() {
     return (
       <div className="container mx-auto p-4">
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
-          <ReturnButton href="/mobile/items" />
+          <ReturnButton
+            href={isTabletRoute ? "/tablet/items" : "/mobile/items"}
+          />
           <h1 className="text-2xl font-bold text-red-500">
             Item niet gevonden
           </h1>
@@ -541,21 +545,21 @@ export default function ReservationPage() {
           {termsError && (
             <p className="text-red-500 text-xs mt-1">{termsError}</p>
           )}
+          <div className="flex justify-center items-center w-full">
+            <button
+              form="reservationForm"
+              type="submit"
+              disabled={isSubmitting}
+              className="w-64 bg-primarygreen-1 text-white py-3 px-4 rounded-lg hover:bg-green-900 transition-colors disabled:bg-gray-400"
+            >
+              {isSubmitting
+                ? "Bezig met reserveren..."
+                : isTabletRoute
+                  ? "Huur nu"
+                  : "Reserveren"}
+            </button>
+          </div>
         </form>
-      </div>
-      <div className="flex justify-center items-center w-full">
-        <button
-          form="reservationForm"
-          type="submit"
-          disabled={isSubmitting}
-          className="w-64 bg-primarygreen-1 text-white py-3 px-4 rounded-lg hover:bg-green-900 transition-colors disabled:bg-gray-400"
-        >
-          {isSubmitting
-            ? "Bezig met reserveren..."
-            : isTabletRoute
-              ? "Huur nu"
-              : "Reserveren"}
-        </button>
       </div>
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
