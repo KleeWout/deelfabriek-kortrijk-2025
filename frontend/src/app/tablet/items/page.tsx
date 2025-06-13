@@ -14,8 +14,8 @@ export default function TabletItemsPage() {
   return (
     <div className="flex flex-col bg-[#f3f6f8] overflow-x-hidden">
       {/* Header bar */}
-      <div className="relative flex items-center w-full max-w-7xl pt-6 pb-2 px-8">
-        <div className="flex-shrink-0">
+      <div className="relative flex items-center w-full max-w-7xl px-6 h-[64px] pt-4">
+        <div className="flex-shrink-0 absolute z-10">
           <ReturnButton href="/tablet" />
         </div>
         <h1
