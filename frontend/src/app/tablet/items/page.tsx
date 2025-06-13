@@ -12,19 +12,24 @@ export default function TabletItemsPage() {
   const baseRoute = "/tablet/items";
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f3f6f8]">
+    <div className="flex flex-col bg-[#f3f6f8] overflow-x-hidden">
       {/* Header bar */}
-
-      {/* Title and back arrow */}
-      <div className="flex items-center justify-between w-full max-w-7xl mx-auto mt-10 mb-8 px-8">
-        <ReturnButton href="/tablet" />
-        <h1 className="text-4xl font-extrabold tracking-wide text-gray-700 mx-auto" style={{ letterSpacing: 1 }}>
+      <div className="relative flex items-center w-full max-w-7xl pt-6 pb-2 px-8">
+        <div className="flex-shrink-0">
+          <ReturnButton href="/tablet" />
+        </div>
+        <h1
+          className="text-4xl font-extrabold tracking-wide text-gray-700 absolute w-screen text-center
+            "
+          style={{ letterSpacing: 1 }}
+        >
           SELECTEER EEN ITEM
         </h1>
-        <div className="w-16" /> {/* Spacer for symmetry */}
+        <div className="flex-shrink-0 w-[44px]" />
       </div>
-
-      <ItemPage baseRoute={baseRoute} />
+      <div className="flex-1 flex flex-col">
+        <ItemPage baseRoute={baseRoute} />
+      </div>
     </div>
   );
 }
