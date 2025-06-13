@@ -1,10 +1,9 @@
-import ReservationPage from "@/components/common/reservationPage"
+import ReservationPage from "@/components/common/reservationPage";
 
-export default function MobileReservationPage(){
-
+export default function MobileReservationPage() {
   return (
-  <div>
-    <ReservationPage />
-  </div>
-  )
+    <div className="w-full">
+      <ReservationPage />
+    </div>
+  );
 }

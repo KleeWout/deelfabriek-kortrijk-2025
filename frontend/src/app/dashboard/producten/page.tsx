@@ -112,10 +112,8 @@ export default function ItemsPage() {
   const handleSave = async () => {
     try {
       setLoading(true);
-      const oldata = await fetch(getApiUrl("/items/" + formData.id));
-      const oldataJson = await oldata.json();
-      // Convert form data to the right format
-      const itemData = {
+
+      let itemData: any = {
         file: formData.imageFile ?? undefined,
         title: formData.title,
         pricePerWeek: parseFloat(formData.price),
@@ -124,17 +122,29 @@ export default function ItemsPage() {
         weight: formData.weight,
         dimensions: formData.dimensions,
         tip: formData.tip,
-        status: oldataJson.status,
         description: formData.description,
-        lockerId: oldataJson.lockerId,
         category: formData.category,
-        timesLoaned: oldataJson.timesLoaned,
       };
+
       if (editingItem) {
-        // Update existing item
+        // Only fetch old data if editing
+        const oldata = await fetch(getApiUrl("/items/" + formData.id));
+        const oldataJson = await oldata.json();
+        itemData = {
+          ...itemData,
+          status: oldataJson.status,
+          lockerId: oldataJson.lockerId,
+          timesLoaned: oldataJson.timesLoaned,
+        };
         await updateItem(editingItem.id, itemData);
       } else {
-        // Add new item
+        // Set defaults for new item
+        itemData = {
+          ...itemData,
+          status: "Beschikbaar",
+          lockerId: "",
+          timesLoaned: 0,
+        };
         await createItem(itemData);
       }
 
@@ -211,7 +221,8 @@ export default function ItemsPage() {
   // Fetch image for form preview
   useEffect(() => {
     let isMounted = true;
-    if (formData.imageSrc) {
+    // Only fetch if there is an imageSrc and NO local imageFile
+    if (formData.imageSrc && !formData.imageFile) {
       fetch(getApiUrl(`/photo?src=${encodeURIComponent(formData.imageSrc)}`))
         .then((res) => res.blob())
         .then((blob) => {
@@ -220,13 +231,16 @@ export default function ItemsPage() {
         .catch(() => {
           if (isMounted) setFetchedFormImg(null);
         });
+    } else if (formData.imageFile) {
+      // If there is a local file, show its preview
+      setFetchedFormImg(URL.createObjectURL(formData.imageFile));
     } else {
       setFetchedFormImg(null);
     }
     return () => {
       isMounted = false;
     };
-  }, [formData.imageSrc]);
+  }, [formData.imageSrc, formData.imageFile]);
   if (currentView === "list") {
     return (
       <div className="p-6 bg-gray-100 min-h-screen">

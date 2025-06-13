@@ -58,16 +58,25 @@ export function ItemPage({
   }, [items, selectedCategoryId, categories]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Main content area that will expand to fill space */}
-      <main className="flex-1">
-        {" "}
+    <div className=" bg-[#f3f6f8]">
+      {/* Main content area */}
+      <main className="flex-1 w-full mx-auto px-2 sm:px-6 py-4">
         {loading ? (
-          <div className="text-center py-8 min-h-96">Loading items...</div>
+          <div className="flex flex-col items-center justify-center py-16 min-h-96">
+            <span className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primarygreen-1 mb-4"></span>
+            <span className="text-lg text-primarygreen-1 font-semibold">
+              Items laden...
+            </span>
+          </div>
         ) : error ? (
-          <div className="text-center text-red-500 py-8 min-h-96">{error}</div>
+          <div className="flex flex-col items-center justify-center py-16 min-h-96">
+            <span className="text-3xl mb-2">😢</span>
+            <span className="text-center text-red-500 text-lg font-semibold">
+              {error}
+            </span>
+          </div>
         ) : filteredItems.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 sm:w-full">
             {filteredItems.map((item, index) => (
               <ItemCard
                 key={item.id}
@@ -88,8 +97,9 @@ export function ItemPage({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 min-h-96 text-gray-500">
-            <p>Geen items beschikbaar</p>
+          <div className="flex flex-col items-center justify-center py-16 min-h-96 text-gray-500">
+            <span className="text-3xl mb-2">🔍</span>
+            <p className="text-lg">Geen items beschikbaar</p>
           </div>
         )}
       </main>
