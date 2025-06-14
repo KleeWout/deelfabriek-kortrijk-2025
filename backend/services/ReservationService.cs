@@ -302,6 +302,7 @@ public class ReservationService : IReservationService
     // Helper methode voor het voltooien van een return
     private async Task<ReservationViewKioskDto> CompleteReturn(Reservation reservation)
     {
+        Console.WriteLine("Completing return for reservation...");
         reservation.ActualReturnDate = DateTime.Now;
         reservation.Status = ReservationStatus.Completed;
 
@@ -589,15 +590,31 @@ public class ReservationService : IReservationService
         {
             try
             {
+                // Update reservation status
                 reservation.ActualReturnDate = DateTime.Now;
                 reservation.Status = ReservationStatus.Completed;
 
                 // Update item status back to beschikbaar
                 reservation.Item.Status = ItemStatus.Beschikbaar;
+
+                // Save both updates
                 await _itemRepo.UpdateAsync(reservation.Item);
                 await _resRepo.UpdateAsync(reservation);
 
+                // Commit transaction
                 await transaction.CommitAsync();
+
+                // Map to DTO first before any non-transactional operations
+                var dto = _mapper.Map<ReservationViewKioskDto>(reservation);
+                dto.HasFine = false;
+                dto.FineAmount = 0;
+                dto.RequiresPayment = false;
+
+                // Post-transaction operations (non-critical for data consistency)
+                await SendReturnConfirmationEmail(reservation);
+                await NotifyUsersItemAvailable(reservation.Item);
+
+                return dto;
             }
             catch (Exception ex)
             {
@@ -605,8 +622,25 @@ public class ReservationService : IReservationService
                 throw new Exception($"Failed to complete reservation: {ex.Message}", ex);
             }
         }
+    }
 
-        return _mapper.Map<ReservationViewKioskDto>(reservation);
+    private async Task SendReturnConfirmationEmail(Reservation reservation)
+    {
+        try
+        {
+            var user = await _userRepo.GetByIdAsync(reservation.UserId);
+            var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
+
+            if (user != null && item != null)
+            {
+                await _emailService.SendReturnConfirmation(user, item, reservation);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log but don't fail the operation
+            Console.WriteLine($"Failed to send return confirmation email: {ex.Message}");
+        }
     }
 
     private async Task<int> GenerateUnique6DigitCode()

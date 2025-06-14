@@ -76,7 +76,7 @@ public class EmailNotificationService : IEmailNotificationService
             await _mailService.SendMailAsync(user.Email, subject, htmlBody);
 
             // Ook admin notificatie sturen
-            await SendAdminReturnConfirmation(user, item, reservation);
+            // await SendAdminReturnConfirmation(user, item, reservation);
         }
         catch (Exception ex)
         {
