@@ -293,96 +293,99 @@ public static class AdminRoutes
 
         // post items
         // Combined endpoint for posting items with or without image
-        group.MapPost("/", async (HttpContext httpContext, IItemService itemService, ItemValidator validator) =>
+        group.MapPost("/", async (HttpContext httpContext, IItemService itemService, ItemValidator validator, IWebHostEnvironment environment) =>
+{
+    try
+    {
+        Item item;
+        var contentType = httpContext.Request.ContentType ?? string.Empty;
+
+        if (contentType.StartsWith("multipart/form-data"))
         {
-            try
+            var form = await httpContext.Request.ReadFormAsync();
+
+            item = new Item
             {
-                Item item;
+                Title = form["title"],
+                Description = form["description"],
+                PricePerWeek = decimal.TryParse(form["pricePerWeek"], out var price) ? price : null,
+                HowToUse = form["howToUse"],
+                Accesories = form["accesories"],
+                Weight = decimal.TryParse(form["weight"], out var weight) ? weight : null,
+                Dimensions = form["dimensions"],
+                Tip = form["tip"],
+                Status = ItemStatus.Ongebruikt,
+                LockerId = int.TryParse(form["lockerId"], out var lockerId) ? lockerId : null,
+                Category = form["category"],
+                ImageSrc = ""
+            };
 
-                // Check content type to determine how to handle the request
-                var contentType = httpContext.Request.ContentType ?? string.Empty;
-
-                if (contentType.StartsWith("multipart/form-data"))
-                {
-                    // Handle form data with possible file upload
-                    var form = await httpContext.Request.ReadFormAsync();
-
-                    // Extract item data from form
-                    item = new Item
-                    {
-                        Title = form["title"],
-                        Description = form["description"],
-                        PricePerWeek = decimal.TryParse(form["pricePerWeek"], out var price) ? price : null,
-                        HowToUse = form["howToUse"],
-                        Accesories = form["accesories"],
-                        Weight = decimal.TryParse(form["weight"], out var weight) ? weight : null,
-                        Dimensions = form["dimensions"],
-                        Tip = form["tip"],
-                        Status = ItemStatus.Ongebruikt,
-                        LockerId = int.TryParse(form["lockerId"], out var lockerId) ? lockerId : null,
-                        Category = form["category"],
-                        ImageSrc = "" // Set empty initially to pass validation
-                    };
-
-                    // Handle file upload
-                    if (form.Files.Count > 0)
-                    {
-                        var file = form.Files[0];
-
-                        // Validate file type
-                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-                        var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-                        if (!allowedExtensions.Contains(fileExtension))
-                        {
-                            return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
-                        }
-
-                        // Create uploads directory if it doesn't exist
-                        var uploadsPath = Path.GetFullPath("./uploads/");
-                        Directory.CreateDirectory(uploadsPath);
-
-                        // Use original filename
-                        var fileName = file.FileName;
-                        var filePath = Path.Combine(uploadsPath, fileName);
-
-                        // Save the file
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await file.CopyToAsync(stream);
-                        }
-
-                        // Set the filename
-                        item.ImageSrc = fileName;
-                    }
-                }
-                else
-                {
-                    // Handle JSON request
-                    item = await httpContext.Request.ReadFromJsonAsync<Item>();
-                    if (item == null)
-                    {
-                        return Results.BadRequest("Invalid item data");
-                    }
-                }
-
-                // Validate the item
-                var validationResult = await validator.ValidateAsync(item);
-                if (!validationResult.IsValid)
-                {
-                    var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                    return Results.BadRequest(warnings);
-                }
-
-                // Save item to database
-                await itemService.AddItem(item);
-                return Results.Created($"/items/{item.Id}", item);
-            }
-            catch (Exception ex)
+            if (form.Files.Count > 0)
             {
-                return Results.Problem($"An error occurred while creating the item: {ex.Message}");
+                var file = form.Files[0];
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
+                }
+
+                // Use the same path as your static files configuration
+                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads");
+                Console.WriteLine($"Saving file to: {uploadsPath}");
+
+                // Ensure directory exists
+                Directory.CreateDirectory(uploadsPath);
+
+                // Generate unique filename to avoid conflicts
+                var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                var filePath = Path.Combine(uploadsPath, fileName);
+
+                Console.WriteLine($"Full file path: {filePath}");
+
+                try
+                {
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                    Console.WriteLine($"File saved successfully: {fileName}");
+                    item.ImageSrc = fileName;
+                }
+                catch (Exception fileEx)
+                {
+                    Console.WriteLine($"Error saving file: {fileEx.Message}");
+                    return Results.Problem($"Error saving file: {fileEx.Message}");
+                }
             }
-        }).DisableAntiforgery();
+        }
+        else
+        {
+            item = await httpContext.Request.ReadFromJsonAsync<Item>();
+            if (item == null)
+            {
+                return Results.BadRequest("Invalid item data");
+            }
+        }
+
+        var validationResult = await validator.ValidateAsync(item);
+        if (!validationResult.IsValid)
+        {
+            var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            return Results.BadRequest(warnings);
+        }
+
+        await itemService.AddItem(item);
+        return Results.Created($"/items/{item.Id}", item);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Exception in item creation: {ex}");
+        return Results.Problem($"An error occurred while creating the item: {ex.Message}");
+    }
+});
         // Keep compatibility with existing frontend code that uses /with-image endpoint
         group.MapPost("/with-image", async (HttpContext httpContext, IItemService itemService, ItemValidator validator) =>
         {
