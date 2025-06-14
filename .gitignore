@@ -29,6 +29,7 @@ obj/
 # Don't ignore all appsettings, as they contain structure information
 # But do ignore production settings with sensitive data
 **/appsettings.Production.json
+**/appsettings.json
 
 # MySQL data
 db_data/

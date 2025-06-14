@@ -11,9 +11,7 @@ export default function MobileItemPage() {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
-    null
-  );
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
   useEffect(() => {
     clearAllAppData();
@@ -43,14 +41,11 @@ export default function MobileItemPage() {
       setSelectedCategoryId(categoryId);
     }
   };
-
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Main content grows and pushes footer down */}
-      <main className="flex-grow flex flex-col">
-        <h1 className="text-primarygreen-1 font-bold text-xl px-6 pb-2 pt-6 mb-0">
-          Bekijk onze items
-        </h1>
+      {/* Main content takes exactly screen height minus footer height */}
+      <main className="h-dvh flex flex-col overflow-y-auto">
+        <h1 className="text-primarygreen-1 font-bold text-xl px-6 pb-2 pt-6 mb-0">Bekijk onze items</h1>
 
         <div className="flex gap-2 overflow-x-auto px-6 py-2 hide-scrollbar">
           {loading ? (
@@ -61,29 +56,15 @@ export default function MobileItemPage() {
             <div className="text-red-500 px-4">{error}</div>
           ) : (
             <>
-              <CategoryCard
-                key="all"
-                title="Alle items"
-                onClick={() => setSelectedCategoryId(null)}
-                isSelected={selectedCategoryId === null}
-              />
+              <CategoryCard key="all" title="Alle items" onClick={() => setSelectedCategoryId(null)} isSelected={selectedCategoryId === null} />
               {categories.map((category) => (
-                <CategoryCard
-                  key={category.id}
-                  iconName={category.iconName}
-                  title={category.name}
-                  onClick={() => handleCategoryClick(category.id)}
-                  isSelected={selectedCategoryId === category.id}
-                />
+                <CategoryCard key={category.id} iconName={category.iconName} title={category.name} onClick={() => handleCategoryClick(category.id)} isSelected={selectedCategoryId === category.id} />
               ))}
             </>
           )}
         </div>
 
-        <ItemPage
-          selectedCategoryId={selectedCategoryId}
-          categories={categories}
-        />
+        <ItemPage selectedCategoryId={selectedCategoryId} categories={categories} />
       </main>
 
       {/* Footer immediately after main, no margin/padding on main */}

@@ -76,7 +76,7 @@ export function ItemPage({
             </span>
           </div>
         ) : filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 sm:w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8">
             {filteredItems.map((item, index) => (
               <ItemCard
                 key={item.id}
