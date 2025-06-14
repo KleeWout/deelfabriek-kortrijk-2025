@@ -20,27 +20,27 @@ export function ItemCard(props: ItemCardProps & { onClick?: () => void }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [fetchedImg, setFetchedImg] = useState<string | null>(null);
-  useEffect(() => {
-    let isMounted = true;
+  // const [fetchedImg, setFetchedImg] = useState<string | null>(null);
+  // useEffect(() => {
+  //   let isMounted = true;
 
-    const fetchImage = async () => {
-      if (imageSrc) {
-        try {
-          const imageUrl = await getItemImage(imageSrc);
-          if (isMounted) setFetchedImg(imageUrl);
-        } catch (error) {
-          if (isMounted) setFetchedImg(null);
-        }
-      }
-    };
+  //   const fetchImage = async () => {
+  //     if (imageSrc) {
+  //       try {
+  //         const imageUrl = await getItemImage(imageSrc);
+  //         if (isMounted) setFetchedImg(imageUrl);
+  //       } catch (error) {
+  //         if (isMounted) setFetchedImg(null);
+  //       }
+  //     }
+  //   };
 
-    fetchImage();
+  //   fetchImage();
 
-    return () => {
-      isMounted = false;
-    };
-  }, [imageSrc]);
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [imageSrc]);
 
   // If baseRoute is not provided, determine it from the current path
   const resolvedBaseRoute = baseRoute || (pathname.startsWith("/mobile") ? "/mobile/items" : pathname.startsWith("/tablet") ? "/tablet/items" : "/items");
