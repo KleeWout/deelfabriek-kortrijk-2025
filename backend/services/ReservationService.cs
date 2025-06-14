@@ -188,16 +188,6 @@ public class ReservationService : IReservationService
 
                 // Commit the transaction
                 await transaction.CommitAsync();
-                try
-                {
-                    await _emailService.SendReservationConfirmation(user, item, reservation);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error sending reservation confirmation email: {ex.Message}");
-                    throw;
-                }
-
             }
             catch (Exception ex)
             {
@@ -205,6 +195,20 @@ public class ReservationService : IReservationService
                 await transaction.RollbackAsync();
                 throw new Exception($"Failed to create reservation: {ex.Message}", ex);
             }
+        }
+
+        // Send email notification AFTER transaction is committed
+        // This way, if email fails, the database transaction is already complete
+        try
+        {
+            await _emailService.SendReservationConfirmation(user, item, reservation);
+        }
+        catch (Exception ex)
+        {
+            // Log the error but don't throw exception - allow reservation to succeed
+            // even if email notification fails
+            Console.WriteLine($"Error sending reservation confirmation email: {ex.Message}");
+            // We don't rethrow the exception here
         }
 
         var response = new ReservationCreatedDto

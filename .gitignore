@@ -22,6 +22,9 @@ node_modules/
 # .NET
 bin/
 obj/
+# Configuration files with sensitive data
+**/appsettings.json
+**/appsettings.Development.json
 
 # MySQL data
 db_data/

@@ -46,6 +46,7 @@ builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>(
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
+
 builder.Services.AddValidatorsFromAssemblyContaining<ItemValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
@@ -111,6 +112,18 @@ adminApi.MapGroup("/reservations").GroupAdminReservations();
 adminApi.MapGroup("/openingshours").GroupAdminOpeningHours();
 adminApi.MapGroup("/reports").GroupAdminReports();
 
+app.MapGet("/mail", async ( MailService mailSender) =>
+{
+    try
+    {
+        await mailSender.SendMailAsync("wout.klee@gmail.com", "Test Email2", "<h1>This is a test email</h1><p>If you see this, the email service is working!</p>");
+        return Results.Ok($"Email sent successfully");
+    }
+    catch (Exception)
+    {
+        return Results.Problem("Failed to send email. Please check the SMTP configuration.");
+    }
+});
 
 
 app.Run();
