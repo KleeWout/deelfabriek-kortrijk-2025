@@ -26,8 +26,9 @@ obj/
 **/Properties/launchSettings.json
 *.userprefs
 
-# Don't ignore appsettings completely, as they contain structure information
-# Instead, make sure all sensitive data is stored in user secrets
+# Don't ignore all appsettings, as they contain structure information
+# But do ignore production settings with sensitive data
+**/appsettings.Production.json
 
 # MySQL data
 db_data/

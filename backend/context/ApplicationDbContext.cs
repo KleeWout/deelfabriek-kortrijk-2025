@@ -74,8 +74,8 @@ public class ApplicationDbContext : IdentityDbContext
 
         // Seed Categories
         modelBuilder.Entity<Category>().HasData(
-            new Category { Id = 1, Name = "Elektrisch", IconName = "electricity" },
-            new Category { Id = 2, Name = "Speelgoed", IconName = "toy" },
+            new Category { Id = 1, Name = "Huishoud", IconName = "Broom" },
+            new Category { Id = 2, Name = "Speelgoed", IconName = "Lego" },
             new Category { Id = 3, Name = "Tuingereedschap", IconName = "garden-tools" },
             new Category { Id = 4, Name = "Keukenapparatuur", IconName = "kitchen-appliances" }
         );
@@ -140,6 +140,7 @@ public class ApplicationDbContext : IdentityDbContext
             Dimensions = null,
             CreatedAt = new DateTime(2023, 6, 5),
             LockerId = 1,
+            Category = "Huishoud",
         },
         new Item
         {
