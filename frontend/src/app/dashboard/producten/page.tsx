@@ -208,7 +208,7 @@ export default function ItemsPage() {
         items.map(async (item) => {
           if (item.imageSrc) {
             try {
-              const res = await fetch(getApiUrl(`/images/${item.imageSrc}`));
+              const res = await fetch(getApiUrl(`/images/items/${item.imageSrc}`));
               const blob = await res.blob();
               newImgs[item.id] = URL.createObjectURL(blob);
             } catch {
