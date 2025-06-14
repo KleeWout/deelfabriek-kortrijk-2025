@@ -28,7 +28,8 @@ services:
       - 3001:3001
     volumes:
       - uploads_data:/app/Uploads
-    user: "1000:1000" # Match with user ID that owns the directory
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
     restart: unless-stopped
 
   database:
