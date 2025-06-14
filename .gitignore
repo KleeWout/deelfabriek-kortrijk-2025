@@ -22,9 +22,12 @@ node_modules/
 # .NET
 bin/
 obj/
-# Configuration files with sensitive data
-**/appsettings.json
-**/appsettings.Development.json
+# User Secrets
+**/Properties/launchSettings.json
+*.userprefs
+
+# Don't ignore appsettings completely, as they contain structure information
+# Instead, make sure all sensitive data is stored in user secrets
 
 # MySQL data
 db_data/
