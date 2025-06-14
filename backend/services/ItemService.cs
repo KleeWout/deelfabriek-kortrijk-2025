@@ -13,6 +13,9 @@ public interface IItemService
     // Task<List<ItemsPageDto>> GetItemsByCategoryAsync(int categoryId);
     Task<List<ItemNameDto>> GetAvailableItems();
 
+    Task<int> CurrentAvailableItems();
+    Task<int> CurrentLoanedItems();
+
     // category related methods
 
     // Task<Item> GetItemByIdWithCategories(int id);
@@ -101,6 +104,16 @@ public class ItemService : IItemService
     //     return _mapper.Map<ItemDetailDto>(item);
 
     // }
+
+    public async Task<int> CurrentAvailableItems()
+    {
+        return await _customItemRepository.CurrentAvailableItems();
+    }
+    
+    public async Task<int> CurrentLoanedItems()
+    {
+        return await _customItemRepository.CurrentLoanedItems();
+    }
 
     public async Task AddItem(Item item)
     {

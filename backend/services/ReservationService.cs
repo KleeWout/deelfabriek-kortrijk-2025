@@ -30,6 +30,9 @@ public interface IReservationService
 
     Task NotifyUsersItemAvailable(Item item);
 
+    Task<int> CountOverdueItemsAsync();
+    Task<int> TotalTimesItemsLoanedAsync();
+
 }
 
 public class ReservationService : IReservationService
@@ -74,6 +77,16 @@ public class ReservationService : IReservationService
         var reservation = await _customreservationRepository.GetByIdAsync(id);
         return _mapper.Map<ReservationViewDto>(reservation);
 
+    }
+
+    public async Task<int> CountOverdueItemsAsync()
+    {
+        return await _customreservationRepository.CountOverdueItemsAsync();
+    }
+
+    public async Task<int> TotalTimesItemsLoanedAsync()
+    {
+        return await _customreservationRepository.TotalTimesItemsLoanedAsync();
     }
     public async Task DeleteReservation(int id)
     {
@@ -447,9 +460,7 @@ public class ReservationService : IReservationService
                 var item = await _itemRepo.GetByIdAsync(reservation.ItemId);
                 if (item != null)
                 {
-                    item.Status = ItemStatus.Beschikbaar;
                     reservation.Status = ReservationStatus.Cancelled;
-                    await NotifyUsersItemAvailable(reservation.Item);
                     await _itemRepo.UpdateAsync(item);
                 }
 
