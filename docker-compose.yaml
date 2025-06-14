@@ -26,6 +26,8 @@ services:
       #   - linux/arm64
     ports:
       - 3001:3001
+    volumes:
+      - uploads_data:/app/Uploads
     restart: unless-stopped
 
   database:
@@ -54,3 +56,4 @@ services:
 
 volumes:
   db_data:
+  uploads_data:
