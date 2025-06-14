@@ -103,18 +103,35 @@ app.MapGet("/photo", (IHostEnvironment env, string? src) =>
     if (string.IsNullOrWhiteSpace(src))
         return Results.BadRequest("Missing 'src' query parameter.");
 
-    // Only allow file names, not paths
-    var fileName = Path.GetFileName(src);
-    var filePath = Path.Combine(env.ContentRootPath, "Uploads", "items", fileName);
+    string filePath;
+
+    // Handle paths with items/ prefix 
+    if (src.StartsWith("items/"))
+    {
+        // Extract just the filename from the path
+        string fileName = Path.GetFileName(src);
+        filePath = Path.Combine(env.ContentRootPath, "Uploads", "items", fileName);
+    }
+    else
+    {
+        // Backward compatibility for old paths
+        string fileName = Path.GetFileName(src);
+        filePath = Path.Combine(env.ContentRootPath, "Uploads", "items", fileName);
+    }
 
     if (!System.IO.File.Exists(filePath))
         return Results.NotFound("File not found.");
 
     var contentType = "application/octet-stream";
-    if (fileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+    string fileExt = Path.GetExtension(src).ToLowerInvariant();
+    if (fileExt == ".png")
         contentType = "image/png";
-    else if (fileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+    else if (fileExt == ".jpg" || fileExt == ".jpeg")
         contentType = "image/jpeg";
+    else if (fileExt == ".gif")
+        contentType = "image/gif";
+    else if (fileExt == ".webp")
+        contentType = "image/webp";
 
     return Results.File(filePath, contentType);
 });
