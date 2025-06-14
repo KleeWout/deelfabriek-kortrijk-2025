@@ -350,7 +350,8 @@ public static class AdminRoutes
                         await file.CopyToAsync(stream);
                     }
                     Console.WriteLine($"File saved successfully: {fileName}");
-                    item.ImageSrc = fileName;
+                    // Add "items/" prefix to ImageSrc for database storage
+                    item.ImageSrc = $"items/{fileName}";
                 }
                 catch (Exception fileEx)
                 {
@@ -434,10 +435,8 @@ public static class AdminRoutes
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
-                    }
-
-                    // Set the filename
-                    item.ImageSrc = fileName;
+                    }                    // Set the filename with items/ prefix
+                    item.ImageSrc = $"items/{fileName}";
                 }
 
                 // Validate the item
@@ -504,12 +503,17 @@ public static class AdminRoutes
                 Console.WriteLine($"Updating file to: {uploadsPath}");
 
                 // Ensure directory exists
-                Directory.CreateDirectory(uploadsPath);
-
-                // Delete old image if it exists
+                Directory.CreateDirectory(uploadsPath);                // Delete old image if it exists
                 if (!string.IsNullOrEmpty(existingItem.ImageSrc))
                 {
-                    var oldImagePath = Path.Combine(uploadsPath, existingItem.ImageSrc);
+                    // Extract just the filename, removing the "items/" prefix if present
+                        string existingFileName = existingItem.ImageSrc;
+                        if (existingFileName.StartsWith("items/"))
+                        {
+                            existingFileName = existingFileName.Substring(6); // Remove "items/" prefix
+                        }
+    
+                        var oldImagePath = Path.Combine(uploadsPath, existingFileName);
                     if (File.Exists(oldImagePath))
                     {
                         File.Delete(oldImagePath);
@@ -528,7 +532,8 @@ public static class AdminRoutes
                     await file.CopyToAsync(stream);
                 }
                 Console.WriteLine($"File updated successfully: {fileName}");
-                existingItem.ImageSrc = fileName;
+                // Add "items/" prefix to ImageSrc for database storage
+                existingItem.ImageSrc = $"items/{fileName}";
             }
 
             // Validate the updated item
@@ -564,7 +569,15 @@ public static class AdminRoutes
             if (!string.IsNullOrEmpty(existingItem.ImageSrc))
             {
                 var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads", "items");
-                var imagePath = Path.Combine(uploadsPath, existingItem.ImageSrc);
+
+                // Extract just the filename, removing the "items/" prefix if present
+                string fileName = existingItem.ImageSrc;
+                if (fileName.StartsWith("items/"))
+                {
+                    fileName = fileName.Substring(6); // Remove "items/" prefix
+                }
+
+                var imagePath = Path.Combine(uploadsPath, fileName);
 
                 if (File.Exists(imagePath))
                 {
