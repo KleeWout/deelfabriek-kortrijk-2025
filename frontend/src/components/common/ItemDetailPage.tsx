@@ -50,24 +50,24 @@ export default function ItemDetailPage() {
   }, [id]);
 
   // Fetch the image as blob when item.imageSrc verandert
-  useEffect(() => {
-    let isMounted = true;
-    if (item && item.imageSrc) {
-      fetch(getApiUrl(`/photo?src=${encodeURIComponent(item.imageSrc)}`))
-        .then((res) => res.blob())
-        .then((blob) => {
-          if (isMounted) setFetchedImg(URL.createObjectURL(blob));
-        })
-        .catch(() => {
-          if (isMounted) setFetchedImg(null);
-        });
-    } else {
-      setFetchedImg(null);
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [item?.imageSrc]);
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   if (item && item.imageSrc) {
+  //     fetch(getApiUrl(`/photo?src=${encodeURIComponent(item.imageSrc)}`))
+  //       .then((res) => res.blob())
+  //       .then((blob) => {
+  //         if (isMounted) setFetchedImg(URL.createObjectURL(blob));
+  //       })
+  //       .catch(() => {
+  //         if (isMounted) setFetchedImg(null);
+  //       });
+  //   } else {
+  //     setFetchedImg(null);
+  //   }
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [item?.imageSrc]);
 
   const handleReservation = () => {
     // Use the pathname from Next.js hooks instead of window.location
@@ -139,7 +139,9 @@ export default function ItemDetailPage() {
                 style={{ height: "100%" }}
               >
                 <Image
-                  src={imageSrc}
+                  src={getApiUrl(
+                        `/images/${item.imageSrc}`
+                      )}
                   width={350}
                   height={350}
                   alt={item.title}

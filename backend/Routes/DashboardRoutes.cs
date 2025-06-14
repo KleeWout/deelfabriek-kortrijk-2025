@@ -267,8 +267,7 @@ public static class AdminRoutes
     }
 
     public static RouteGroupBuilder GroupAdminItems(this RouteGroupBuilder group)
-    {
-        // get items for admin panel
+    {        // get items for admin panel
         group.MapGet("/", async (IItemService itemService) =>
         {
             var items = await itemService.GetAllItemsAdmin();
@@ -279,20 +278,89 @@ public static class AdminRoutes
             return Results.Ok(items);
         });
 
-        // post items
-        group.MapPost("/", async (Item item, IItemService itemService, ItemValidator validator) =>
+        // Combined endpoint for posting items with or without image
+        group.MapPost("/", async (HttpContext httpContext, IItemService itemService, ItemValidator validator) =>
         {
-            // Validate the item
-            var validationResult = await validator.ValidateAsync(item);
-            if (!validationResult.IsValid)
-            {
-                // Extract only the validation error messages
-                var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return Results.BadRequest(warnings); // Return only the warnings
-            }
-
             try
             {
+                Item item;
+
+                // Check content type to determine how to handle the request
+                var contentType = httpContext.Request.ContentType ?? string.Empty;
+
+                if (contentType.StartsWith("multipart/form-data"))
+                {
+                    // Handle form data with possible file upload
+                    var form = await httpContext.Request.ReadFormAsync();
+
+                    // Extract item data from form
+                    item = new Item
+                    {
+                        Title = form["title"],
+                        Description = form["description"],
+                        PricePerWeek = decimal.TryParse(form["pricePerWeek"], out var price) ? price : null,
+                        HowToUse = form["howToUse"],
+                        Accesories = form["accesories"],
+                        Weight = decimal.TryParse(form["weight"], out var weight) ? weight : null,
+                        Dimensions = form["dimensions"],
+                        Tip = form["tip"],
+                        Status = ItemStatus.Ongebruikt,
+                        LockerId = int.TryParse(form["lockerId"], out var lockerId) ? lockerId : null,
+                        Category = form["category"],
+                        ImageSrc = "" // Set empty initially to pass validation
+                    };
+
+                    // Handle file upload
+                    if (form.Files.Count > 0)
+                    {
+                        var file = form.Files[0];
+
+                        // Validate file type
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                        var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                        if (!allowedExtensions.Contains(fileExtension))
+                        {
+                            return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
+                        }
+
+                        // Create uploads directory if it doesn't exist
+                        var uploadsPath = Path.GetFullPath("./uploads/");
+                        Directory.CreateDirectory(uploadsPath);
+
+                        // Use original filename
+                        var fileName = file.FileName;
+                        var filePath = Path.Combine(uploadsPath, fileName);
+
+                        // Save the file
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        // Set the filename
+                        item.ImageSrc = fileName;
+                    }
+                }
+                else
+                {
+                    // Handle JSON request
+                    item = await httpContext.Request.ReadFromJsonAsync<Item>();
+                    if (item == null)
+                    {
+                        return Results.BadRequest("Invalid item data");
+                    }
+                }
+
+                // Validate the item
+                var validationResult = await validator.ValidateAsync(item);
+                if (!validationResult.IsValid)
+                {
+                    var warnings = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return Results.BadRequest(warnings);
+                }
+
+                // Save item to database
                 await itemService.AddItem(item);
                 return Results.Created($"/items/{item.Id}", item);
             }
@@ -300,31 +368,18 @@ public static class AdminRoutes
             {
                 return Results.Problem($"An error occurred while creating the item: {ex.Message}");
             }
-
-        });
-
-        group.MapPost("/upload", (IFormFile file) =>
-        {
-            using var reader = new StreamReader(file.OpenReadStream());
-            var content = reader.ReadToEnd();
-            var filePath = Path.GetFullPath("./Uploads/" + file.FileName);
-            File.WriteAllText(filePath, content);
-            return Results.Ok(content);
-
         }).DisableAntiforgery();
-
-        // post item with image - works via postman 
-        group.MapPost("/with-image", async (
-              HttpRequest request,
-              IItemService itemService,
-              ItemValidator validator) =>
+        // Keep compatibility with existing frontend code that uses /with-image endpoint
+        group.MapPost("/with-image", async (HttpContext httpContext, IItemService itemService, ItemValidator validator) =>
         {
+            // Use the same implementation as the main endpoint
             try
             {
-                var form = await request.ReadFormAsync();
+                Item item;
+                var form = await httpContext.Request.ReadFormAsync();
 
-                // Extract item data from form using your actual model properties
-                var item = new Item
+                // Extract item data from form
+                item = new Item
                 {
                     Title = form["title"],
                     Description = form["description"],
@@ -336,10 +391,11 @@ public static class AdminRoutes
                     Tip = form["tip"],
                     Status = Enum.TryParse<ItemStatus>(form["status"], out var status) ? status : ItemStatus.Beschikbaar,
                     LockerId = int.TryParse(form["lockerId"], out var lockerId) ? lockerId : null,
+                    Category = form["category"],
                     ImageSrc = "" // Set empty initially to pass validation
                 };
 
-                // Handle file upload first
+                // Handle file upload
                 if (form.Files.Count > 0)
                 {
                     var file = form.Files[0];
@@ -367,11 +423,11 @@ public static class AdminRoutes
                         await file.CopyToAsync(stream);
                     }
 
-                    // Now set the filename after upload
+                    // Set the filename
                     item.ImageSrc = fileName;
                 }
 
-                // Validate the item (now ImageSrc has a value if file was uploaded)
+                // Validate the item
                 var validationResult = await validator.ValidateAsync(item);
                 if (!validationResult.IsValid)
                 {
@@ -496,7 +552,7 @@ public static class AdminRoutes
         return group;
     }
 
- public static RouteGroupBuilder GroupAdminReservations(this RouteGroupBuilder group)
+    public static RouteGroupBuilder GroupAdminReservations(this RouteGroupBuilder group)
     {
         // get all reservations
         group.MapGet("/", async (IReservationService reservationService) =>

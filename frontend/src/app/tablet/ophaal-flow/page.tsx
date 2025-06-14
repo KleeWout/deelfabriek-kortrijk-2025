@@ -48,7 +48,7 @@ export default function OphaalFlowPage() {
   // Get image source from item data or use placeholder
   const imageSrc = reservationData?.item?.imageSrc
     ? getApiUrl(
-        `/photo?src=${encodeURIComponent(reservationData.item.imageSrc)}`
+        `/images/${reservationData.item.imageSrc}`
       )
     : "/assets/items/naaimachine.png";
 

@@ -87,7 +87,7 @@ export function ItemPage({
                 imageSrc={
                   item.imageSrc
                     ? getApiUrl(
-                        `/photo?src=${encodeURIComponent(item.imageSrc)}`
+                        `/images/${item.imageSrc}`
                       )
                     : ""
                 }

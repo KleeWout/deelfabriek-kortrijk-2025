@@ -1,5 +1,5 @@
-
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +70,15 @@ var app = builder.Build();
 // Enable CORS middleware - this line was missing
 app.UseCors("AllowAll");
 
+// Configure static file middleware for serving images from Uploads directory
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
+    RequestPath = "/images"
+});
+
+
+
 app.MapGet("/", () => "Welcome to the deelfabriek API!");
 
 app.MapGet("/photo", (IHostEnvironment env, string? src) =>
@@ -80,6 +89,27 @@ app.MapGet("/photo", (IHostEnvironment env, string? src) =>
     // Only allow file names, not paths
     var fileName = Path.GetFileName(src);
     var filePath = Path.Combine(env.ContentRootPath, "Uploads", fileName);
+
+    if (!System.IO.File.Exists(filePath))
+        return Results.NotFound("File not found.");
+
+    var contentType = "application/octet-stream";
+    if (fileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+        contentType = "image/png";
+    else if (fileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+        contentType = "image/jpeg";
+
+    return Results.File(filePath, contentType);
+});
+
+app.MapGet("/photo/items", (IHostEnvironment env, string? src) =>
+{
+    if (string.IsNullOrWhiteSpace(src))
+        return Results.BadRequest("Missing 'src' query parameter.");
+
+    // Only allow file names, not paths
+    var fileName = Path.GetFileName(src);
+    var filePath = Path.Combine(env.ContentRootPath, "Uploads/items", fileName);
 
     if (!System.IO.File.Exists(filePath))
         return Results.NotFound("File not found.");
@@ -112,18 +142,7 @@ adminApi.MapGroup("/reservations").GroupAdminReservations();
 adminApi.MapGroup("/openingshours").GroupAdminOpeningHours();
 adminApi.MapGroup("/reports").GroupAdminReports();
 
-app.MapGet("/mail", async ( MailService mailSender) =>
-{
-    try
-    {
-        await mailSender.SendMailAsync("wout.klee@gmail.com", "Test Email2", "<h1>This is a test email</h1><p>If you see this, the email service is working!</p>");
-        return Results.Ok($"Email sent successfully");
-    }
-    catch (Exception)
-    {
-        return Results.Problem("Failed to send email. Please check the SMTP configuration.");
-    }
-});
+
 
 
 app.Run();
