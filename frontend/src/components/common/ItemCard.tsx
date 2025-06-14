@@ -67,7 +67,6 @@ export function ItemCard(props: ItemCardProps & { onClick?: () => void }) {
   const handleItemClick = (itemId: number) => {
     router.push(`${resolvedBaseRoute}/${itemId}`);
   };
-  console.log("Image src:", imageSrc);
   return (
     <div
       className="flex flex-col w-full h-full rounded-xl shadow-md hover:shadow-lg border-white border-2 relative cursor-pointer"

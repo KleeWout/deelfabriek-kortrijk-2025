@@ -158,7 +158,6 @@ export const getItemImage = async (
   imageSrc: string
 ): Promise<string | null> => {
   try {
-    console.log("Fetching item image:", encodeURIComponent(imageSrc));
     const response = await fetch(
       getApiUrl(`photo/${encodeURIComponent(imageSrc)}`)
     );
