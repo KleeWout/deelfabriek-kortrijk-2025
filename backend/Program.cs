@@ -77,6 +77,11 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/images"
 });
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Uploads/items")),
+    RequestPath = "/images/items"
+});
 
 
 app.MapGet("/", () => "Welcome to the deelfabriek API!");
@@ -89,27 +94,6 @@ app.MapGet("/photo", (IHostEnvironment env, string? src) =>
     // Only allow file names, not paths
     var fileName = Path.GetFileName(src);
     var filePath = Path.Combine(env.ContentRootPath, "Uploads", fileName);
-
-    if (!System.IO.File.Exists(filePath))
-        return Results.NotFound("File not found.");
-
-    var contentType = "application/octet-stream";
-    if (fileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-        contentType = "image/png";
-    else if (fileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
-        contentType = "image/jpeg";
-
-    return Results.File(filePath, contentType);
-});
-
-app.MapGet("/photo/items", (IHostEnvironment env, string? src) =>
-{
-    if (string.IsNullOrWhiteSpace(src))
-        return Results.BadRequest("Missing 'src' query parameter.");
-
-    // Only allow file names, not paths
-    var fileName = Path.GetFileName(src);
-    var filePath = Path.Combine(env.ContentRootPath, "Uploads/items", fileName);
 
     if (!System.IO.File.Exists(filePath))
         return Results.NotFound("File not found.");
