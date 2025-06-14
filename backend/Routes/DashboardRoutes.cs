@@ -559,15 +559,34 @@ public static class AdminRoutes
             {
                 return Results.Problem($"An error occurred while updating the item: {ex.Message}");
             }
-        }).DisableAntiforgery();
-
-        // delete item
-        group.MapDelete("/{id}", async (int id, IItemService itemService) =>
+        }).DisableAntiforgery();        // delete item
+        group.MapDelete("/{id}", async (int id, IItemService itemService, IWebHostEnvironment environment) =>
         {
             var existingItem = await itemService.GetItemById(id);
             if (existingItem == null)
             {
                 return Results.NotFound();
+            }
+
+            // Delete the associated image file if it exists
+            if (!string.IsNullOrEmpty(existingItem.ImageSrc))
+            {
+                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads");
+                var imagePath = Path.Combine(uploadsPath, existingItem.ImageSrc);
+
+                if (File.Exists(imagePath))
+                {
+                    try
+                    {
+                        File.Delete(imagePath);
+                        Console.WriteLine($"Deleted image file: {imagePath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error deleting image file: {ex.Message}");
+                        // Continue with item deletion even if image deletion fails
+                    }
+                }
             }
 
             await itemService.DeleteItem(id);
