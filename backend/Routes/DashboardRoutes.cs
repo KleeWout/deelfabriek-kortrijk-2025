@@ -330,10 +330,8 @@ public static class AdminRoutes
                 if (!allowedExtensions.Contains(fileExtension))
                 {
                     return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
-                }
-
-                // Use the same path as your static files configuration
-                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads");
+                }                // Use the same path as your static files configuration but with items subfolder
+                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads", "items");
                 Console.WriteLine($"Saving file to: {uploadsPath}");
 
                 // Ensure directory exists
@@ -424,10 +422,8 @@ public static class AdminRoutes
                     if (!allowedExtensions.Contains(fileExtension))
                     {
                         return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
-                    }
-
-                    // Create uploads directory if it doesn't exist
-                    var uploadsPath = Path.GetFullPath("./uploads/");
+                    }                    // Create uploads directory if it doesn't exist
+                    var uploadsPath = Path.GetFullPath("./uploads/items/");
                     Directory.CreateDirectory(uploadsPath);
 
                     // Use original filename
@@ -503,10 +499,8 @@ public static class AdminRoutes
                 if (!allowedExtensions.Contains(fileExtension))
                 {
                     return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
-                }
-
-                // Use the same path as the POST endpoint
-                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads");
+                }                // Use the same path as the POST endpoint with items subfolder
+                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads", "items");
                 Console.WriteLine($"Updating file to: {uploadsPath}");
 
                 // Ensure directory exists
@@ -566,12 +560,10 @@ public static class AdminRoutes
             if (existingItem == null)
             {
                 return Results.NotFound();
-            }
-
-            // Delete the associated image file if it exists
+            }            // Delete the associated image file if it exists
             if (!string.IsNullOrEmpty(existingItem.ImageSrc))
             {
-                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads");
+                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads", "items");
                 var imagePath = Path.Combine(uploadsPath, existingItem.ImageSrc);
 
                 if (File.Exists(imagePath))

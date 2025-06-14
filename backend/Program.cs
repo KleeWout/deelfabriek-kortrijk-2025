@@ -72,16 +72,23 @@ app.UseCors("AllowAll");
 
 // Configure static file middleware for serving images from Uploads directory
 var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
+var itemsUploadsPath = Path.Combine(uploadsPath, "items");
+
+// Ensure directories exist
+Directory.CreateDirectory(uploadsPath);
+Directory.CreateDirectory(itemsUploadsPath);
+
 Console.WriteLine($"Looking for uploads at: {uploadsPath}");
+Console.WriteLine($"Items uploads path: {itemsUploadsPath}");
 Console.WriteLine($"Directory exists: {Directory.Exists(uploadsPath)}");
 
-if (Directory.Exists(uploadsPath))
+if (Directory.Exists(itemsUploadsPath))
 {
-    var files = Directory.GetFiles(uploadsPath);
-    Console.WriteLine($"Files found: {string.Join(", ", files.Select(Path.GetFileName))}");
+    var files = Directory.GetFiles(itemsUploadsPath);
+    Console.WriteLine($"Item images found: {string.Join(", ", files.Select(Path.GetFileName))}");
 }
 
-// Your static files configuration
+// Configure static file middleware for the Uploads directory
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsPath),
@@ -98,7 +105,7 @@ app.MapGet("/photo", (IHostEnvironment env, string? src) =>
 
     // Only allow file names, not paths
     var fileName = Path.GetFileName(src);
-    var filePath = Path.Combine(env.ContentRootPath, "Uploads", fileName);
+    var filePath = Path.Combine(env.ContentRootPath, "Uploads", "items", fileName);
 
     if (!System.IO.File.Exists(filePath))
         return Results.NotFound("File not found.");
