@@ -204,3 +204,14 @@ GET {{url}}/dashboard/reports
 ###
 
 GET {{url}}/items/2
+
+###
+
+GET {{url}}/items/available
+###
+GET {{url}}/items/loaned
+
+###
+GET {{url}}/reservations/overdue
+###
+GET {{url}}/reservations/total-loaned

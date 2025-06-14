@@ -278,6 +278,20 @@ public static class AdminRoutes
             return Results.Ok(items);
         });
 
+        // get current available items
+        group.MapGet("/available", async (IItemService itemService) =>
+        {
+            var availableItems = await itemService.CurrentAvailableItems();
+            return Results.Ok(availableItems);
+        });
+        // get current loaned items
+        group.MapGet("/loaned", async (IItemService itemService) =>
+        {
+            var loanedItems = await itemService.CurrentLoanedItems();
+            return Results.Ok(loanedItems);
+        });
+
+        // post items
         // Combined endpoint for posting items with or without image
         group.MapPost("/", async (HttpContext httpContext, IItemService itemService, ItemValidator validator) =>
         {
@@ -575,6 +589,20 @@ public static class AdminRoutes
 
             await reservationService.DeleteReservation(id);
             return Results.NoContent();
+        });
+
+        // countoverdueitem
+        group.MapGet("/overdue", async (IReservationService reservationService) =>
+        {
+            var count = await reservationService.CountOverdueItemsAsync();
+            return Results.Ok(count);
+        });
+
+        // total times items loaned
+        group.MapGet("/total-loaned", async (IReservationService reservationService) =>
+        {
+            var total = await reservationService.TotalTimesItemsLoanedAsync();
+            return Results.Ok(total);
         });
 
         return group;

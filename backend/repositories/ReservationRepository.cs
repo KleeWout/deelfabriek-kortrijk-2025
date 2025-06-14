@@ -20,6 +20,11 @@ public interface IReservationRepository
     Task<int> CountActiveReservationsForUserAsync(int userId);
 
     Task<IDbContextTransaction> BeginTransactionAsync();
+
+    Task<int> CountOverdueItemsAsync();
+    Task<int> TotalTimesItemsLoanedAsync();
+
+
 }
 
 
@@ -77,6 +82,17 @@ public class ReservationRepository : IReservationRepository
     public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
         return await _context.Database.BeginTransactionAsync();
+    }
+
+    public async Task<int> CountOverdueItemsAsync()
+    {
+        return await _context.Reservations
+            .CountAsync(r => r.Status == ReservationStatus.Active && r.LoanEnd < DateTime.UtcNow);
+    }
+
+    public Task<int> TotalTimesItemsLoanedAsync()
+    {
+        return _context.Items.SumAsync(i => i.TimesLoaned);
     }
 
 

@@ -16,6 +16,10 @@ public interface IItemRepository
 
     Task DeleteCategory(string category);
 
+    Task<int> CurrentAvailableItems();
+
+    Task<int> CurrentLoanedItems();
+
     // Task<List<Item>> GetItemsByCategoryAsync(int categoryId);
     // Task UpdateItemWithCategories(Item item);
     // Task<Item> GetItemByIdWithCategories(int id);
@@ -77,6 +81,18 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
             .ToListAsync();
     }
 
+    public async Task<int> CurrentAvailableItems()
+    {
+        return await _context.Items
+            .CountAsync(i => i.Status == ItemStatus.Beschikbaar);
+    }
+    public async Task<int> CurrentLoanedItems()
+    {
+        return await _context.Items
+            .CountAsync(i => i.Status == ItemStatus.Geleend);
+    }
+
+ 
     // public async Task UpdateItemWithCategories(Item item)
     // {
     //     using var transaction = await _context.Database.BeginTransactionAsync();
