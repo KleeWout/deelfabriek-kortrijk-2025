@@ -21,9 +21,10 @@ COPY --from=build /app .
 # This ensures your uploaded files are included in the container
 COPY Uploads/ /app/Uploads/
 
-# Create directory if it doesn't exist and set permissions
+# Create directory with proper permissions before the volume is mounted
 RUN mkdir -p /app/Uploads && \
-    chmod -R 755 /app/Uploads
+    chown -R 1000:1000 /app/Uploads && \
+    chmod -R 777 /app/Uploads
 
 # Define a safe default port
 EXPOSE 3001
