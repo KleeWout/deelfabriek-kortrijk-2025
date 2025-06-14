@@ -8,12 +8,12 @@ public interface IEmailNotificationService
     Task SendReservationConfirmation(User user, Item item, Reservation reservation);
     Task SendPickupConfirmation(User user, Item item, Reservation reservation);
     Task SendReturnConfirmation(User user, Item item, Reservation reservation); // bij terugbrengen
-    Task SendAdminReturnConfirmation(User user, Item item, Reservation reservation);
+    // Task SendAdminReturnConfirmation(User user, Item item, Reservation reservation);
     // ---------------------------------------
     Task SendReturnLate(User user, Item item, Reservation reservation); // als het item nog niet teruggebracht is
-    Task SendAdminLateNotification(User user, Item item, Reservation reservation);
+    // Task SendAdminLateNotification(User user, Item item, Reservation reservation);
     Task SendReturnReminder(User user, Item item, Reservation reservation); // 48 uur voor terugbrengen
-    Task SendAdminBlockedUserNotification(User user, Item item, Reservation reservation);
+    // Task SendAdminBlockedUserNotification(User user, Item item, Reservation reservation);
     Task SendUserBlockedNotification(User user, Item item, Reservation reservation);
     Task SendItemBackOnlineNotification(User user, Item item); // als item weer beschikbaar is 
 }
@@ -28,7 +28,7 @@ public class EmailNotificationService : IEmailNotificationService
     {
         _mailService = mailService;
         _configuration = configuration;
-        _adminEmail = _configuration["AdminEmail"] ?? "admin@deelkast.be";
+        // _adminEmail = _configuration["AdminEmail"] ?? "admin@deelkast.be";
     }
 
     public async Task SendReservationConfirmation(User user, Item item, Reservation reservation)
@@ -184,7 +184,7 @@ public class EmailNotificationService : IEmailNotificationService
             // Don't throw here to avoid disrupting user flow
         }
     }
-    
+
     public async Task SendItemBackOnlineNotification(User user, Item item)
     {
         try

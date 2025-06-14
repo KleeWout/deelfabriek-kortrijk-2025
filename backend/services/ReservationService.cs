@@ -265,17 +265,18 @@ public class ReservationService : IReservationService
                 dto.RequiresPayment = true;
                 return dto;
             }
-            else
-            {
-                // No fine, complete the return immediately
-                return await CompleteReturn(reservation);
-            }
+            // else
+            // {
+            //     // No fine, complete the return immediately
+            //     return await CompleteReturn(reservation);
+            // }
         }
 
         if (reservation.Status == ReservationStatus.Expired)
         {
             throw new Exception("Reservation has expired");
         }
+        Console.WriteLine("Reservation status is not active or expired, returning reservation details.");
         return _mapper.Map<ReservationViewKioskDto>(reservation);
     }
 
