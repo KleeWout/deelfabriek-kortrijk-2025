@@ -11,7 +11,7 @@ public interface IItemService
     Task DeleteItem(int id);
 
     // Task<List<ItemsPageDto>> GetItemsByCategoryAsync(int categoryId);
-    Task<List<ItemNameDto>> GetAvailableItems();
+    Task<List<ItemsPageDto>> GetAvailableItems();
 
     // category related methods
 
@@ -131,10 +131,10 @@ public class ItemService : IItemService
 
 
 
-    public async Task<List<ItemNameDto>> GetAvailableItems()
+    public async Task<List<ItemsPageDto>> GetAvailableItems()
     {
         var items = await _customItemRepository.GetAvailableItemsAsync();
-        return _mapper.Map<List<ItemNameDto>>(items);
+        return _mapper.Map<List<ItemsPageDto>>(items);
     }
 
     public async Task<IEnumerable<CategoryDto>> GetAllCategories()

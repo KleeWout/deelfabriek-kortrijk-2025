@@ -27,7 +27,7 @@ import { getApiUrl } from "./config";
 
 export const getItems = async (): Promise<ItemProps[]> => {
   try {
-    const response = await fetch(getApiUrl("items/lockers"));
+    const response = await fetch(getApiUrl("items/available"));
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
