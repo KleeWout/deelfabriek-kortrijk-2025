@@ -110,7 +110,6 @@ export default function ItemsPage() {
     setCurrentView("list");
     setEditingItem(null);
   };
-
   const handleSave = async () => {
     try {
       setLoading(true);
@@ -131,18 +130,24 @@ export default function ItemsPage() {
         // Only fetch old data if editing
         const oldata = await fetch(getApiUrl("/items/" + formData.id));
         const oldataJson = await oldata.json();
+
+        // Make sure we maintain the file in itemData when merging with oldataJson
+        const imageFile = itemData.file; // Save reference to the file
+
         itemData = {
           ...itemData,
+          file: imageFile, // Ensure the file is preserved after the merge
           status: formData.status || oldataJson.status, // Use status from form if available
           lockerId: oldataJson.lockerId,
           timesLoaned: oldataJson.timesLoaned,
         };
+
         await updateItem(editingItem.id, itemData);
       } else {
         // Set defaults for new item
         itemData = {
           ...itemData,
-          status: "Beschikbaar",
+          status: "Ongebruikt",
           lockerId: "",
           timesLoaned: 0,
         };

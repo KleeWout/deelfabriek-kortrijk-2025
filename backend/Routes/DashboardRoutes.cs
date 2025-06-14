@@ -460,10 +460,8 @@ public static class AdminRoutes
             {
                 return Results.Problem($"An error occurred while creating the item: {ex.Message}");
             }
-        }).DisableAntiforgery();
-
-        //edit item
-        group.MapPut("/{id}", async (HttpRequest request, int id, IItemService itemService, ItemValidator validator) =>
+        }).DisableAntiforgery();        //edit item
+        group.MapPut("/{id}", async (HttpRequest request, int id, IItemService itemService, ItemValidator validator, IWebHostEnvironment environment) =>
         {
             // Get the existing item from the database
             var existingItem = await itemService.GetItemById(id);
@@ -507,25 +505,35 @@ public static class AdminRoutes
                     return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
                 }
 
+                // Use the same path as the POST endpoint
+                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads");
+                Console.WriteLine($"Updating file to: {uploadsPath}");
+
+                // Ensure directory exists
+                Directory.CreateDirectory(uploadsPath);
+
                 // Delete old image if it exists
                 if (!string.IsNullOrEmpty(existingItem.ImageSrc))
                 {
-                    var oldImagePath = Path.GetFullPath("./uploads/" + existingItem.ImageSrc);
+                    var oldImagePath = Path.Combine(uploadsPath, existingItem.ImageSrc);
                     if (File.Exists(oldImagePath))
                     {
                         File.Delete(oldImagePath);
+                        Console.WriteLine($"Deleted old image: {oldImagePath}");
                     }
                 }
 
-                // Save new image
-                var uploadsPath = Path.GetFullPath("./uploads/");
-                Directory.CreateDirectory(uploadsPath);
-                var fileName = file.FileName;
+                // Generate unique filename to avoid conflicts, just like in POST
+                var fileName = $"{Guid.NewGuid()}_{file.FileName}";
                 var filePath = Path.Combine(uploadsPath, fileName);
+
+                Console.WriteLine($"Full file path for update: {filePath}");
+
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }
+                Console.WriteLine($"File updated successfully: {fileName}");
                 existingItem.ImageSrc = fileName;
             }
 
