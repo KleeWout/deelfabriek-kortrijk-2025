@@ -13,7 +13,7 @@ export default function TabletProductDetailPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#f3f6f8]">
       <div className="py-7 px-4">
-        <ReturnButton href="/tablet/items" />
+        <ReturnButton href="/kiosk/items" />
       </div>
       <ItemDetailPage />
     </div>

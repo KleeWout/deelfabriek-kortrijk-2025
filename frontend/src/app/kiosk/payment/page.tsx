@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import animationData from "@/app/tablet/ophaal-flow/pay/Animation - 1748702795819.json";
+import animationData from "@/app/kiosk/ophaal-flow/pay/Animation - 1748702795819.json";
 import { TabletHeader } from "@/components/tabletHeader";
 import { createPayconiqPayment, checkPaymentStatus } from "@/services/payconiq";
 import { cancelReservation } from "@/app/api/reservations";
@@ -153,7 +153,7 @@ export default function ReservationPayPage() {
       const t = setTimeout(() => {
         console.log("Navigation timeout triggered, pushing to locker-open");
         // Pass the pickup code from the reservation data if available
-        router.push(`/tablet/payment/locker-open`);
+        router.push(`/kiosk/payment/locker-open`);
       }, 5000);
       return () => clearTimeout(t);
     }
@@ -199,7 +199,7 @@ export default function ReservationPayPage() {
     // Early return if we don't have reservation data yet
     if (!reservationData?.pickupCode) return;
 
-    const isConfirmationPage = (path: string) => typeof path === "string" && path.includes("/tablet/payment/locker-open"); // Define the cancelation function that will be called for any navigation event
+    const isConfirmationPage = (path: string) => typeof path === "string" && path.includes("/kiosk/payment/locker-open"); // Define the cancelation function that will be called for any navigation event
     const handleNavigation = (url?: string) => {
       // Skip cancellation if already paid or navigating to confirmation page
       if (paid || navigatingToConfirmation || !reservationData?.pickupCode) {
@@ -289,7 +289,7 @@ export default function ReservationPayPage() {
 
       // Check various flags to determine if we should cancel
       const currentUrl = window.location.href;
-      const isConfirmationUrl = currentUrl.includes("/tablet/payment/locker-open");
+      const isConfirmationUrl = currentUrl.includes("/kiosk/payment/locker-open");
       const isNavigatingToConfirmation = navigatingToConfirmation;
       const isPaidState = paid;
 

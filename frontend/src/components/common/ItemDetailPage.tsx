@@ -15,7 +15,7 @@ export default function ItemDetailPage() {
   const id = parseInt(params.id as string);
   const router = useRouter();
   const pathname = usePathname();
-  const isTabletRoute = pathname.includes("/tablet/");
+  const isTabletRoute = pathname.includes("/kiosk/");
   const [isReserving, setIsReserving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [item, setItem] = useState<ItemResponse | null>(null);
@@ -76,9 +76,9 @@ export default function ItemDetailPage() {
   const handleReservation = () => {
     // Use the pathname from Next.js hooks instead of window.location
     if (isTabletRoute) {
-      router.push(`/tablet/reserveer/${id}`);
+      router.push(`/kiosk/reserveer/${id}`);
     } else {
-      router.push(`/mobile/reserveer/${id}`);
+      router.push(`/reserveer/${id}`);
     }
   };
   const handleNotificationRequest = async (e: React.FormEvent) => {
@@ -124,7 +124,6 @@ export default function ItemDetailPage() {
     return (
       <div className="container mx-auto p-4">
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
-          {/* <ReturnButton href="/mobile/items" /> */}
           <h1 className="text-2xl font-bold text-red-500">Item niet gevonden</h1>
           {error && <p className="text-red-500 mt-2">{error}</p>}
         </div>

@@ -8,7 +8,7 @@ export default function mobileProductDetailPage() {
   return (
     <div className="bg-[#f3f6f8]">
       <div className="py-6 px-4">
-        <ReturnButton href="/mobile/items" />
+        <ReturnButton href="/items" />
       </div>
       <ItemDetailPage />
     </div>

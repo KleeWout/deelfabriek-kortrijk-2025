@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle } from "phosphor-react";
 
 // Import the API function
-import {
-  createReservationReport,
-  markReservationAsReturned,
-} from "@/app/api/reservations";
+import { createReservationReport, markReservationAsReturned } from "@/app/api/reservations";
 
 // Wrapper component that reads from localStorage
 function ThankYouContent() {
@@ -32,20 +29,14 @@ function ThankYouContent() {
         console.log("Reservation details:", reservationDetails);
         // Call API to mark the reservation as returned
         if (reservationDetails.pickupCode) {
-          createReservationReport(
-            reservationDetails.id,
-            reservationDetails.rating,
-            reservationDetails.reasons
-          );
+          createReservationReport(reservationDetails.id, reservationDetails.rating, reservationDetails.reasons);
           markReservationAsReturned(reservationDetails.pickupCode)
             .then(() => {
               console.log("Reservation successfully marked as returned");
             })
             .catch((error) => {
               console.error("Error marking reservation as returned:", error);
-              setApiError(
-                "Er is een fout opgetreden bij het registreren van de teruggave."
-              );
+              setApiError("Er is een fout opgetreden bij het registreren van de teruggave.");
             });
         }
 
@@ -78,7 +69,7 @@ function ThankYouContent() {
     if (shouldRedirect) {
       // Use a small timeout to ensure this happens after render is complete
       const redirectTimeout = setTimeout(() => {
-        router.push("/tablet");
+        router.push("/kiosk");
       }, 100);
 
       return () => clearTimeout(redirectTimeout);
@@ -90,44 +81,25 @@ function ThankYouContent() {
         <div className="bg-white rounded-2xl shadow-xl p-12 flex flex-col items-center">
           {/* Logo */}
           <div className="mb-12">
-            <Image
-              src="/deelfabriek-website-labels-boven_v2.svg"
-              alt="Deelfabriek Logo"
-              width={320}
-              height={120}
-            />
+            <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={320} height={120} />
           </div>
           {/* Success Icon */}
           <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mb-8">
-            <CheckCircle
-              size={64}
-              weight="fill"
-              className="text-[var(--color-primarygreen-1)]"
-            />
+            <CheckCircle size={64} weight="fill" className="text-[var(--color-primarygreen-1)]" />
           </div>{" "}
           {/* Message */}
           <div className="text-center max-w-2xl">
             <h1 className="text-3xl font-bold text-[var(--color-primarygreen-1)] mb-6">
-              Bedankt voor het terugbrengen van {itemName} met reservatiecode{" "}
-              {reservatieCode}.
+              Bedankt voor het terugbrengen van {itemName} met reservatiecode {reservatieCode}.
             </h1>
-            <p className="text-xl text-gray-700 mb-8">
-              Dit is succesvol geregistreerd, je krijgt ook nog een email later.
-            </p>
+            <p className="text-xl text-gray-700 mb-8">Dit is succesvol geregistreerd, je krijgt ook nog een email later.</p>
 
             {/* Display API error if any */}
-            {apiError && (
-              <p className="text-lg text-red-500 font-medium mb-4">
-                {apiError}
-              </p>
-            )}
+            {apiError && <p className="text-lg text-red-500 font-medium mb-4">{apiError}</p>}
           </div>
           {/* Countdown */}
           <div className="mt-8 text-center">
-            <p className="text-gray-600">
-              Je wordt over {countdown} seconden doorgestuurd naar het
-              beginscherm...
-            </p>
+            <p className="text-gray-600">Je wordt over {countdown} seconden doorgestuurd naar het beginscherm...</p>
           </div>
         </div>
       </div>
@@ -142,12 +114,7 @@ function ThankYouPageLoading() {
       <div className="w-full max-w-4xl mx-auto px-8">
         <div className="bg-white rounded-2xl shadow-xl p-12 flex flex-col items-center">
           <div className="mb-12">
-            <Image
-              src="/deelfabriek-website-labels-boven_v2.svg"
-              alt="Deelfabriek Logo"
-              width={320}
-              height={120}
-            />
+            <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={320} height={120} />
           </div>
           <p className="text-gray-600">Laden...</p>
         </div>

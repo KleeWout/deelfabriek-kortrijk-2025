@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React from "react";
 import { MagnifyingGlass, Package, ClipboardText, CreditCard } from "phosphor-react";
 import Image from "next/image";
@@ -54,9 +54,9 @@ export function TabletHeader() {
   const pathname = usePathname();
 
   const getActiveStep = () => {
-    if (pathname === "/tablet/items") return 1;
-    else if (pathname.includes("/tablet/items/")) return 2;
-    else if (pathname.includes("/tablet/reserveer/")) return 3;
+    if (pathname === "/kiosk/items") return 1;
+    else if (pathname.includes("/kiosk/items/")) return 2;
+    else if (pathname.includes("/kiosk/reserveer/")) return 3;
     else if (pathname.includes("/payment")) return 4;
     return 1;
   };
@@ -65,7 +65,7 @@ export function TabletHeader() {
     <div className="w-full flex items-center justify-between bg-white px-12 py-6 shadow-sm">
       {/* Logo */}
       <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={240} height={90} />
-      
+
       {/* Stepper component */}
       <Stepper activeStep={getActiveStep()} />
     </div>

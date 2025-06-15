@@ -19,7 +19,7 @@ export default function ReservationPage() {
   const pathname = usePathname();
 
   // Check if we're on the tablet route
-  const isTabletRoute = pathname.includes("/tablet/");
+  const isTabletRoute = pathname.includes("/kiosk/");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -116,7 +116,7 @@ export default function ReservationPage() {
   if (!item) {
     return (
       <div className="container mx-auto p-4 flex flex-col ">
-        <ReturnButton href={isTabletRoute ? "/tablet/items" : "/mobile/items"} />
+        <ReturnButton href={isTabletRoute ? "/kiosk/items" : "/items"} />
         <div className="  p-6 text-center">
           <h1 className="text-2xl font-bold text-primarygreen-1">Item gegevens laden...</h1>{" "}
           <div className="mt-4 flex justify-center items-center">
@@ -131,7 +131,7 @@ export default function ReservationPage() {
   if (!item.id) {
     return (
       <div className="container mx-auto p-4">
-        <ReturnButton href={isTabletRoute ? "/tablet/items" : "/mobile/items"} />
+        <ReturnButton href={isTabletRoute ? "/kiosk/items" : "/items"} />
         <div className=" p-6 text-center">
           <h1 className="text-2xl font-bold text-red-500">Item niet gevonden</h1>
           <p className="mt-2 text-gray-600">Er is een probleem opgetreden bij het laden van de itemgegevens.</p>
@@ -216,10 +216,10 @@ export default function ReservationPage() {
       localStorage.setItem("reservationDetails", JSON.stringify(response));
       // Navigate to the appropriate confirmation page based on route type
       if (isTabletRoute) {
-        router.push(`/tablet/payment/`);
+        router.push(`/kiosk/payment/`);
       } else {
         // Call the API and get the response
-        router.push("/mobile/reserveer/confirmation");
+        router.push("/reserveer/confirmation");
       }
     } catch (error) {
       console.error("Error submitting reservation:", error);
@@ -358,7 +358,7 @@ export default function ReservationPage() {
           </div>
           {termsError && <p className="text-red-500 text-xs mt-1">{termsError}</p>}
           <div className="flex justify-center items-center w-full gap-4">
-            <button type="button" onClick={() => router.push(isTabletRoute ? "/tablet/items" : "/mobile/items")} className="w-40 border border-primarygreen-1 text-primarygreen-1 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
+            <button type="button" onClick={() => router.push(isTabletRoute ? "/kiosk/items" : "/items")} className="w-40 border border-primarygreen-1 text-primarygreen-1 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
               Annuleren
             </button>
 

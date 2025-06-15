@@ -16,7 +16,7 @@ export default function Navigation() {
         open ? " fixed inset-0" : ""
       }`}
     >
-      <Link href="/mobile" onClick={handleClose}>
+      <Link href="/" onClick={handleClose}>
         <Image
           src="/deelfabriek-website-labels-boven_v2.svg"
           alt="Logo deelfabriek"
@@ -28,7 +28,7 @@ export default function Navigation() {
       <ul className="hidden md:flex gap-6 ml-8">
         <li>
           <Link
-            href="/mobile"
+            href="/"
             className="flex items-center gap-2 text-lg text-primarygreen-1 font-semibold"
           >
             <House size={22} weight="fill" /> Home
@@ -36,7 +36,7 @@ export default function Navigation() {
         </li>
         <li>
           <Link
-            href="/mobile/items"
+            href="/items"
             className="flex items-center gap-2 text-lg text-primarygreen-1 font-semibold"
           >
             <Package size={22} weight="fill" /> Items
@@ -90,7 +90,7 @@ export default function Navigation() {
         >
           <li>
             <Link
-              href="/mobile"
+              href="/"
               className="flex items-center gap-3 text-2xl text-white font-semibold"
               onClick={handleClose}
             >
@@ -99,7 +99,7 @@ export default function Navigation() {
           </li>
           <li>
             <Link
-              href="/mobile/items"
+              href="/items"
               className="flex items-center gap-3 text-2xl text-white font-semibold"
               onClick={handleClose}
             >

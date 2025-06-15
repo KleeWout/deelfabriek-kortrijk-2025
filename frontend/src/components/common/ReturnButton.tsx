@@ -23,10 +23,10 @@ export function ReturnButton({ href }: ReturnButtonProps) {
 // Helper function to determine the appropriate return path
 function getReturnPathFromCurrentPath(pathname: string): string {
   // Check if the path contains 'tablet' or 'mobile'
-  if (pathname.includes("/tablet/")) {
-    return "/tablet/items";
-  } else if (pathname.includes("/mobile/")) {
-    return "/mobile/items";
+  if (pathname.includes("/kiosk/")) {
+    return "/kiosk/items";
+  } else {
+    return "/items";
   }
 
   // Default fallback

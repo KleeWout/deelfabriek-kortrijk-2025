@@ -22,7 +22,7 @@ export default function MobilePage() {
         </p>
         <Link
           className="bg-primarygreen-1 text-white flex justify-center rounded-xl py-2 w-3/4 mx-auto items-center max-w-2xs gap-2"
-          href={"/mobile/items"}
+          href={"/items"}
         >
           <Package size={32} />
           Ontdek alle items

@@ -48,7 +48,7 @@ function ReservationContent() {
           console.error("Invalid reservation data structure");
           // Delay redirect to avoid abrupt navigation
 
-          const timer = setTimeout(() => router.push("/mobile/items"), 500);
+          const timer = setTimeout(() => router.push("/items"), 500);
           return () => clearTimeout(timer);
         }
 
@@ -81,14 +81,14 @@ function ReservationContent() {
         console.error("Error parsing reservation details:", error);
         // Delay redirect to avoid abrupt navigation
 
-        const timer = setTimeout(() => router.push("/mobile/items"), 500);
+        const timer = setTimeout(() => router.push("/items"), 500);
         return () => clearTimeout(timer);
       }
     } else {
       console.log("No reservation data found in localStorage");
       // Delay redirect to avoid abrupt navigation
 
-      const timer = setTimeout(() => router.push("/mobile/items"), 500);
+      const timer = setTimeout(() => router.push("/items"), 500);
       return () => clearTimeout(timer);
     }
   }, [router]);
@@ -214,7 +214,7 @@ function ReservationContent() {
       </div>
       <div className="mt-8 flex justify-center">
         <button
-          onClick={() => router.push("/mobile")}
+          onClick={() => router.push("/")}
           className="bg-primarygreen-1 text-white py-3 px-8 rounded-lg text-lg font-medium hover:bg-green-800 transition-colors flex items-center gap-2"
         >
           Terug naar Home

@@ -9,14 +9,14 @@ export default function TabletItemsPage() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const baseRoute = "/tablet/items";
+  const baseRoute = "/kiosk/items";
 
   return (
     <div className="flex flex-col bg-[#f3f6f8] overflow-x-hidden">
       {/* Header bar */}
       <div className="relative flex items-center w-full max-w-7xl px-6 h-[64px] pt-4">
         <div className="flex-shrink-0 absolute z-10">
-          <ReturnButton href="/tablet" />
+          <ReturnButton href="/kiosk" />
         </div>
         <h1
           className="text-4xl font-extrabold tracking-wide text-gray-700 absolute w-screen text-center

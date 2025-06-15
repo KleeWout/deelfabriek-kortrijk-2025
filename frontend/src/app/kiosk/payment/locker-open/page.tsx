@@ -92,7 +92,7 @@ export default function LockerOpenPage() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3f6f8]">
         <div className="bg-white rounded-2xl shadow-xl p-12 flex flex-col items-center">
           <div className="mb-8 text-red-600 text-xl font-bold">{error}</div>
-          <button onClick={() => router.push("/tablet")} className="flex items-center gap-2 bg-[var(--color-primarygreen-1)] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#007260] transition-colors">
+          <button onClick={() => router.push("/kiosk")} className="flex items-center gap-2 bg-[var(--color-primarygreen-1)] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#007260] transition-colors">
             <House size={24} weight="bold" />
             Terug naar startpagina
           </button>
@@ -141,7 +141,7 @@ export default function LockerOpenPage() {
           )}
 
           {/* Home Button */}
-          <button onClick={() => router.push("/tablet")} className="flex items-center gap-2 bg-[var(--color-primarygreen-1)] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#007260] transition-colors">
+          <button onClick={() => router.push("/kiosk")} className="flex items-center gap-2 bg-[var(--color-primarygreen-1)] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#007260] transition-colors">
             <House size={24} weight="bold" />
             Terug naar startpagina
           </button>
