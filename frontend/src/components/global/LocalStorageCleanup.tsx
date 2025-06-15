@@ -15,10 +15,10 @@ export default function LocalStorageCleanup() {
       const keys = Object.keys(localStorage);
       console.log("Cleaning up localStorage on app startup. Found keys:", keys);
 
-      // Use our utility function to clean reservation data
-      clearReservationData();
+      // Clear all localStorage data completely
+      localStorage.clear();
 
-      console.log("LocalStorage cleanup complete");
+      console.log("LocalStorage completely cleared");
     } catch (error) {
       console.error("Error cleaning up localStorage:", error);
     }
