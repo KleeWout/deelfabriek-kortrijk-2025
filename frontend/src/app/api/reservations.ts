@@ -59,14 +59,19 @@ export interface ReservationResponse {
   };
 }
 
-export async function markReservationAsPaid(code: string): Promise<ReservationResponse> {
+export async function markReservationAsPaid(
+  code: string
+): Promise<ReservationResponse> {
   try {
-    const response = await fetch(getApiUrl(`reservations/code/${code}/ispayed`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      getApiUrl(`reservations/code/${code}/ispayed`),
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -82,20 +87,54 @@ export async function markReservationAsPaid(code: string): Promise<ReservationRe
   }
 }
 
-export async function markReservationAsReturned(code: string): Promise<ReservationResponse> {
+export async function markReservationAsReturned(
+  code: string
+): Promise<ReservationResponse> {
   try {
-    const response = await fetch(getApiUrl(`reservations/code/${code}/returned`));
+    const response = await fetch(
+      getApiUrl(`reservations/code/${code}/returned`)
+    );
 
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error("Reservation not found");
       }
-      throw new Error(`Failed to mark reservation as returned: ${response.status}`);
+      throw new Error(
+        `Failed to mark reservation as returned: ${response.status}`
+      );
     }
 
     return await response.json();
   } catch (error) {
     console.error("Error marking reservation as returned:", error);
+    throw error;
+  }
+}
+
+export async function createReservationReport(
+  reservationid: number,
+  rating: number,
+  reasons: string[]
+): Promise<any> {
+  try {
+    const remark = reasons.join(", ");
+    const response = await fetch(getApiUrl(`/reports`), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ reservationid, rating, remark }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to create reservation report: ${response.status}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating reservation report:", error);
     throw error;
   }
 }
@@ -108,17 +147,22 @@ export async function cancelReservation(reservationId: string): Promise<any> {
     const alreadyCancelled = localStorage.getItem(key);
 
     if (alreadyCancelled === "completed") {
-      console.log(`Reservation ${reservationId} was already cancelled, skipping`);
+      console.log(
+        `Reservation ${reservationId} was already cancelled, skipping`
+      );
       return { success: true, status: "already_cancelled" };
     }
 
     localStorage.setItem(key, "in_progress");
-    const response = await fetch(getApiUrl(`reservations/code/${reservationId}`), {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      getApiUrl(`reservations/code/${reservationId}`),
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     // Handle the response based on status and content
     if (response.ok) {
@@ -133,7 +177,9 @@ export async function cancelReservation(reservationId: string): Promise<any> {
           return text ? JSON.parse(text) : { success: true };
         } catch (parseError) {
           // If parsing fails, return a success object
-          console.log("Response wasn't valid JSON, but cancellation was successful");
+          console.log(
+            "Response wasn't valid JSON, but cancellation was successful"
+          );
           return { success: true };
         }
       } else {
@@ -152,6 +198,9 @@ export async function cancelReservation(reservationId: string): Promise<any> {
   } catch (error) {
     console.error("Error cancelling reservation:", error);
     // Don't throw the error, just return a standardized error object
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }

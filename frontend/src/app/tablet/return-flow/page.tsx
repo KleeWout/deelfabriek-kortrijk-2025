@@ -6,9 +6,24 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import StarRating from "../components/StarRating";
 
-const reasons = ["Item defect", "Item niet zoals verwacht", "Item had schade", "Item had iets te kort", "Batterij leeg", "Niet proper", "Handleiding ontbrak", "Anders"];
+const reasons = [
+  "Item defect",
+  "Item niet zoals verwacht",
+  "Item had schade",
+  "Item had iets te kort",
+  "Batterij leeg",
+  "Niet proper",
+  "Handleiding ontbrak",
+  "Anders",
+];
 
-const feedbackOptions = ["Product was beschadigd", "Product werkte niet goed", "Product was niet schoon", "Product was niet compleet", "Andere reden"];
+const feedbackOptions = [
+  "Product was beschadigd",
+  "Product werkte niet goed",
+  "Product was niet schoon",
+  "Product was niet compleet",
+  "Andere reden",
+];
 
 export default function ReturnFlow() {
   const router = useRouter();
@@ -55,7 +70,11 @@ export default function ReturnFlow() {
   };
 
   const handleOptionToggle = (option: string) => {
-    setSelectedReasons((prev) => (prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]));
+    setSelectedReasons((prev) =>
+      prev.includes(option)
+        ? prev.filter((o) => o !== option)
+        : [...prev, option]
+    );
   };
 
   const showReasons = rating > 0 && rating <= 3;
@@ -81,7 +100,10 @@ export default function ReturnFlow() {
       if (selectedReasons.includes("Anders") && otherReason) {
         reservationDetails.otherReason = otherReason;
       }
-      localStorage.setItem("reservationDetails", JSON.stringify(reservationDetails));
+      localStorage.setItem(
+        "reservationDetails",
+        JSON.stringify(reservationDetails)
+      );
     }
 
     router.push(`/tablet/return-flow/thank-you`);
@@ -93,7 +115,10 @@ export default function ReturnFlow() {
     if (reservationDetailsStr) {
       const reservationDetails = JSON.parse(reservationDetailsStr);
       reservationDetails.hasFeedback = false;
-      localStorage.setItem("reservationDetails", JSON.stringify(reservationDetails));
+      localStorage.setItem(
+        "reservationDetails",
+        JSON.stringify(reservationDetails)
+      );
     }
 
     router.push(`/tablet/return-flow/thank-you`);
@@ -103,15 +128,29 @@ export default function ReturnFlow() {
     <div className="min-h-screen flex flex-col items-center bg-[var(--color-primarybackground)] py-8">
       {/* Logo bovenaan */}
       <div className="w-full flex justify-center mb-8">
-        <Image src="/deelfabriek-website-labels-boven_v2.svg" alt="Deelfabriek Logo" width={260} height={70} />
+        <Image
+          src="/deelfabriek-website-labels-boven_v2.svg"
+          alt="Deelfabriek Logo"
+          width={260}
+          height={70}
+        />
       </div>
       <div className="flex flex-1 w-full max-w-7xl mx-auto items-stretch">
         {/* Linkerzijde */}
         <div className="flex flex-col justify-center items-center basis-1/2 gap-8">
-          <LockOpen size={180} color="var(--color-primarygreen-1)" weight="bold" className="mb-6" />
+          <LockOpen
+            size={180}
+            color="var(--color-primarygreen-1)"
+            weight="bold"
+            className="mb-6"
+          />
           <div className="flex flex-col items-center">
-            <span className="text-5xl font-bold text-[var(--color-primarygreen-1)] text-center whitespace-nowrap mb-2">Locker {lockerNumber.toString().padStart(2, "0")} is geopend.</span>
-            <span className="text-xl text-[var(--color-primarytext-1)] text-center">Plaats je item in de locker en sluit de locker.</span>
+            <span className="text-5xl font-bold text-[var(--color-primarygreen-1)] text-center whitespace-nowrap mb-2">
+              Locker {lockerNumber.toString().padStart(2, "0")} is geopend.
+            </span>
+            <span className="text-xl text-[var(--color-primarytext-1)] text-center">
+              Plaats je item in de locker en sluit de locker.
+            </span>
           </div>
         </div>
         {/* Verticale lijn */}
@@ -119,8 +158,12 @@ export default function ReturnFlow() {
         {/* Rechterzijde */}
         <div className="flex flex-col justify-center items-center basis-1/2 gap-12">
           <div className="w-full max-w-[600px] flex flex-col items-start">
-            <div className="text-4xl font-bold text-[var(--color-primarygreen-1)] mb-2">Laat een beoordeling achter</div>
-            <div className="text-2xl text-[var(--color-primarytext-1)] mb-8">Wat was je ervaring met het item?</div>
+            <div className="text-4xl font-bold text-[var(--color-primarygreen-1)] mb-2">
+              Laat een beoordeling achter
+            </div>
+            <div className="text-2xl text-[var(--color-primarytext-1)] mb-8">
+              Wat was je ervaring met het item?
+            </div>
             {/* Sterren */}
             <div className="flex justify-center gap-2 mb-8">
               <StarRating value={rating} onChange={setRating} />
@@ -129,8 +172,14 @@ export default function ReturnFlow() {
             {showReasons && (
               <div className="w-full mb-4 mt-8 animate-fade-in transition-opacity duration-500 opacity-100">
                 <div className="flex items-center gap-2 mb-4">
-                  <Warning size={28} color="var(--color-primarypink-1)" weight="bold" />
-                  <span className="text-xl md:text-2xl font-bold text-[var(--color-primarygreen-1)]">Conditie van het item</span>
+                  <Warning
+                    size={28}
+                    color="var(--color-primarypink-1)"
+                    weight="bold"
+                  />
+                  <span className="text-xl md:text-2xl font-bold text-[var(--color-primarygreen-1)]">
+                    Conditie van het item
+                  </span>
                 </div>
                 <div className="flex flex-wrap gap-3 mb-2">
                   {reasons.map((reason) => {
@@ -155,15 +204,30 @@ export default function ReturnFlow() {
                     {warning}
                   </div>
                 )}
-                {showOtherInput && <input type="text" value={otherReason} onChange={(e) => setOtherReason(e.target.value)} placeholder="Schrijf hier je opmerking..." className="w-full mt-4 p-4 border-2 border-[var(--color-secondarygreen-1)] rounded-lg bg-white text-[var(--color-primarytext-1)] text-base md:text-lg" />}
+                {showOtherInput && (
+                  <input
+                    type="text"
+                    value={otherReason}
+                    onChange={(e) => setOtherReason(e.target.value)}
+                    placeholder="Schrijf hier je opmerking..."
+                    className="w-full mt-4 p-4 border-2 border-[var(--color-secondarygreen-1)] rounded-lg bg-white text-[var(--color-primarytext-1)] text-base md:text-lg"
+                  />
+                )}
               </div>
             )}
             {/* Knoppen */}
             <div className="flex gap-8 mt-10 w-full">
-              <button className="flex-1 py-5 bg-[var(--color-primarygreen-1)] text-white text-3xl rounded-lg font-semibold shadow hover:bg-[#00664f] transition" disabled={rating === 0} onClick={handleSubmit}>
+              <button
+                className="flex-1 py-5 bg-[var(--color-primarygreen-1)] text-white text-3xl rounded-lg font-semibold shadow hover:bg-[#00664f] transition"
+                disabled={rating === 0}
+                onClick={handleSubmit}
+              >
                 Verzenden
               </button>
-              <button className="flex-1 py-5 bg-white text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] text-3xl rounded-lg font-semibold hover:bg-[var(--color-primarygreen-2)] transition" onClick={handleSkip}>
+              <button
+                className="flex-1 py-5 bg-white text-[var(--color-primarygreen-1)] border-2 border-[var(--color-primarygreen-1)] text-3xl rounded-lg font-semibold hover:bg-[var(--color-primarygreen-2)] transition"
+                onClick={handleSkip}
+              >
                 Overslaan
               </button>
             </div>

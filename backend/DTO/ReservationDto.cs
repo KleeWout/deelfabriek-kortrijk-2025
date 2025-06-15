@@ -19,22 +19,23 @@ public class ReservationViewDto
 
 public class ReservationViewKioskDto
 {
+    public int Id { get; set; }
     public string PickupCode { get; set; }
     public decimal TotalPrice { get; set; }
     public string UserName { get; set; }
     public string LockerNumber { get; set; }
-    public int Weeks { get; set; } 
+    public int Weeks { get; set; }
 
     public int ItemId { get; set; }
     public ItemDetailDto? Item { get; set; }
 
-     public ReservationStatus Status { get; set; } 
+    public ReservationStatus Status { get; set; }
 
-      // Fine properties
+    // Fine properties
     public bool HasFine { get; set; }
     public decimal FineAmount { get; set; }
     public bool RequiresPayment { get; set; }
-    
+
 }
 
 
@@ -42,7 +43,7 @@ public class ReservationViewKioskDto
 public class CreateReservationDto
 {
     public newUserDto User { get; set; }
-    
+
     public int ItemId { get; set; }
     public int Weeks { get; set; }
 }
