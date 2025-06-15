@@ -36,10 +36,28 @@ export default function LockerOpenPage() {
           return;
         }
 
+        // Check if we've already processed this payment by looking for a flag in sessionStorage
+        const paymentProcessed = sessionStorage.getItem(`payment_processed_${pickupCode}`);
+        if (paymentProcessed) {
+          console.log("Payment already processed, skipping API call");
+          const cachedData = JSON.parse(sessionStorage.getItem(`payment_data_${pickupCode}`) || "null");
+          if (cachedData) {
+            setPaymentData(cachedData);
+          }
+          setIsLoading(false);
+          return;
+        }
+
         // Call the API to mark the reservation as paid
         const data = await markReservationAsPaid(pickupCode);
         setPaymentData(data);
-        console.log("Payment confirmation data from API:", data); // After successful API call, remove the items from localStorage
+        console.log("Payment confirmation data from API:", data);
+
+        // Store a flag in sessionStorage to prevent duplicate API calls
+        sessionStorage.setItem(`payment_processed_${pickupCode}`, "true");
+        sessionStorage.setItem(`payment_data_${pickupCode}`, JSON.stringify(data));
+
+        // After successful API call, remove the items from localStorage
         localStorage.removeItem("reservationDetails");
         localStorage.removeItem("paymentConfirmation");
       } catch (error) {

@@ -27,7 +27,7 @@ import { getApiUrl } from "./config";
 
 export const getItems = async (): Promise<ItemProps[]> => {
   try {
-    const response = await fetch(getApiUrl("items/lockers"));
+    const response = await fetch(getApiUrl("items/available"));
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -104,7 +104,8 @@ export async function createItem(item: any): Promise<any> {
       }
     }
   });
-  const response = await fetch(getApiUrl("dashboard/items/with-image"), {
+  const response = await fetch(getApiUrl("dashboard/items"), {
+    // const response = await fetch(getApiUrl("dashboard/items/with-image"), {
     method: "POST",
     body: formData,
   });
@@ -151,3 +152,22 @@ export async function deleteItem(id: number): Promise<void> {
     throw new Error(`Failed to delete item: ${response.status}`);
   }
 }
+
+// Fetch an item image and return it as a blob URL
+export const getItemImage = async (
+  imageSrc: string
+): Promise<string | null> => {
+  try {
+    const response = await fetch(
+      getApiUrl(`photo/${encodeURIComponent(imageSrc)}`)
+    );
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  } catch (error) {
+    console.error("Failed to fetch item image:", error);
+    return null;
+  }
+};

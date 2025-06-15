@@ -5,12 +5,7 @@ import ItemProps from "@/models/ItemProps";
 import { PencilSimpleLine, Trash } from "phosphor-react";
 import { ItemCard } from "@/components/common/ItemCard";
 import { CategorySelector } from "@/components/common/CategorySelector";
-import {
-  createItem,
-  deleteItem,
-  getItemsDashboard,
-  updateItem,
-} from "@/app/api/items";
+import { createItem, deleteItem, getItemsDashboard, updateItem } from "@/app/api/items";
 import { getApiUrl } from "@/app/api/config";
 
 // interface Item {
@@ -23,6 +18,12 @@ import { getApiUrl } from "@/app/api/config";
 // }
 
 export default function ItemsPage() {
+  // Helper function to capitalize category and handle empty or null cases
+  const formatCategory = (category: string | null | undefined): string => {
+    const categoryText = !category || category.trim() === "" ? "Geen categorie" : category;
+    return categoryText.charAt(0).toUpperCase() + categoryText.slice(1);
+  };
+
   // Initialize the items state
   const [items, setItems] = useState<ItemProps[]>([]);
 
@@ -42,6 +43,7 @@ export default function ItemsPage() {
     imageSrc: "",
     imageFile: null as File | null,
     lockerId: "",
+    status: "",
   });
   // Removed setItems(item) from useEffect
 
@@ -63,7 +65,6 @@ export default function ItemsPage() {
 
     fetchItems();
   }, []);
-
   const handleAddItem = () => {
     setEditingItem(null);
     setFormData({
@@ -80,10 +81,10 @@ export default function ItemsPage() {
       imageSrc: "",
       imageFile: null,
       lockerId: "", // <-- reset lockerId
+      status: "Ongebruikt", // Set default status
     });
     setCurrentView("form");
   };
-
   const handleEditItem = (item: ItemProps) => {
     setEditingItem(item);
     setFormData({
@@ -100,6 +101,7 @@ export default function ItemsPage() {
       imageSrc: item.imageSrc || "",
       imageFile: null,
       lockerId: item.lockerId?.toString() || "", // <-- set lockerId
+      status: item.status,
     });
     setCurrentView("form");
   };
@@ -125,14 +127,13 @@ export default function ItemsPage() {
         description: formData.description,
         category: formData.category,
       };
-
       if (editingItem) {
         // Only fetch old data if editing
         const oldata = await fetch(getApiUrl("/items/" + formData.id));
         const oldataJson = await oldata.json();
         itemData = {
           ...itemData,
-          status: oldataJson.status,
+          status: formData.status || oldataJson.status, // Use status from form if available
           lockerId: oldataJson.lockerId,
           timesLoaned: oldataJson.timesLoaned,
         };
@@ -202,9 +203,7 @@ export default function ItemsPage() {
         items.map(async (item) => {
           if (item.imageSrc) {
             try {
-              const res = await fetch(
-                getApiUrl(`/photo?src=${encodeURIComponent(item.imageSrc)}`)
-              );
+              const res = await fetch(getApiUrl(`/images/${item.imageSrc}`));
               const blob = await res.blob();
               newImgs[item.id] = URL.createObjectURL(blob);
             } catch {
@@ -223,7 +222,7 @@ export default function ItemsPage() {
     let isMounted = true;
     // Only fetch if there is an imageSrc and NO local imageFile
     if (formData.imageSrc && !formData.imageFile) {
-      fetch(getApiUrl(`/photo?src=${encodeURIComponent(formData.imageSrc)}`))
+      fetch(getApiUrl(`/images/${formData.imageSrc}`))
         .then((res) => res.blob())
         .then((blob) => {
           if (isMounted) setFetchedFormImg(URL.createObjectURL(blob));
@@ -245,11 +244,8 @@ export default function ItemsPage() {
     return (
       <div className="p-6 bg-gray-100 min-h-screen">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Itemen</h1>
-          <button
-            className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors"
-            onClick={handleAddItem}
-          >
+          <h1 className="text-2xl font-bold text-gray-800">Items</h1>
+          <button className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors" onClick={handleAddItem}>
             Voeg item toe
           </button>
         </div>
@@ -259,21 +255,11 @@ export default function ItemsPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Item
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Categorie
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Prijs per week
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acties
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categorie</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prijs per week</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -282,9 +268,7 @@ export default function ItemsPage() {
                     <td colSpan={5} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#004431] mb-4"></div>
-                        <p className="text-gray-600 font-medium">
-                          Itemen laden...
-                        </p>
+                        <p className="text-gray-600 font-medium">Items laden...</p>
                       </div>
                     </td>
                   </tr>
@@ -297,7 +281,7 @@ export default function ItemsPage() {
                 ) : items.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center">
-                      <p className="text-gray-600">Geen itemen gevonden.</p>
+                      <p className="text-gray-600">Geen items gevonden.</p>
                     </td>
                   </tr>
                 ) : (
@@ -306,53 +290,27 @@ export default function ItemsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <img
-                              className="h-10 w-10 rounded-lg object-cover"
-                              src={
-                                fetchedTableImgs[item.id] ||
-                                "/assets/items/naaimachine.png"
-                              }
-                              alt={item.title}
-                            />
+                            <img className="h-10 w-10 rounded-lg object-cover" src={fetchedTableImgs[item.id] || "/assets/items/naaimachine.png"} alt={item.title} />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {item.title}
-                            </div>
+                            <div className="text-sm font-medium text-gray-900">{item.title}</div>
                           </div>
                         </div>
+                      </td>{" "}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCategory(item.category)}</div>
+                      </td>{" "}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">€{item.pricePerWeek?.toFixed(2)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {(item.category ?? "Geen categorie")
-                            .charAt(0)
-                            .toUpperCase() +
-                            (item.category ?? "Geen categorie").slice(1)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          €{item.pricePerWeek?.toFixed(2)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.status === "Beschikbaar" ? "bg-green-100 text-green-800" : item.status === "Geleend" ? "bg-primarypink-1 text-white" : "bg-gray-200 text-gray-800"}`}
-                        >
-                          {item.status}
-                        </span>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.status === "Beschikbaar" ? "bg-green-100 text-green-800" : item.status === "Geleend" ? "bg-primarypink-1 text-white" : item.status === "In_onderhoud" ? "bg-red-100 text-red-800" : "bg-gray-200 text-gray-800"}`}>{item.status === "In_onderhoud" ? "In onderhoud" : item.status}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          className="text-[#004431] hover:text-[#003422] mr-4"
-                          onClick={() => handleEditItem(item)}
-                        >
+                        <button className="text-[#004431] hover:text-[#003422] mr-4" onClick={() => handleEditItem(item)}>
                           <PencilSimpleLine size={20} />
                         </button>
-                        <button
-                          className="text-red-600 hover:text-red-800"
-                          onClick={() => handleDeleteItem(item.id)}
-                        >
+                        <button className="text-red-600 hover:text-red-800" onClick={() => handleDeleteItem(item.id)}>
                           <Trash size={20} />
                         </button>
                       </td>
@@ -372,18 +330,12 @@ export default function ItemsPage() {
         {/* Header */}
 
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Itemen</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Items</h1>
           <div className="flex space-x-3">
-            <button
-              onClick={handleCancel}
-              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-            >
+            <button onClick={handleCancel} className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
               Annuleren
             </button>
-            <button
-              onClick={handleSave}
-              className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors"
-            >
+            <button onClick={handleSave} className="bg-[#004431] text-white px-4 py-2 rounded-lg hover:bg-[#003422] transition-colors">
               Opslaan
             </button>
           </div>
@@ -391,116 +343,59 @@ export default function ItemsPage() {
         {/* Form Content */}
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-700">
-              {editingItem ? "Item bewerken" : "Item aanmaken en bewerken"}
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-700">{editingItem ? "Item bewerken" : "Item aanmaken en bewerken"}</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column */}
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 ">
-                  Item naam
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange("title", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1"
-                  placeholder="naaimachine"
-                />
-              </div>
-
+                <label className="block text-sm font-medium text-gray-700 mb-2 ">Item naam</label>
+                <input type="text" value={formData.title} onChange={(e) => handleInputChange("title", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="naaimachine" />
+              </div>{" "}
               <div className="grid grid-cols-2 gap-4">
                 {" "}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Categorie
-                  </label>
-                  <CategorySelector
-                    value={formData.category}
-                    onChange={(category) =>
-                      handleInputChange("category", category)
-                    }
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Categorie</label>
+                  <CategorySelector value={formData.category} onChange={(category) => handleInputChange("category", category)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Prijs
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange("price", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1"
-                    placeholder="€15.00"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Prijs</label>
+                  <input type="number" step="0.01" value={formData.price} onChange={(e) => handleInputChange("price", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="€15.00" />
                 </div>
-              </div>
-
+              </div>{" "}
+              {editingItem && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <select value={formData.status} onChange={(e) => handleInputChange("status", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1">
+                    <option value="Beschikbaar">Beschikbaar</option>
+                    <option value="Geleend">Geleend</option>
+                    <option value="In_onderhoud">In onderhoud</option>
+                  </select>
+                </div>
+              )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Beschrijving
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    handleInputChange("description", e.target.value)
-                  }
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Beschrijving</label>
+                <textarea value={formData.description} onChange={(e) => handleInputChange("description", e.target.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hoe gebruiken?
-                </label>
-                <textarea
-                  value={formData.howToUse}
-                  onChange={(e) =>
-                    handleInputChange("howToUse", e.target.value)
-                  }
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Hoe gebruiken?</label>
+                <textarea value={formData.howToUse} onChange={(e) => handleInputChange("howToUse", e.target.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Wat zit erbij?
-                </label>
-                <textarea
-                  value={formData.accesories}
-                  onChange={(e) =>
-                    handleInputChange("accesories", e.target.value)
-                  }
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Wat zit erbij?</label>
+                <textarea value={formData.accesories} onChange={(e) => handleInputChange("accesories", e.target.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tip
-                </label>
-                <textarea
-                  value={formData.tip}
-                  onChange={(e) => handleInputChange("tip", e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tip</label>
+                <textarea value={formData.tip} onChange={(e) => handleInputChange("tip", e.target.value)} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
               </div>
             </div>
 
             {/* Right Column */}
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Item foto
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Item foto</label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-white">
                   {formData.imageSrc ? (
                     <div className="flex flex-col items-center space-y-4">
@@ -510,38 +405,20 @@ export default function ItemsPage() {
                           formData.imageFile
                             ? URL.createObjectURL(formData.imageFile) // Show local preview if new file selected
                             : formData.id && fetchedTableImgs[formData.id]
-                              ? fetchedTableImgs[formData.id] ||
-                                "/assets/items/naaimachine.png"
+                              ? fetchedTableImgs[formData.id] || "/assets/items/naaimachine.png"
                               : "/assets/items/naaimachine.png"
                         }
                         alt="Item foto"
                       />
-                      <button
-                        type="button"
-                        className="text-red-600 hover:text-red-800 text-sm underline"
-                        onClick={() => handleInputChange("imageSrc", "")}
-                      >
+                      <button type="button" className="text-red-600 hover:text-red-800 text-sm underline" onClick={() => handleInputChange("imageSrc", "")}>
                         Verwijder foto
                       </button>
                     </div>
                   ) : (
                     <>
-                      <label
-                        htmlFor="image-upload"
-                        className="cursor-pointer flex flex-col items-center text-gray-500 hover:text-gray-700 font-medium"
-                      >
-                        <svg
-                          className="mx-auto h-12 w-12 mb-2 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                          />
+                      <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center text-gray-500 hover:text-gray-700 font-medium">
+                        <svg className="mx-auto h-12 w-12 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                         Upload foto
                       </label>
@@ -555,10 +432,7 @@ export default function ItemsPage() {
                           if (file) {
                             const reader = new FileReader();
                             reader.onloadend = () => {
-                              handleInputChange(
-                                "imageSrc",
-                                reader.result as string
-                              );
+                              handleInputChange("imageSrc", reader.result as string);
                               setFormData((prev) => ({
                                 ...prev,
                                 imageFile: file, // <-- sla het bestand op
@@ -575,31 +449,13 @@ export default function ItemsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gewicht (kg)
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.weight}
-                  onChange={(e) => handleInputChange("weight", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1"
-                  placeholder="0.00"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Gewicht (kg)</label>
+                <input type="number" step="0.01" value={formData.weight} onChange={(e) => handleInputChange("weight", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="0.00" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Afmetingen
-                </label>
-                <input
-                  type="text"
-                  value={formData.dimensions}
-                  onChange={(e) =>
-                    handleInputChange("dimensions", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Afmetingen</label>
+                <input type="text" value={formData.dimensions} onChange={(e) => handleInputChange("dimensions", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" />
               </div>
             </div>
           </div>

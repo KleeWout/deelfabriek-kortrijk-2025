@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import { Clock, EnvelopeSimple, Phone, MapPin } from "phosphor-react";
 import { useOpeningsHours } from "@/context/OpeningHoursContext";

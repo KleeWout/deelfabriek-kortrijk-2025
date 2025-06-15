@@ -72,6 +72,9 @@ public static class EmailTemplates
     public static string GetPickupConfirmationTemplate(User user, Item item, Reservation reservation)
     {
         var content = $@"
+        <div style='font-size: 2em; font-weight: bold; color: #004431; margin-bottom: 20px; text-align: center;'>
+                {reservation.PickupCode}
+            </div>
             <p>Dag {user.FirstName} {user.LastName},</p>
             
             <p>Je item is succesvol opgehaald!</p>

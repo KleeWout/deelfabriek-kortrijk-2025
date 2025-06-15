@@ -1,5 +1,5 @@
-
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +46,7 @@ builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>(
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
+
 builder.Services.AddValidatorsFromAssemblyContaining<ItemValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
@@ -68,6 +69,20 @@ var app = builder.Build();
 // app.UseAuthorization();
 // Enable CORS middleware - this line was missing
 app.UseCors("AllowAll");
+
+// Configure static file middleware for serving images from Uploads directory
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
+    RequestPath = "/images"
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Uploads/items")),
+    RequestPath = "/images/items"
+});
+
 
 app.MapGet("/", () => "Welcome to the deelfabriek API!");
 
@@ -110,6 +125,7 @@ adminApi.MapGroup("/users").GroupAdminUsers();
 adminApi.MapGroup("/reservations").GroupAdminReservations();
 adminApi.MapGroup("/openingshours").GroupAdminOpeningHours();
 adminApi.MapGroup("/reports").GroupAdminReports();
+
 
 
 

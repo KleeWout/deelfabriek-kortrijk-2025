@@ -3,6 +3,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { getGradientClassForBackground } from "@/utils/constants";
 import { ItemCardProps } from "@/models/ItemCardProps";
 import { useEffect, useState } from "react";
+import { getItemImage } from "@/app/api/items";
 
 // interface ItemCardProps {
 //   id: number;
@@ -30,24 +31,25 @@ export function ItemCard(props: ItemCardProps & { onClick?: () => void }) {
   const pathname = usePathname();
 
   const [fetchedImg, setFetchedImg] = useState<string | null>(null);
+  useEffect(() => {
+    let isMounted = true;
 
-  // useEffect(() => {
-  //   let isMounted = true;
-  //   if (imageSrc) {
-  //     const url = `http://localhost:3001/photo?src=${encodeURIComponent(imageSrc)}`;
-  //     fetch(url)
-  //       .then((res) => res.blob())
-  //       .then((blob) => {
-  //         if (isMounted) setFetchedImg(URL.createObjectURL(blob));
-  //       })
-  //       .catch(() => {
-  //         if (isMounted) setFetchedImg(null);
-  //       });
-  //   }
-  //   return () => {
-  //     isMounted = false;
-  //   };
-  // }, [imageSrc]);
+    const fetchImage = async () => {
+      if (imageSrc) {
+        try {
+          if (isMounted) setFetchedImg(imageSrc);
+        } catch (error) {
+          if (isMounted) setFetchedImg(null);
+        }
+      }
+    };
+
+    fetchImage();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [imageSrc]);
 
   // If baseRoute is not provided, determine it from the current path
   const resolvedBaseRoute =
@@ -65,7 +67,6 @@ export function ItemCard(props: ItemCardProps & { onClick?: () => void }) {
   const handleItemClick = (itemId: number) => {
     router.push(`${resolvedBaseRoute}/${itemId}`);
   };
-
   return (
     <div
       className="flex flex-col w-full h-full rounded-xl shadow-md hover:shadow-lg border-white border-2 relative cursor-pointer"

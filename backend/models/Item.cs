@@ -14,7 +14,7 @@ public class Item : IEntity
     [Precision(10, 2)]
     public decimal? PricePerWeek { get; set; }
 
-    public ItemStatus Status { get; set; } = ItemStatus.Beschikbaar;
+    public ItemStatus Status { get; set; } = ItemStatus.Ongebruikt;
 
     public string? ImageSrc { get; set; }
 
