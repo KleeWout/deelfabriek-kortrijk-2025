@@ -7,8 +7,11 @@
  * - For production: https://api-deelfabriek.woutjuuh02.be
  */
 
-// Local development URL (default)
-export const API_BASE_URL = "http://localhost:3001";
+// Local development URL with proxy through Next.js
+export const API_BASE_URL = "/api";
+
+// Direct local development URL (no proxy)
+// export const API_BASE_URL = "http://localhost:3001";
 
 // Docker URL
 // export const API_BASE_URL = "http://backend:3001";
@@ -18,7 +21,6 @@ export const API_BASE_URL = "http://localhost:3001";
 
 // Environment-based URL (if using environment variables)
 // export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
-
 
 export function getApiUrl(path: string): string {
   // Ensure path doesn't start with a slash to avoid double slashes

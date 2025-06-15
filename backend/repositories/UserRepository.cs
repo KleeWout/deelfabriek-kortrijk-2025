@@ -8,8 +8,8 @@ public interface IUserRepository
 
     Task<bool> EmailExists(string email);
     Task ToggleUserBlockStatus(int userId);
-
     Task<User> GetUser(newUserDto user);
+    Task<User> GetUserByEmailAsync(string email);
 
 }
 
@@ -29,7 +29,7 @@ public class UserRepository : IUserRepository
     }
 
     public async Task<User> GetUser(newUserDto user)
-     {
+    {
         // Using FirstOrDefaultAsync since email should be unique
         var result = await _context.User.FirstOrDefaultAsync(u => u.Email == user.Email);
         if (result == null)
@@ -48,8 +48,7 @@ public class UserRepository : IUserRepository
         var users = await _genericRepository.GetAllAsync();
         return users.Any(u => u.Email == email);
     }
-
-     public async Task ToggleUserBlockStatus(int userId)
+    public async Task ToggleUserBlockStatus(int userId)
     {
         var user = await _genericRepository.GetByIdAsync(userId);
         if (user != null)
@@ -58,7 +57,11 @@ public class UserRepository : IUserRepository
             await _genericRepository.UpdateAsync(user);
         }
     }
-  
+
+    public async Task<User> GetUserByEmailAsync(string email)
+    {
+        return await _context.User.FirstOrDefaultAsync(u => u.Email == email);
+    }
 
 }
 

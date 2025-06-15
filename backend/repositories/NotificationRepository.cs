@@ -3,7 +3,7 @@ namespace Deelkast.API.Repositories;
 
 public interface INotificationRepository
 {
-    Task AddNotificationRequest(int itemId, int userId);
+    Task AddNotificationRequest(int itemId, string userEmail);
     Task<IEnumerable<ItemAvailabilityNotification>> GetPendingNotificationsForItem(int itemId);
     Task UpdateNotification(ItemAvailabilityNotification notification);
     //delete 
@@ -19,10 +19,10 @@ public class NotificationRepository : GenericRepository<ItemAvailabilityNotifica
         _context = context;
     }
 
-    public async Task AddNotificationRequest(int itemId, int userId)
+    public async Task AddNotificationRequest(int itemId, string userEmail)
     {
         var exists = await _context.ItemAvailabilityNotifications
-            .AnyAsync(n => n.ItemId == itemId && n.UserId == userId);
+            .AnyAsync(n => n.ItemId == itemId && n.UserEmail == userEmail);
 
         if (exists)
             return; // Already subscribed for this item
@@ -30,7 +30,7 @@ public class NotificationRepository : GenericRepository<ItemAvailabilityNotifica
         var notification = new ItemAvailabilityNotification
         {
             ItemId = itemId,
-            UserId = userId,
+            UserEmail = userEmail,
             RequestedAt = DateTime.Now,
         };
 

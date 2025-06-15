@@ -17,6 +17,15 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=build /app .
 
+# Copy the Uploads directory to include initial content
+# This ensures your uploaded files are included in the container
+COPY Uploads/ /app/Uploads/
+
+# Create directory with proper permissions before the volume is mounted
+RUN mkdir -p /app/Uploads && \
+    chown -R 1000:1000 /app/Uploads && \
+    chmod -R 777 /app/Uploads
+
 # Define a safe default port
 EXPOSE 3001
 

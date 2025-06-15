@@ -24,12 +24,13 @@ public interface IItemService
     Task AddCategory(Category category);
     Task DeleteCategory(string category);
 
+    Task<Category> UpdateCategory(Category category);
     Task<List<ItemsPageDto>> GetItemsWithLocker();
 
     // Task UpdateItemWithCategories(Item item);
 
     // ------------------- notifications 
-    Task AddNotificationRequest(int itemId, int userId);
+    Task AddNotificationRequest(int itemId, string userEmail);
     Task UpdateNotification(ItemAvailabilityNotification notification);
     Task DeleteNotification(int id);
 
@@ -172,15 +173,20 @@ public class ItemService : IItemService
     }
 
 
+    public async Task<Category> UpdateCategory(Category category)
+    {
+        return await _customItemRepository.UpdateCategory(category);
+    }
+
     public async Task<List<ItemsPageDto>> GetItemsWithLocker()
     {
         var items = await _customItemRepository.GetItemsWithLocker();
         return _mapper.Map<List<ItemsPageDto>>(items);
     }
 
-    public async Task AddNotificationRequest(int itemId, int userId)
+    public async Task AddNotificationRequest(int itemId, string userEmail)
     {
-        await _notificationRepository.AddNotificationRequest(itemId, userId);
+        await _notificationRepository.AddNotificationRequest(itemId, userEmail);
     }
     public async Task UpdateNotification(ItemAvailabilityNotification notification)
     {

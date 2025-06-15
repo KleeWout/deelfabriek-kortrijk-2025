@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CategoryResponse, getCategories, createCategory, deleteCategory } from "@/app/api/categories";
+import { CategoryResponse, getCategories, createCategory, deleteCategory, updateCategory } from "@/app/api/categories";
 import { IconSelector } from "./IconSelector";
 import { Pencil, Trash, Plus, X, Check } from "@phosphor-icons/react";
 import { getIconByName } from "@/utils/iconUtils";
@@ -105,12 +105,28 @@ export function CategoryManagement() {
     setCurrentIconTarget(null);
   };
 
-  // Handle editing a category (In a real implementation, you would add an API call to update the category)
-  // Since there's no update endpoint in the provided API, I'm leaving this as a visual mock
   const handleSaveEdit = async (category: CategoryResponse) => {
-    setEditingCategory(null);
-    // Mock update - In a real scenario, you'd call an API endpoint here
-    alert(`In een echte implementatie zou dit categorie ${category.name} updaten met icon ${category.iconName}`);
+    if (!category.name.trim()) {
+      setError("Categorie naam is verplicht");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await updateCategory(category.id, {
+        name: category.name,
+        iconName: category.iconName,
+      });
+      setEditingCategory(null);
+      // Refresh categories
+      await fetchCategories();
+      setError(null);
+    } catch (err: any) {
+      console.error("Failed to update category:", err);
+      setError(err.message || "Fout bij het bijwerken van categorie");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -132,11 +148,22 @@ export function CategoryManagement() {
               <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700">
                 Naam
               </label>
-              <input id="categoryName" type="text" value={newCategory.name} onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primarygreen-1 focus:ring focus:ring-primarygreen-1 focus:ring-opacity-50" placeholder="Categorie naam" />
+
+              <input
+                id="categoryName"
+                type="text"
+                value={newCategory.name}
+                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                className="pl-2 mt-1 block w-full py-2.5 rounded-md border border-gray-300  
+                    focus:border-primarygreen-1 focus:ring focus:ring-primarygreen-1  
+                    transition-all duration-200 ease-in-out
+                    placeholder:text-gray-400 placeholder:italic"
+                placeholder="Categorie naam"
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Icoon</label>
+              <label className="block text-sm font-medium text-gray-700">Icon</label>
               <div onClick={() => openIconSelector("new")} className="mt-1 flex items-center border border-gray-300 rounded-md p-2 cursor-pointer hover:bg-gray-50">
                 <div className="flex items-center space-x-2">
                   {" "}
@@ -189,7 +216,10 @@ export function CategoryManagement() {
                           const updatedCategories = categories.map((c) => (c.id === category.id ? { ...c, name: e.target.value } : c));
                           setCategories(updatedCategories);
                         }}
-                        className="block rounded-md border-gray-300 shadow-sm focus:border-primarygreen-1 focus:ring focus:ring-primarygreen-1 focus:ring-opacity-50"
+                        className="pl-2 mt-1 block w-full py-2.5 rounded-md border border-gray-300  
+                    focus:border-primarygreen-1 focus:ring focus:ring-primarygreen-1  
+                    transition-all duration-200 ease-in-out
+                    placeholder:text-gray-400 placeholder:italic"
                         placeholder="Categorie naam"
                       />
                     </div>
@@ -210,7 +240,7 @@ export function CategoryManagement() {
                       <span className="font-medium">{category.name}</span>
                     </div>
                     <div className="flex space-x-2">
-                      <button onClick={() => setEditingCategory(category)} className="p-2 text-blue-600 hover:text-blue-800">
+                      <button onClick={() => setEditingCategory(category)} className="p-2 text-pri hover:text-green-700">
                         <Pencil size={20} />
                       </button>
                       <button onClick={() => handleDeleteCategory(category.name)} className="p-2 text-red-600 hover:text-red-800">

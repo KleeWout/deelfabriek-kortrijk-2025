@@ -9,7 +9,7 @@ services:
     build:
       context: ./frontend
       # platforms:
-      #   - linux/arm64    
+      #   - linux/arm64
     environment:
       - PAYCONIQ_API_KEY=${PAYCONIQ_API_KEY}
       - NEXT_PUBLIC_API_URL=/api
@@ -26,6 +26,10 @@ services:
       #   - linux/arm64
     ports:
       - 3001:3001
+    volumes:
+      - uploads_data:/app/Uploads
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
     restart: unless-stopped
 
   database:
@@ -54,3 +58,5 @@ services:
 
 volumes:
   db_data:
+  uploads_data:
+    driver: local

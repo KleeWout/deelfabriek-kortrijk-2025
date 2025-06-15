@@ -56,9 +56,13 @@ export function ItemPage({
         : false;
     });
   }, [items, selectedCategoryId, categories]);
+// normal grid
+// grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8
 
+//cursed grid:
+// grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8
   return (
-    <div className=" bg-[#f3f6f8]">
+    <div className=" bg-primarybackground">
       {/* Main content area */}
       <main className="flex-1 w-full mx-auto px-2 sm:px-6 py-4">
         {loading ? (
@@ -70,13 +74,12 @@ export function ItemPage({
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-16 min-h-96">
-            <span className="text-3xl mb-2">😢</span>
             <span className="text-center text-red-500 text-lg font-semibold">
               {error}
             </span>
           </div>
         ) : filteredItems.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-fit mx-auto mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-9 p-4 w-full mx-auto mb-8">
             {filteredItems.map((item, index) => (
               <ItemCard
                 key={item.id}
