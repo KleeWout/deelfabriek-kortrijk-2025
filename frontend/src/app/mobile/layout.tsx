@@ -10,7 +10,7 @@ interface MobileLayoutProps {
 
 export default function MobileLayout({ children }: MobileLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-primarybackground">
+    <div className="min-h-screen flex flex-col bg-primarybackground hide-scrollbar">
       <Navigation />
       <main className="flex-grow">{children}</main>
     </div>

@@ -58,7 +58,7 @@ export function ItemPage({
   }, [items, selectedCategoryId, categories]);
 
   return (
-    <div className=" bg-[#f3f6f8]">
+    <div className=" bg-primarybackground">
       {/* Main content area */}
       <main className="flex-1 w-full mx-auto px-2 sm:px-6 py-4">
         {loading ? (
