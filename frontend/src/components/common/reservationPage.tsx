@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
@@ -17,33 +17,33 @@ export default function ReservationPage() {
   const pathname = usePathname();
 
   // Check if we're on the tablet route
-  const isTabletRoute = pathname.includes("/tablet/");
+  const isTabletRoute = pathname.includes('/tablet/');
 
   // Form state
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    street: "",
-    houseNumber: "",
-    city: "",
-    postalCode: "",
-    bus: "",
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    street: '',
+    houseNumber: '',
+    city: '',
+    postalCode: '',
+    bus: '',
     duration: 1, // Default duration in weeks
   });
 
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [termsError, setTermsError] = useState("");
+  const [termsError, setTermsError] = useState('');
 
   const [errors, setErrors] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    street: "",
-    city: "",
-    postalCode: "",
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    street: '',
+    city: '',
+    postalCode: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -177,7 +177,7 @@ export default function ReservationPage() {
     if (errors[name as keyof typeof errors]) {
       setErrors({
         ...errors,
-        [name]: "",
+        [name]: '',
       });
     }
   };
@@ -207,15 +207,15 @@ export default function ReservationPage() {
 
     setErrors(newErrors);
 
-    return !Object.values(newErrors).some((error) => error !== "");
+    return !Object.values(newErrors).some((error) => error !== '');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setTermsError("");
+    setTermsError('');
     if (!acceptedTerms) {
-      setTermsError("Je moet de gebruikersvoorwaarden accepteren.");
+      setTermsError('Je moet de gebruikersvoorwaarden accepteren.');
       return;
     }
 
@@ -238,7 +238,7 @@ export default function ReservationPage() {
           phoneNumber: formData.phone,
           street: formData.street,
           bus: formData.bus || undefined, // Only include if not empty
-          houseNumber: formData.houseNumber || "", // Convert empty to empty string
+          houseNumber: formData.houseNumber || '', // Convert empty to empty string
           postalCode: formData.postalCode,
           city: formData.city,
         },
@@ -248,13 +248,13 @@ export default function ReservationPage() {
 
       const response = await createReservation(reservationData);
       // Store the response in localStorage
-      localStorage.setItem("reservationDetails", JSON.stringify(response));
+      localStorage.setItem('reservationDetails', JSON.stringify(response));
       // Navigate to the appropriate confirmation page based on route type
       if (isTabletRoute) {
         router.push(`/tablet/payment/`);
       } else {
         // Call the API and get the response
-        router.push("/mobile/reserveer/confirmation");
+        router.push('/mobile/reserveer/confirmation');
       }
     } catch (error) {
       console.error("Error submitting reservation:", error);
@@ -537,7 +537,7 @@ export default function ReservationPage() {
                 className="underline text-primarygreen-1 hover:text-primarygreen-2 font-semibold"
               >
                 gebruikersvoorwaarden
-              </a>{" "}
+              </button>{' '}
               gelezen en goedgekeurd
               <span className="text-red-500"> *</span>
             </label>
@@ -588,6 +588,10 @@ export default function ReservationPage() {
           </div>
         </div>
       )}
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+      />
     </div>
   );
 }

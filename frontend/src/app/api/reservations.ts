@@ -1,4 +1,4 @@
-import { ReservationData } from "../../models/ReservationData";
+import { ReservationData } from '../../models/ReservationData';
 
 import { getApiUrl } from "./config";
 
@@ -7,7 +7,7 @@ export async function createReservation(data: ReservationData): Promise<any> {
     const response = await fetch(getApiUrl("reservations"), {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     });
@@ -18,7 +18,7 @@ export async function createReservation(data: ReservationData): Promise<any> {
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating reservation:", error);
+    console.error('Error creating reservation:', error);
     throw error;
   }
 }
@@ -29,14 +29,14 @@ export async function getReservationByCode(code: string): Promise<any> {
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error("Reservation not found");
+        throw new Error('Reservation not found');
       }
       throw new Error(`Failed to get reservation: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching reservation data:", error);
+    console.error('Error fetching reservation data:', error);
     throw error;
   }
 }
@@ -75,14 +75,14 @@ export async function markReservationAsPaid(
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error("Reservation not found");
+        throw new Error('Reservation not found');
       }
       throw new Error(`Failed to mark reservation as paid: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error marking reservation as paid:", error);
+    console.error('Error marking reservation as paid:', error);
     throw error;
   }
 }
@@ -97,7 +97,7 @@ export async function markReservationAsReturned(
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error("Reservation not found");
+        throw new Error('Reservation not found');
       }
       throw new Error(
         `Failed to mark reservation as returned: ${response.status}`
@@ -106,7 +106,7 @@ export async function markReservationAsReturned(
 
     return await response.json();
   } catch (error) {
-    console.error("Error marking reservation as returned:", error);
+    console.error('Error marking reservation as returned:', error);
     throw error;
   }
 }
@@ -166,11 +166,11 @@ export async function cancelReservation(reservationId: string): Promise<any> {
 
     // Handle the response based on status and content
     if (response.ok) {
-      localStorage.setItem(key, "completed");
+      localStorage.setItem(key, 'completed');
 
       // Check if there's actually JSON content to parse
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
         try {
           // Try to parse JSON, but handle empty response
           const text = await response.text();
@@ -190,17 +190,30 @@ export async function cancelReservation(reservationId: string): Promise<any> {
       // For error responses
       if (response.status === 404) {
         // Reservation not found is not an error - it's already gone
-        localStorage.setItem(key, "completed");
-        return { success: true, status: "not_found" };
+        localStorage.setItem(key, 'completed');
+        return { success: true, status: 'not_found' };
       }
       throw new Error(`Failed to cancel reservation: ${response.status}`);
     }
   } catch (error) {
-    console.error("Error cancelling reservation:", error);
+    console.error('Error cancelling reservation:', error);
     // Don't throw the error, just return a standardized error object
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
     };
+  }
+}
+
+export async function getAllReservations(): Promise<any[]> {
+  try {
+    const response = await fetch(`${url}/dashboard/reservations`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch reservations: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching all reservations:', error);
+    throw error;
   }
 }
