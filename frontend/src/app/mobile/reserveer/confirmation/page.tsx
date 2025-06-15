@@ -159,7 +159,9 @@ function ReservationContent() {
             </div>
             <div className="flex flex-col">
               <div className="flex gap-2">
-                <span className="font-bold">Ophalen voor:</span>
+                <span className="font-bold">
+                  Uw reservering is geldig tot en met:
+                </span>
                 <span className="text-red-600 font-medium">
                   {formatDate(reservationDetails.returnDate)}
                 </span>
@@ -198,7 +200,7 @@ function ReservationContent() {
         </h2>
 
         <ol className="list-decimal list-inside space-y-3 pl-4">
-          <li>Ga naar locker {reservationDetails.locker}</li>
+          <li>Ga naar de deelkast</li>
           <li>Voer ophaalcode {reservationDetails.code} in</li>
           <li>Betaal ter plaatse via qr-code</li>
           <li>Locker opent automatisch</li>
