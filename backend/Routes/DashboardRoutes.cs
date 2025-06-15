@@ -144,6 +144,28 @@ public static class AdminRoutes
             }
         });
 
+        // update category
+        group.MapPut("/", async (Category category, IItemService itemService) =>
+        {
+            if (category == null)
+            {
+                return Results.BadRequest("Category cannot be null");
+            }
+
+            try
+            {
+                var newCategory = await itemService.UpdateCategory(category);
+                return Results.Ok(newCategory);
+            }
+
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred while updating the category: {ex.Message}");
+            }
+
+
+        });
+
         // delete category
         group.MapDelete("/{category}", async (string category, IItemService itemService) =>
         {
@@ -330,8 +352,10 @@ public static class AdminRoutes
                 if (!allowedExtensions.Contains(fileExtension))
                 {
                     return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
-                }                // Use the same path as your static files configuration but with items subfolder
-                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads", "items");
+                }
+
+                // Use the same path as your static files configuration
+                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads");
                 Console.WriteLine($"Saving file to: {uploadsPath}");
 
                 // Ensure directory exists
@@ -350,8 +374,7 @@ public static class AdminRoutes
                         await file.CopyToAsync(stream);
                     }
                     Console.WriteLine($"File saved successfully: {fileName}");
-                    // Add "items/" prefix to ImageSrc for database storage
-                    item.ImageSrc = $"items/{fileName}";
+                    item.ImageSrc = fileName;
                 }
                 catch (Exception fileEx)
                 {
@@ -423,8 +446,10 @@ public static class AdminRoutes
                     if (!allowedExtensions.Contains(fileExtension))
                     {
                         return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
-                    }                    // Create uploads directory if it doesn't exist
-                    var uploadsPath = Path.GetFullPath("./uploads/items/");
+                    }
+
+                    // Create uploads directory if it doesn't exist
+                    var uploadsPath = Path.GetFullPath("./uploads/");
                     Directory.CreateDirectory(uploadsPath);
 
                     // Use original filename
@@ -435,8 +460,10 @@ public static class AdminRoutes
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
-                    }                    // Set the filename with items/ prefix
-                    item.ImageSrc = $"items/{fileName}";
+                    }
+
+                    // Set the filename
+                    item.ImageSrc = fileName;
                 }
 
                 // Validate the item
@@ -455,8 +482,10 @@ public static class AdminRoutes
             {
                 return Results.Problem($"An error occurred while creating the item: {ex.Message}");
             }
-        }).DisableAntiforgery();        //edit item
-        group.MapPut("/{id}", async (HttpRequest request, int id, IItemService itemService, ItemValidator validator, IWebHostEnvironment environment) =>
+        }).DisableAntiforgery();
+
+        //edit item
+        group.MapPut("/{id}", async (HttpRequest request, int id, IItemService itemService, ItemValidator validator) =>
         {
             // Get the existing item from the database
             var existingItem = await itemService.GetItemById(id);
@@ -498,42 +527,28 @@ public static class AdminRoutes
                 if (!allowedExtensions.Contains(fileExtension))
                 {
                     return Results.BadRequest(new { errors = new[] { "Only image files are allowed" } });
-                }                // Use the same path as the POST endpoint with items subfolder
-                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads", "items");
-                Console.WriteLine($"Updating file to: {uploadsPath}");
+                }
 
-                // Ensure directory exists
-                Directory.CreateDirectory(uploadsPath);                // Delete old image if it exists
+                // Delete old image if it exists
                 if (!string.IsNullOrEmpty(existingItem.ImageSrc))
                 {
-                    // Extract just the filename, removing the "items/" prefix if present
-                        string existingFileName = existingItem.ImageSrc;
-                        if (existingFileName.StartsWith("items/"))
-                        {
-                            existingFileName = existingFileName.Substring(6); // Remove "items/" prefix
-                        }
-    
-                        var oldImagePath = Path.Combine(uploadsPath, existingFileName);
+                    var oldImagePath = Path.GetFullPath("./uploads/" + existingItem.ImageSrc);
                     if (File.Exists(oldImagePath))
                     {
                         File.Delete(oldImagePath);
-                        Console.WriteLine($"Deleted old image: {oldImagePath}");
                     }
                 }
 
-                // Generate unique filename to avoid conflicts, just like in POST
-                var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                // Save new image
+                var uploadsPath = Path.GetFullPath("./uploads/");
+                Directory.CreateDirectory(uploadsPath);
+                var fileName = file.FileName;
                 var filePath = Path.Combine(uploadsPath, fileName);
-
-                Console.WriteLine($"Full file path for update: {filePath}");
-
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }
-                Console.WriteLine($"File updated successfully: {fileName}");
-                // Add "items/" prefix to ImageSrc for database storage
-                existingItem.ImageSrc = $"items/{fileName}";
+                existingItem.ImageSrc = fileName;
             }
 
             // Validate the updated item
@@ -558,40 +573,15 @@ public static class AdminRoutes
             {
                 return Results.Problem($"An error occurred while updating the item: {ex.Message}");
             }
-        }).DisableAntiforgery();        // delete item
-        group.MapDelete("/{id}", async (int id, IItemService itemService, IWebHostEnvironment environment) =>
+        }).DisableAntiforgery();
+
+        // delete item
+        group.MapDelete("/{id}", async (int id, IItemService itemService) =>
         {
             var existingItem = await itemService.GetItemById(id);
             if (existingItem == null)
             {
                 return Results.NotFound();
-            }            // Delete the associated image file if it exists
-            if (!string.IsNullOrEmpty(existingItem.ImageSrc))
-            {
-                var uploadsPath = Path.Combine(environment.ContentRootPath, "Uploads", "items");
-
-                // Extract just the filename, removing the "items/" prefix if present
-                string fileName = existingItem.ImageSrc;
-                if (fileName.StartsWith("items/"))
-                {
-                    fileName = fileName.Substring(6); // Remove "items/" prefix
-                }
-
-                var imagePath = Path.Combine(uploadsPath, fileName);
-
-                if (File.Exists(imagePath))
-                {
-                    try
-                    {
-                        File.Delete(imagePath);
-                        Console.WriteLine($"Deleted image file: {imagePath}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error deleting image file: {ex.Message}");
-                        // Continue with item deletion even if image deletion fails
-                    }
-                }
             }
 
             await itemService.DeleteItem(id);

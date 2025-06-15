@@ -24,6 +24,7 @@ public interface IItemService
     Task AddCategory(Category category);
     Task DeleteCategory(string category);
 
+    Task<Category> UpdateCategory(Category category);
     Task<List<ItemsPageDto>> GetItemsWithLocker();
 
     // Task UpdateItemWithCategories(Item item);
@@ -171,6 +172,11 @@ public class ItemService : IItemService
         await _customItemRepository.DeleteCategory(category);
     }
 
+
+    public async Task<Category> UpdateCategory(Category category)
+    {
+        return await _customItemRepository.UpdateCategory(category);
+    }
 
     public async Task<List<ItemsPageDto>> GetItemsWithLocker()
     {

@@ -46,6 +46,35 @@ export async function createCategory(category: { name: string; iconName: string 
   }
 }
 
+// Update a category
+export async function updateCategory(id: number, category: { name: string; iconName: string }): Promise<CategoryResponse> {
+  try {
+    const response = await fetch(getApiUrl(`dashboard/categories`), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // Make sure to send a Category object format that matches what the backend expects
+      body: JSON.stringify({
+        id: id,
+        name: category.name,
+        iconName: category.iconName,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData || `Failed to update category: ${response.status}`);
+    }
+
+    const data: CategoryResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error updating category:", error);
+    throw error;
+  }
+}
+
 // Delete a category
 export async function deleteCategory(categoryName: string): Promise<void> {
   try {

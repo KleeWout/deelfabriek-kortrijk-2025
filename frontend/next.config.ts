@@ -14,8 +14,8 @@ const nextConfig: NextConfig = {
       {
         source: "/api/:path*",
         // destination: process.env.BACKEND_URL || "http://backend:3001/:path*", // Proxy to Backend
-        // destination: process.env.BACKEND_URL || "http://localhost:3001/:path*",
-        destination: process.env.BACKEND_URL || "http://192.168.129.235:3001//:path*", // Proxy to Backend
+        destination: process.env.BACKEND_URL || "http://localhost:3001/:path*",
+        // destination: process.env.BACKEND_URL || "http://192.168.129.235:3001//:path*", // Proxy to Backend
       },
     ];
   },
