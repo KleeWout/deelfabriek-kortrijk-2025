@@ -88,11 +88,7 @@ export function ItemPage({
                 pricePerWeek={item.pricePerWeek}
                 status={item.status}
                 imageSrc={
-                  item.imageSrc
-                    ? getApiUrl(
-                        `/images/${item.imageSrc}`
-                      )
-                    : ""
+                  item.imageSrc ? getApiUrl(`/images/${item.imageSrc}`) : ""
                 }
                 lockerId={item.lockerId}
                 index={index}

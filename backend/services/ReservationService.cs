@@ -1,4 +1,5 @@
 using Deelkast.API.Exceptions;
+using FluentValidation.TestHelper;
 namespace Deelkast.API.Services;
 
 
@@ -267,6 +268,7 @@ public class ReservationService : IReservationService
         {
             // await _resRepo.UpdateAsync(reservation);
             return _mapper.Map<ReservationViewKioskDto>(reservation);
+
         }
         else if (reservation.Status == ReservationStatus.Active)
         {

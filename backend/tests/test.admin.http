@@ -185,14 +185,13 @@ GET {{url}}/dashboard/rapports
 GET {{url}}/dashboard/rapports/1
 ###
 // POST Rapport
-POST {{url}}/dashboard/rapports
+POST {{url}}/reports
 Content-Type: application/json
 
 {
   "reservationid": 1,
   "rating": 1,
   "remark": "Damaged"
-
 }
 ###
 // delete reservation 
