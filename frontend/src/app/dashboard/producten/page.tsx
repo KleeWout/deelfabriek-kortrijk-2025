@@ -301,10 +301,10 @@ export default function ItemsPage() {
                             <div className="text-sm font-medium text-gray-900">{item.title}</div>
                           </div>
                         </div>
-                      </td>{" "}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{formatCategory(item.category)}</div>
-                      </td>{" "}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">€{item.pricePerWeek?.toFixed(2)}</div>
                       </td>
@@ -357,9 +357,8 @@ export default function ItemsPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 ">Item naam</label>
                 <input type="text" value={formData.title} onChange={(e) => handleInputChange("title", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="naaimachine" />
-              </div>{" "}
+              </div>
               <div className="grid grid-cols-2 gap-4">
-                {" "}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Categorie</label>
                   <CategorySelector value={formData.category} onChange={(category) => handleInputChange("category", category)} />
@@ -368,7 +367,7 @@ export default function ItemsPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Prijs</label>
                   <input type="number" step="0.01" value={formData.price} onChange={(e) => handleInputChange("price", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primarygreen-1" placeholder="€15.00" />
                 </div>
-              </div>{" "}
+              </div>
               {editingItem && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>

@@ -1,6 +1,7 @@
 "use client";
 
 import { getIconByName } from "@/utils/iconUtils";
+import { hr } from "date-fns/locale";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -9,6 +10,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: "SquaresFour" },
   { name: "Producten", href: "/dashboard/producten", icon: "Package" },
   { name: "Reservaties", href: "/dashboard/reservaties", icon: "CalendarDots" },
+  {name: "Users", href: "/dashboard/users", icon: "Users"},
   { name: "Lockers", href: "/dashboard/lockers", icon: "Lockers" },
   { name: "Rapporten", href: "/dashboard/rapporten", icon: "FileText" },
   { name: "Openingsuren", href: "/dashboard/openingsuren", icon: "Calendar" },
