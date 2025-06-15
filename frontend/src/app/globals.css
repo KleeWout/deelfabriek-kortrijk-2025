@@ -67,3 +67,14 @@ h6 {
 .bg-gradient-salmon {
   background: radial-gradient(144.5% 50% at 50% 50%, #ffe8e8 0%, #efabaa 100%);
 }
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hidden {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+}

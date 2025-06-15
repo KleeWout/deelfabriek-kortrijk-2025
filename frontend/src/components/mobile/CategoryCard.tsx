@@ -18,7 +18,7 @@ export function CategoryCard({
 
   return (
     <div
-      className={`flex px-4 py-1.5 justify-center items-center gap-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer ${isSelected ? "bg-primarygreen-1 text-white" : "bg-white hover:bg-gray-50"}`}
+      className={`flex px-4 py-1.5 justify-center items-center gap-2.5 rounded-full shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${isSelected ? "bg-primarygreen-1 text-white" : "bg-white hover:bg-gray-50"}`}
       onClick={onClick}
     >
       {iconName && (
