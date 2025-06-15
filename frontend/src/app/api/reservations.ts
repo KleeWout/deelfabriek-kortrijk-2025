@@ -1,4 +1,4 @@
-import { ReservationData } from '../../models/ReservationData';
+import { ReservationData } from "../../models/ReservationData";
 
 import { getApiUrl } from "./config";
 
@@ -7,7 +7,7 @@ export async function createReservation(data: ReservationData): Promise<any> {
     const response = await fetch(getApiUrl("reservations"), {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
@@ -18,7 +18,7 @@ export async function createReservation(data: ReservationData): Promise<any> {
 
     return await response.json();
   } catch (error) {
-    console.error('Error creating reservation:', error);
+    console.error("Error creating reservation:", error);
     throw error;
   }
 }
@@ -29,14 +29,14 @@ export async function getReservationByCode(code: string): Promise<any> {
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error('Reservation not found');
+        throw new Error("Reservation not found");
       }
       throw new Error(`Failed to get reservation: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching reservation data:', error);
+    console.error("Error fetching reservation data:", error);
     throw error;
   }
 }
@@ -59,63 +59,48 @@ export interface ReservationResponse {
   };
 }
 
-export async function markReservationAsPaid(
-  code: string
-): Promise<ReservationResponse> {
+export async function markReservationAsPaid(code: string): Promise<ReservationResponse> {
   try {
-    const response = await fetch(
-      getApiUrl(`reservations/code/${code}/ispayed`),
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(getApiUrl(`reservations/code/${code}/ispayed`), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error('Reservation not found');
+        throw new Error("Reservation not found");
       }
       throw new Error(`Failed to mark reservation as paid: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error marking reservation as paid:', error);
+    console.error("Error marking reservation as paid:", error);
     throw error;
   }
 }
 
-export async function markReservationAsReturned(
-  code: string
-): Promise<ReservationResponse> {
+export async function markReservationAsReturned(code: string): Promise<ReservationResponse> {
   try {
-    const response = await fetch(
-      getApiUrl(`reservations/code/${code}/returned`)
-    );
+    const response = await fetch(getApiUrl(`reservations/code/${code}/returned`));
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error('Reservation not found');
+        throw new Error("Reservation not found");
       }
-      throw new Error(
-        `Failed to mark reservation as returned: ${response.status}`
-      );
+      throw new Error(`Failed to mark reservation as returned: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error marking reservation as returned:', error);
+    console.error("Error marking reservation as returned:", error);
     throw error;
   }
 }
 
-export async function createReservationReport(
-  reservationid: number,
-  rating: number,
-  reasons: string[]
-): Promise<any> {
+export async function createReservationReport(reservationid: number, rating: number, reasons: string[]): Promise<any> {
   try {
     const remark = reasons.join(", ");
     const response = await fetch(getApiUrl(`/reports`), {
@@ -127,9 +112,7 @@ export async function createReservationReport(
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to create reservation report: ${response.status}`
-      );
+      throw new Error(`Failed to create reservation report: ${response.status}`);
     }
 
     return await response.json();
@@ -147,39 +130,32 @@ export async function cancelReservation(reservationId: string): Promise<any> {
     const alreadyCancelled = localStorage.getItem(key);
 
     if (alreadyCancelled === "completed") {
-      console.log(
-        `Reservation ${reservationId} was already cancelled, skipping`
-      );
+      console.log(`Reservation ${reservationId} was already cancelled, skipping`);
       return { success: true, status: "already_cancelled" };
     }
 
     localStorage.setItem(key, "in_progress");
-    const response = await fetch(
-      getApiUrl(`reservations/code/${reservationId}`),
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(getApiUrl(`reservations/code/${reservationId}`), {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     // Handle the response based on status and content
     if (response.ok) {
-      localStorage.setItem(key, 'completed');
+      localStorage.setItem(key, "completed");
 
       // Check if there's actually JSON content to parse
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
         try {
           // Try to parse JSON, but handle empty response
           const text = await response.text();
           return text ? JSON.parse(text) : { success: true };
         } catch (parseError) {
           // If parsing fails, return a success object
-          console.log(
-            "Response wasn't valid JSON, but cancellation was successful"
-          );
+          console.log("Response wasn't valid JSON, but cancellation was successful");
           return { success: true };
         }
       } else {
@@ -190,13 +166,13 @@ export async function cancelReservation(reservationId: string): Promise<any> {
       // For error responses
       if (response.status === 404) {
         // Reservation not found is not an error - it's already gone
-        localStorage.setItem(key, 'completed');
-        return { success: true, status: 'not_found' };
+        localStorage.setItem(key, "completed");
+        return { success: true, status: "not_found" };
       }
       throw new Error(`Failed to cancel reservation: ${response.status}`);
     }
   } catch (error) {
-    console.error('Error cancelling reservation:', error);
+    console.error("Error cancelling reservation:", error);
     // Don't throw the error, just return a standardized error object
     return {
       success: false,
@@ -207,13 +183,14 @@ export async function cancelReservation(reservationId: string): Promise<any> {
 
 export async function getAllReservations(): Promise<any[]> {
   try {
-    const response = await fetch(`${url}/dashboard/reservations`);
+    const response = await fetch(getApiUrl(`/dashboard/reservations`));
+
     if (!response.ok) {
       throw new Error(`Failed to fetch reservations: ${response.status}`);
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching all reservations:', error);
+    console.error("Error fetching all reservations:", error);
     throw error;
   }
 }
