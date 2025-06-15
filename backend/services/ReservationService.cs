@@ -550,15 +550,13 @@ public class ReservationService : IReservationService
     }
     public async Task NotifyUsersItemAvailable(Item item)
     {
-        if (item == null) return;
-
-        var notifications = await _itemAvailabilityNotificationRepo.GetPendingNotificationsForItem(item.Id);
+        if (item == null) return; var notifications = await _itemAvailabilityNotificationRepo.GetPendingNotificationsForItem(item.Id);
         if (notifications == null) return;
 
         foreach (var notif in notifications)
         {
             if (notif == null) continue;
-            var user = await _userRepo.GetByIdAsync(notif.UserId);
+            var user = await _customUserRepository.GetUserByEmailAsync(notif.UserEmail);
             if (user != null)
             {
                 try
@@ -568,7 +566,7 @@ public class ReservationService : IReservationService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to notify user {user?.Id} about item availability: {ex.Message}");
+                    Console.WriteLine($"Failed to notify user {user?.Email} about item availability: {ex.Message}");
                 }
             }
         }

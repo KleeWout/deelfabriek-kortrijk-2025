@@ -30,7 +30,7 @@ public interface IItemService
     // Task UpdateItemWithCategories(Item item);
 
     // ------------------- notifications 
-    Task AddNotificationRequest(int itemId, int userId);
+    Task AddNotificationRequest(int itemId, string userEmail);
     Task UpdateNotification(ItemAvailabilityNotification notification);
     Task DeleteNotification(int id);
 
@@ -184,9 +184,9 @@ public class ItemService : IItemService
         return _mapper.Map<List<ItemsPageDto>>(items);
     }
 
-    public async Task AddNotificationRequest(int itemId, int userId)
+    public async Task AddNotificationRequest(int itemId, string userEmail)
     {
-        await _notificationRepository.AddNotificationRequest(itemId, userId);
+        await _notificationRepository.AddNotificationRequest(itemId, userEmail);
     }
     public async Task UpdateNotification(ItemAvailabilityNotification notification)
     {

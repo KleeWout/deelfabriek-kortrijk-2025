@@ -317,7 +317,7 @@ public static class PublicRoutes
     {
         try
         {
-            await service.AddNotificationRequest(notification.ItemId, notification.UserId);
+            await service.AddNotificationRequest(notification.ItemId, notification.UserEmail);
             return Results.Ok(new { message = "Notification request sent successfully." });
         }
         catch (Exception ex)
