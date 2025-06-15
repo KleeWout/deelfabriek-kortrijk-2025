@@ -35,6 +35,10 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
           </button>
         </div>
         <div className="overflow-y-auto flex-grow">
+          <p className="mb-4 text-base text-gray-700">
+            Lees hieronder aandachtig de gebruikersvoorwaarden. Je moet deze
+            accepteren om verder te gaan met je reservatie.
+          </p>
           <iframe
             src="/gebruiksvoorwaarden.pdf"
             className="w-full h-full min-h-[60vh]"
