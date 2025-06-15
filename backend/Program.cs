@@ -72,23 +72,16 @@ app.UseCors("AllowAll");
 
 // Configure static file middleware for serving images from Uploads directory
 var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
-var itemsUploadsPath = Path.Combine(uploadsPath, "items");
-
-// Ensure directories exist
-Directory.CreateDirectory(uploadsPath);
-Directory.CreateDirectory(itemsUploadsPath);
-
 Console.WriteLine($"Looking for uploads at: {uploadsPath}");
-Console.WriteLine($"Items uploads path: {itemsUploadsPath}");
 Console.WriteLine($"Directory exists: {Directory.Exists(uploadsPath)}");
 
-if (Directory.Exists(itemsUploadsPath))
+if (Directory.Exists(uploadsPath))
 {
-    var files = Directory.GetFiles(itemsUploadsPath);
-    Console.WriteLine($"Item images found: {string.Join(", ", files.Select(Path.GetFileName))}");
+    var files = Directory.GetFiles(uploadsPath);
+    Console.WriteLine($"Files found: {string.Join(", ", files.Select(Path.GetFileName))}");
 }
 
-// Configure static file middleware for the Uploads directory
+// Your static files configuration
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsPath),
@@ -103,35 +96,18 @@ app.MapGet("/photo", (IHostEnvironment env, string? src) =>
     if (string.IsNullOrWhiteSpace(src))
         return Results.BadRequest("Missing 'src' query parameter.");
 
-    string filePath;
-
-    // Handle paths with items/ prefix 
-    if (src.StartsWith("items/"))
-    {
-        // Extract just the filename from the path
-        string fileName = Path.GetFileName(src);
-        filePath = Path.Combine(env.ContentRootPath, "Uploads", "items", fileName);
-    }
-    else
-    {
-        // Backward compatibility for old paths
-        string fileName = Path.GetFileName(src);
-        filePath = Path.Combine(env.ContentRootPath, "Uploads", "items", fileName);
-    }
+    // Only allow file names, not paths
+    var fileName = Path.GetFileName(src);
+    var filePath = Path.Combine(env.ContentRootPath, "Uploads", fileName);
 
     if (!System.IO.File.Exists(filePath))
         return Results.NotFound("File not found.");
 
     var contentType = "application/octet-stream";
-    string fileExt = Path.GetExtension(src).ToLowerInvariant();
-    if (fileExt == ".png")
+    if (fileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
         contentType = "image/png";
-    else if (fileExt == ".jpg" || fileExt == ".jpeg")
+    else if (fileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
         contentType = "image/jpeg";
-    else if (fileExt == ".gif")
-        contentType = "image/gif";
-    else if (fileExt == ".webp")
-        contentType = "image/webp";
 
     return Results.File(filePath, contentType);
 });

@@ -16,6 +16,8 @@ public interface IItemRepository
 
     Task DeleteCategory(string category);
 
+    Task<Category> UpdateCategory(Category category);
+
     Task<int> CurrentAvailableItems();
 
     Task<int> CurrentLoanedItems();
@@ -193,5 +195,24 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
             _context.Categories.Remove(categoryToDelete);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<Category> UpdateCategory(Category category)
+    {
+        var existingCategory = await _context.Categories
+            .FirstOrDefaultAsync(c => c.Id == category.Id);
+
+        if (existingCategory == null)
+        {
+            throw new InvalidOperationException($"Category with ID {category.Id} not found.");
+        }
+
+        existingCategory.Name = category.Name;
+        existingCategory.IconName = category.IconName;
+
+        _context.Categories.Update(existingCategory);
+        await _context.SaveChangesAsync();
+
+        return existingCategory;
     }
 }
