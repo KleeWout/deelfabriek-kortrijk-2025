@@ -79,7 +79,7 @@ public class ItemRepository : GenericRepository<Item>, IItemRepository
     public async Task<List<Item>> GetAvailableItemsAsync()
     {
         return await _context.Items
-            .Where(i => i.Status == ItemStatus.Beschikbaar && i.LockerId != null)
+            .Where(i => (i.Status == ItemStatus.Beschikbaar || i.Status == ItemStatus.Geleend) && i.LockerId != null)
             .ToListAsync();
     }
 
