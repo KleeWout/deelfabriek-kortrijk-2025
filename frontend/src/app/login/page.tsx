@@ -1,11 +1,25 @@
-"use client";
-import Image from "next/image";
-import { useState } from "react";
+'use client';
+import Image from 'next/image';
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await login(email, password);
+    } catch (err) {
+      setError('Ongeldige inloggegevens');
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-primarygreen-1">
@@ -23,8 +37,16 @@ export default function Login() {
               className="mx-auto w-[200px] sm:w-[250px]"
             />
           </div>
+          {/* Admin note */}
+          <div className="text-primarygreen-1 font-medium mb-2">
+            Krijg toegang tot het Deelkast Dashboard.
+          </div>
           {/* Login form */}
-          <div className="w-full max-w-sm mx-auto flex flex-col gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="w-full max-w-sm mx-auto flex flex-col gap-4"
+          >
+            {error && <div className="text-red-500 text-sm">{error}</div>}
             <input
               type="email"
               placeholder="Email"
@@ -36,7 +58,7 @@ export default function Login() {
             />
             <div className="relative">
               <input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Wachtwoord"
                 className="border rounded px-3 py-2 pr-10 w-full"
                 value={password}
@@ -50,7 +72,7 @@ export default function Login() {
                 onClick={() => setShowPassword((v) => !v)}
                 tabIndex={-1}
                 aria-label={
-                  showPassword ? "Verberg wachtwoord" : "Toon wachtwoord"
+                  showPassword ? 'Verberg wachtwoord' : 'Toon wachtwoord'
                 }
               >
                 {showPassword ? (
@@ -106,16 +128,7 @@ export default function Login() {
             >
               Login
             </button>
-            <button
-              type="button"
-              className="text-primarygreen-1 text-sm underline mt-1 mx-auto block"
-              onClick={() => {
-                // handle forgot password
-              }}
-            >
-              Wachtwoord vergeten?
-            </button>
-          </div>
+          </form>
         </div>
       </div>
 
